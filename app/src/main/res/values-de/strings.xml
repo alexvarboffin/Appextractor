@@ -1,0 +1,88 @@
+<resources>
+    <string name="action_settings">Einstellungen</string>
+    <string name="dlg_loading_title">Laden</string>
+    <string name="dlg_loading_body">Liste der installierten Anwendungen wird geladen…</string>
+    <string name="search_title">Suche</string>
+    <string name="msg_search_help">Suche nach App- oder Paketnamen</string>
+    <string name="toast_extracted">Apk-Datei wurde als %s extrahiert</string>
+    <string name="toast_failed">Extrahieren der Apk-Datei ist fehlgeschlagen. Siehe adb-Protokoll für Details.</string>
+    <string name="alert_root_title">Mit Root ausprobieren?</string>
+    <string name="alert_root_body">Es scheint, dass diese Anwendung nicht auf herkömmliche Weise extrahiert werden kann. Das ist in Ordnung für kostenpflichtige Apps: Android versucht, sie vor dem Kopieren zu schützen. Allerdings sind sie auf gerooteten Geräten immer noch extrahierbar. Wenn Ihr Gerät gerootet ist, kann %1$s versuchen, es mit Root-Rechten zu extrahieren.</string>
+    <string name="alert_root_yes">Mit Root ausprobieren</string>
+    <string name="alert_root_no">Jetzt nicht</string>
+    <string name="alert_perm_title">Berechtigung erforderlich</string>
+    <string name="alert_perm_body">Um die Apk-Datei zu schreiben, muss der Anwendung die Berechtigung "Speicher" erteilt werden. Bitte öffnen Sie die Einstellungen der App und gewähren Sie ihr die Berechtigung "Speicher".</string>
+    <string name="alert_perm_btn">Einstellungen öffnen</string>
+    <string name="action_extract">Apk extrahieren</string>
+    <string name="search_hint">Suche</string>
+    <string name="data_empty">(Keine Elemente)</string>
+    <string name="google_drive_success">In Google Drive Cloud gespeichert!\n%1$s</string>
+    <string name="file_created">Datei erstellt: %1$s.</string>
+    <string name="telegram_token_title">Token</string>
+    <string name="telegram_chat_id_title">Chat-ID</string>
+    <string name="open_on_google_play">Auf Google Play öffnen</string>
+    <string name="action_launch_app">Anwendung öffnen</string>
+    <string name="action_uninstall_app">Anwendung deinstallieren</string>
+    <string name="access_error">Zugriffsfehler</string>
+    <string name="alert_dialog_title">Warten!</string>
+    <string name="alert_dialog_text">Versuche, ausgewählte Dateien zu extrahieren</string>
+    <string name="extract_marked_files">Markierte Dateien extrahieren?\nAusgewählt: %1$d Dateien</string>
+    <string name="action_extract_btn">Ausgewählte extrahieren</string>
+    <string name="action_deselect">Abwählen</string>
+    <string name="action_selected">Ausgewählt</string>
+    <string name="action_select_all" translatable="false">A</string>
+    <string name="open_file_browser">Dateibrowser öffnen</string>
+    <string name="install_application">Anwendung installieren</string>
+    <string name="action_delete_file">Datei löschen</string>
+    <string name="action_open_file_parent_folder">Öffnen</string>
+    <string name="action_copy_package_name">Paketnamen kopieren</string>
+    <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
+    <string name="app_info_basic">Grundlegende Informationen</string>
+    <string name="app_info_certificate">Zertifikat</string>
+    <string name="app_info_data">Daten</string>
+    <string name="app_info_drop_target_label">App-Info</string>
+    <string name="app_info_enable">Paketstatus</string>
+    <string name="app_info_features">Angeforderte Funktionen</string>
+    <string name="app_info_first_install_time">Erstinstallation</string>
+    <string name="app_info_installation">Installation</string>
+    <string name="app_info_installation_source">Installationsquelle</string>
+    <string name="app_info_last_update">Letztes Update</string>
+    <string name="app_info_package_name" translatable="false">Paketname</string>
+    <string name="app_info_permissions">Berechtigungen</string>
+    <string name="app_info_serial_number">Seriennummer</string>
+    <string name="app_info_system">System App-Info</string>
+    <string name="app_info_min_sdk">Minimale SDK-Version</string>
+    <string name="app_info_target_sdk">Ziel SDK-Version</string>
+    <string name="app_info_version">Version</string>
+    <string name="app_info_version_code">Versionscode</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">Cache</string>
+    <string name="key_value_pair" formatted="false">%s : %s</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="action_app_info">App-Info</string>
+    <string name="app_referer_amazon">Amazon App Store</string>
+    <string name="app_referer_google_play">Google Play Store</string>
+    <string name="action_save_icon" translatable="false">Symbol speichern</string>
+    <string name="savedicon" translatable="false">Gespeichertes Symbol von</string>
+    <string name="err_unable_saved_icon" translatable="false">Symbol von %s konnte nicht gespeichert werden</string>
+    <string name="app_info_uid">UID</string>
+    <string name="app_info_activities" translatable="false">Aktivitäten</string>
+    <string name="app_info_services">Dienste</string>
+    <string name="app_info_receivers">Empfänger</string>
+    <string name="app_info_providers">Provider</string>
+    <string name="action_export_icon">Symbol exportieren</string>
+    <string name="data_to_clipboard">In die Zwischenablage kopiert: %s</string>
+    <string name="app_info_sharedlibraryfiles">SharedLibraryFiles</string>
+    <string name="backup_app_feature_split">Split APK</string>
+    <string name="backup_app_feature_system_app">Systemanwendung</string>
+    <string name="backup_app_feature_install_date">Installiert: %s</string>
+    <string name="backup_app_feature_update_date">Aktualisiert: %s</string>
+    <string name="action_accessibility">Barrierefreiheit</string>
+    <string name="action_app_manifest">Manifest-Explorer</string>
+    <string name="menu_popup_copy">In Zwischenablage kopieren</string>
+    <string name="action_rate_app">ApkChief bewerten</string>
+    <string name="action_share_text">Text teilen</string>
+    <string name="watermark_label_prefix" translatable="false" />
+    <string name="title_strings">ZEICHENKETTEN</string>
+
+</resources>

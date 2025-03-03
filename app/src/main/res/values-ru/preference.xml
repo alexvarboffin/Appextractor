@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_category_save_options_title">Настройки хранилища</string>
+    <string name="preference_save_location_title">Локальное хранилище</string>
+    <string name="preference_google_drive_title">Google Диск</string>
+    <string name="preference_drop_box_title">DropBox</string>
+    <string name="preference_telegram_title">Telegram Чат (10 Mb limit)</string>
+    <string name="storage_off">Хранение отключено</string>
+    <string name="storage_on">Хранение включено</string>
+</resources>

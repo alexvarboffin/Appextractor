@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/ic_action_copy_text.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/ic_action_uninstall_app.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/ic_cert.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/ic_denied.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/ic_download.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/ic_info.xml" value="0.109" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/drawable/rectangle_4.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/about.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/activity_app_detail_info.xml" value="0.11770833333333333" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/activity_files.xml" value="0.121875" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/activity_main.xml" value="0.121875" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/app_bar_main_tab.xml" value="0.10287303058387395" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/content_directory_chooser.xml" value="0.10729166666666666" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/dropbox_files_item.xml" value="0.10729166666666666" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/files_item.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/fragment_log.xml" value="0.10729166666666666" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/fragment_main.xml" value="0.121875" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/fragment_preference_list_content.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_app.xml" value="0.25" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_application.xml" value="0.121875" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_cert.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_group_header.xml" value="0.14" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_header.xml" value="0.15" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_line_permission.xml" value="0.13675213675213677" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_line_simple.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_logger.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_logger_empty.xml" value="0.22" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/item_logger_file.xml" value="0.17" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/log_item_success.xml" value="0.17" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/layout/main.xml" value="0.10729166666666666" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/abc_popup_apps.xml" value="0.19791666666666666" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/menu_app_info.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/menu_apps.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/menu_extractor_tab.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/menu_logger.xml" value="0.10833333333333334" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/menu_main.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/poppup_logger.xml" value="0.1" />
+        <entry key="..\:/walhalla/AE/app/src/main/res/menu/popup_apps.xml" value="0.18" />
+        <entry key="..\:/walhalla/sdk/android/ui/ui/src/main/res/drawable/ic_info_outline_black_24dp.xml" value="0.1" />
+        <entry key="..\:/walhalla/sdk/android/ui/ui/src/main/res/layout/about.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

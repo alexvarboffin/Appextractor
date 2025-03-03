@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/actionCopyName"
+        android:icon="@drawable/ic_baseline_text_snippet_24"
+        android:orderInCategory="104"
+        android:title="@string/actionCopyName" />
+
+    <item
+        android:id="@+id/actionCopyValue"
+        android:icon="@drawable/ic_baseline_text_snippet_24"
+        android:orderInCategory="104"
+        android:title="@string/actionCopyValue" />
+
+    <item
+        android:id="@+id/actionXmlViewer"
+        android:icon="@drawable/ic_xml_viewer"
+        android:orderInCategory="106"
+        android:title="@string/action_xml_viewer" />
+
+<!--    <item-->
+<!--        android:id="@+id/action_share_icon"-->
+<!--        android:icon="@drawable/ic_share"-->
+<!--        android:orderInCategory="107"-->
+<!--        android:title="@string/action_share_file" />-->
+
+</menu>

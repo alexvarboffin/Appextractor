@@ -1,0 +1,94 @@
+<resources>
+    <string name="action_settings">Settings</string>
+    <string name="dlg_loading_title">Loading</string>
+    <string name="dlg_loading_body">Loading list of installed applications…</string>
+    <string name="search_title">Search</string>
+    <string name="msg_search_help">Search by app or package names</string>
+    <string name="toast_extracted">Apk file was extracted as %s</string>
+    <string name="toast_failed">Failed to extract apk file. See adb log for details.</string>
+    <string name="alert_root_title">Try with root?</string>
+    <string name="alert_root_body">It seems that this application cannot be extracted through regular way. It is okay for paid apps: android tries to protect them from copying. However they are still extractable on rooted devices. If your device is rooted, %1$s could try to extract it using root.</string>
+    <string name="alert_root_yes">Lets try with root</string>
+    <string name="alert_root_no">Not now</string>
+    <string name="alert_perm_title">Permission required</string>
+    <string name="alert_perm_body">In order to write apk file application must be granted with \"Storage\" permission.\nPlease, open app\'s settings and grant \"Storage\" permission to it.</string>
+    <string name="alert_perm_btn">Open settings</string>
+    <string name="action_extract">Extract apk</string>
+    <string name="search_hint">Search</string>
+    <string name="data_empty">(No items)</string>
+    <string name="google_drive_success">Saved in Google Drive cloud!\n%1$s</string>
+    <string name="file_created">Created file: %1$s.</string>
+    <string name="telegram_token_title">Token</string>
+    <string name="telegram_chat_id_title">Chat Id</string>
+    <string name="open_on_google_play">Open on Google Play</string>
+    <string name="action_launch_app">Open application</string>
+    <string name="action_uninstall_app">Uninstall application</string>
+    <string name="access_error">Access error</string>
+    <string name="alert_dialog_title">Wait!</string>
+    <string name="alert_dialog_text">Trying to extract selected files</string>
+    <string name="extract_marked_files">Extract marked files to disk?\nSelected: %1$d files</string>
+    <string name="action_extract_btn">Extract selected</string>
+    <string name="action_deselect">Deselect</string>
+    <string name="action_selected">Selected</string>
+    <string name="open_file_browser">Open File Browser</string>
+    <string name="install_application">Install Application</string>
+    <string name="action_open_file_parent_folder">Open</string>
+    <string name="action_copy_package_name">Copy PackageName</string>
+    <string name="copied_to_clipboard">copied to clipboard</string>
+    <string name="menu_popup_copy">Copy to Clipboard</string>
+    <string name="action_rate_app">Rate ApkChief</string>
+    <string name="action_share_text">Share Text</string>
+    <string name="action_delete_file">Delete File</string>
+    <string name="app_info_basic">Basic Information</string>
+    <string name="app_info_certificate">Certificate</string>
+    <string name="app_info_data">Data</string>
+    <string name="app_info_drop_target_label">App info</string>
+    <string name="app_info_enable">Package state</string>
+    <string name="app_info_features">Requested features</string>
+    <string name="app_info_first_install_time">First installation</string>
+    <string name="app_info_installation">Installation</string>
+    <string name="app_info_installation_source">Installation source</string>
+    <string name="app_info_last_update">Last update</string>
+    <string name="app_info_package_name" translatable="false">Package Name</string>
+    <string name="app_info_permissions">Permissions</string>
+    <string name="app_info_serial_number">Serial number</string>
+    <string name="app_info_system">System App Info</string>
+    <string name="app_info_min_sdk">Minimum SDK version</string>
+    <string name="app_info_target_sdk">Target SDK version</string>
+    <string name="app_info_version">Version</string>
+    <string name="app_info_version_code">Version code</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">Cache</string>
+    <string name="key_value_pair" formatted="false">%s : %s</string>
+    <string name="unknown">Unknown</string>
+    <string name="action_app_info">App Info</string>
+    <string name="app_referer_amazon">Amazon App Store</string>
+    <string name="app_referer_google_play">Google Play Store</string>
+    <string name="action_save_icon" translatable="false">Save Icon</string>
+    <string name="savedicon" translatable="false">Saved Icon of</string>
+    <string name="err_unable_saved_icon" translatable="false">Unable to Save Icon of</string>
+    <string name="app_info_uid">UID</string>
+    <string name="app_info_activities" translatable="false">Activities</string>
+    <string name="app_info_services">Services</string>
+    <string name="app_info_receivers">Receivers</string>
+    <string name="app_info_providers">Providers</string>
+    <string name="action_export_icon">Export Icon</string>
+    <string name="data_to_clipboard">Copied to clipboard: %s.</string>
+    <string name="app_info_sharedlibraryfiles">SharedLibraryFiles</string>
+    <string name="backup_app_feature_split">Split APK</string>
+    <string name="backup_app_feature_system_app">System app</string>
+    <string name="backup_app_feature_install_date">Installed: %s</string>
+    <string name="backup_app_feature_update_date">Updated: %s</string>
+    <string name="action_accessibility">Accessibility</string>
+    <string name="action_app_manifest">Manifest Explorer</string>
+    <string name="watermark_label_prefix" translatable="false" />
+    <string name="title_strings">STRINGS</string>
+    <string name="savedfile">Saved file as</string>
+    <string name="err_unable_saved_file">Unable to Save of</string>
+    <string name="action_save_file">Save File</string>
+    <string name="action_share_file">Export File</string>
+    <string name="action_read_file">Read File</string>
+    <string name="actionCopyName">Copy Name</string>
+    <string name="actionCopyValue">Copy Value</string>
+    <string name="action_xml_viewer">XML Viewer</string>
+</resources>

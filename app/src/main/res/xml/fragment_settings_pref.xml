@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<PreferenceCategory android:title="@string/prefs_category_save_options_title">-->
+        <!--<com.walhalla.core.settings.FolderChooser-->
+            <!--android:key="@string/key_save_location"-->
+            <!--android:negativeButtonText="@android:string/cancel"-->
+            <!--android:positiveButtonText="@android:string/ok"-->
+            <!--android:title="@string/preference_save_location_title" />-->
+    <!--</PreferenceCategory>-->
+
+    <PreferenceCategory android:title="@null">
+<!--        <CheckBoxPreference-->
+<!--            android:defaultValue="false"-->
+<!--            android:key="key_google_drive_storage"-->
+<!--            android:summaryOff="@string/storage_off"-->
+<!--            android:summaryOn="@string/storage_on"-->
+<!--            android:title="@string/preference_google_drive_title" />-->
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="key_drop_box_storage"
+            android:summaryOff="@string/storage_off"
+            android:summaryOn="@string/storage_on"
+            android:title="@string/preference_drop_box_title" />
+    </PreferenceCategory>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="key_telegram_storage"
+        android:summaryOff="@string/storage_off"
+        android:summaryOn="@string/storage_on"
+        android:title="@string/preference_telegram_title" />
+
+    <PreferenceCategory android:key="block-1">
+
+        <EditTextPreference
+            android:summary="(123456789:AAGSE2J0uJp8QahqoplzxtW9ytybvb78AGk)"
+            android:defaultValue="@null"
+            android:key="key_telegram_token"
+            android:title="@string/telegram_token_title" />
+
+        <PreferenceCategory>
+            <EditTextPreference
+                android:summary="(-1001112345678)"
+                android:defaultValue="@null"
+                android:key="key_telegram_chat_id"
+                android:title="@string/telegram_chat_id_title" />
+        </PreferenceCategory>
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory>
+        <Preference
+            android:key="key_about_version"
+            android:title="@string/about_version" />
+    </PreferenceCategory>
+
+    <PreferenceCategory>
+        <Preference
+            android:key="key_about"
+            android:title="@string/action_about" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

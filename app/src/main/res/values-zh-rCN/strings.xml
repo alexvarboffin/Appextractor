@@ -1,0 +1,88 @@
+<resources>
+    <string name="action_settings">设置</string>
+    <string name="dlg_loading_title">加载中</string>
+    <string name="dlg_loading_body">正在加载已安装应用程序的列表…</string>
+    <string name="search_title">搜索</string>
+    <string name="msg_search_help">按应用程序或包名称搜索</string>
+    <string name="toast_extracted">Apk 文件已提取为 %s</string>
+    <string name="toast_failed">提取 apk 文件失败。请查看 adb 日志以获取详细信息。</string>
+    <string name="alert_root_title">尝试使用 Root 权限？</string>
+    <string name="alert_root_body">似乎无法通过常规方式提取此应用程序。对于付费应用程序来说没问题：Android 试图保护它们免受复制。但是，在已获取 Root 权限的设备上仍然可以提取它们。如果您的设备已获取 Root 权限，%1$s 可以尝试使用 Root 权限进行提取。</string>
+    <string name="alert_root_yes">尝试使用 Root 权限</string>
+    <string name="alert_root_no">暂不</string>
+    <string name="alert_perm_title">需要权限</string>
+    <string name="alert_perm_body">为了写入 apk 文件，应用程序必须被授予“存储”权限。\n请打开应用的设置并授予其“存储”权限。</string>
+    <string name="alert_perm_btn">打开设置</string>
+    <string name="action_extract">提取 apk</string>
+    <string name="search_hint">搜索</string>
+    <string name="data_empty">（无项目）</string>
+    <string name="google_drive_success">已保存至 Google Drive 云端存储！\n%1$s</string>
+    <string name="file_created">已创建文件：%1$s。</string>
+    <string name="telegram_token_title">令牌</string>
+    <string name="telegram_chat_id_title">聊天 ID</string>
+    <string name="open_on_google_play">在 Google Play 中打开</string>
+    <string name="action_launch_app">打开应用程序</string>
+    <string name="action_uninstall_app">卸载应用程序</string>
+    <string name="access_error">访问错误</string>
+    <string name="alert_dialog_title">请稍候！</string>
+    <string name="alert_dialog_text">正在尝试提取所选文件</string>
+    <string name="extract_marked_files">将标记的文件提取到磁盘上？\n已选择：%1$d 个文件</string>
+    <string name="action_extract_btn">提取所选项</string>
+    <string name="action_deselect">取消选择</string>
+    <string name="action_selected">已选择</string>
+    <string name="action_select_all" translatable="false">全选</string>
+    <string name="open_file_browser">打开文件浏览器</string>
+    <string name="install_application">安装应用程序</string>
+    <string name="action_delete_file">删除文件</string>
+    <string name="action_open_file_parent_folder">打开</string>
+    <string name="action_copy_package_name">复制包名</string>
+    <string name="copied_to_clipboard">已复制到剪贴板</string>
+    <string name="app_info_basic">基本信息</string>
+    <string name="app_info_certificate">证书</string>
+    <string name="app_info_data">数据</string>
+    <string name="app_info_drop_target_label">应用程序信息</string>
+    <string name="app_info_enable">包状态</string>
+    <string name="app_info_features">所需功能</string>
+    <string name="app_info_first_install_time">首次安装</string>
+    <string name="app_info_installation">安装</string>
+    <string name="app_info_installation_source">安装来源</string>
+    <string name="app_info_last_update">最后更新</string>
+    <string name="app_info_package_name" translatable="false">包名</string>
+    <string name="app_info_permissions">权限</string>
+    <string name="app_info_serial_number">序列号</string>
+    <string name="app_info_system">系统应用程序信息</string>
+    <string name="app_info_min_sdk">最低 SDK 版本</string>
+    <string name="app_info_target_sdk">目标 SDK 版本</string>
+    <string name="app_info_version">版本</string>
+    <string name="app_info_version_code">版本号</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">缓存</string>
+    <string name="key_value_pair" formatted="false">%s：%s</string>
+    <string name="unknown">未知</string>
+    <string name="action_app_info">应用程序信息</string>
+    <string name="app_referer_amazon">Amazon 应用商店</string>
+    <string name="app_referer_google_play">Google Play 商店</string>
+    <string name="action_save_icon" translatable="false">保存图标</string>
+    <string name="savedicon" translatable="false">已保存图标：%s</string>
+    <string name="err_unable_saved_icon" translatable="false">无法保存图标：%s</string>
+    <string name="app_info_uid">UID</string>
+    <string name="app_info_activities" translatable="false">活动</string>
+    <string name="app_info_services">服务</string>
+    <string name="app_info_receivers">接收器</string>
+    <string name="app_info_providers">提供程序</string>
+    <string name="action_export_icon">导出图标</string>
+    <string name="data_to_clipboard">已复制到剪贴板：%s</string>
+    <string name="app_info_sharedlibraryfiles">共享库文件</string>
+    <string name="backup_app_feature_split">拆分 APK</string>
+    <string name="backup_app_feature_system_app">系统应用程序</string>
+    <string name="backup_app_feature_install_date">已安装：%s</string>
+    <string name="backup_app_feature_update_date">已更新：%s</string>
+    <string name="action_accessibility">辅助功能</string>
+    <string name="action_app_manifest">清单浏览器</string>
+    <string name="menu_popup_copy">复制到剪贴板</string>
+    <string name="action_rate_app">评价 ApkChief</string>
+    <string name="action_share_text">分享文本</string>
+    <string name="watermark_label_prefix" translatable="false" />
+    <string name="title_strings">字符串</string>
+
+</resources>

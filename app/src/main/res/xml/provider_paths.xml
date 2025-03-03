@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="external"
+        path="." />
+    <external-path
+        name="external_files"
+        path="." />
+    <external-path
+        name="my_docs"
+        path="/Download/" />
+    <external-path
+        name="my_download"
+        path="/storage/emulated/0/Download/" />
+
+    <external-path
+        name="my_download_data"
+        path="/data/app/" />
+
+    <cache-path
+        name="cache"
+        path="." />
+    <external-cache-path
+        name="external_cache"
+        path="." />
+    <files-path
+        name="files"
+        path="." />
+</paths>

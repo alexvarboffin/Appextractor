@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#EBF3F9"
+    android:gravity="center"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:weightSum="2">
+
+    <!--    android:layout_toStartOf="@id/overflowMenu"-->
+
+    <ImageView
+        android:id="@+id/pathIcon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        tools:src="@drawable/ic_split"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/pathIcon"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/text1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="start|center_vertical"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textColor="#000000"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="@string/app_name" />
+
+        <TextView
+            android:id="@+id/text2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="start"
+            android:paddingBottom="4dp"
+            android:textColor="#000000"
+            android:textSize="13sp"
+            tools:text="@string/app_name" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/overflowMenu"
+        android:layout_width="72dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
+        android:background="@null"
+        android:contentDescription="@+id/overflowMenu"
+        android:paddingBottom="0dp"
+        android:scaleType="fitEnd"
+        app:srcCompat="@drawable/ic_dots"
+        app:tint="@color/colorPrimary"
+        tools:background="@android:color/holo_red_dark"
+        tools:ignore="ImageContrastCheck" />
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/searchBtn"-->
+    <!--        android:layout_width="32dp"-->
+    <!--        android:layout_height="32dp"-->
+    <!--        android:layout_alignParentTop="true"-->
+    <!--        android:layout_alignParentEnd="true"-->
+    <!--        android:contentDescription="@null"-->
+    <!--        android:src="@drawable/bg_nav_item"-->
+    <!--        android:visibility="gone" />-->
+
+</RelativeLayout>

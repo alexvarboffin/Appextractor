@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--    <item-->
+    <!--        android:id="@+id/action_rate_app"-->
+    <!--        android:icon="@drawable/ic_star_black_24dp"-->
+    <!--        android:orderInCategory="100"-->
+    <!--        android:title="@string/action_rate_app"-->
+    <!--        app:showAsAction="ifRoom" />-->
+
+    <item
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:orderInCategory="300"
+        android:title="@null"
+        app:showAsAction="always">
+        <menu>
+
+            <item
+                android:id="@+id/action_share_app"
+                android:icon="@drawable/ic_share_24"
+                android:title="@string/action_share_app" />
+
+            <item
+                android:id="@+id/action_discover_more_app"
+                android:icon="@drawable/ic_more_app"
+                android:title="@string/action_discover_more_app" />
+
+            <item
+                android:id="@+id/action_rate_app"
+                android:icon="@drawable/ic_star_black_24dp"
+                android:title="@string/action_rate_app" />
+
+            <item
+                android:id="@+id/action_about"
+                android:icon="@drawable/ic_about"
+                android:title="@string/action_about" />
+
+            <item
+                android:id="@+id/action_privacy_policy"
+                android:icon="@drawable/ic_baseline_security_24"
+                android:title="@string/action_privacy_policy" />
+
+            <item
+                android:id="@+id/action_feedback"
+                android:icon="@drawable/ic_baseline_feedback_24"
+                android:title="@string/action_contact_us" />
+
+            <item
+                android:id="@+id/action_accessibility"
+                android:icon="@drawable/ic_baseline_accessibility_24"
+                android:title="@string/action_accessibility" />
+            <item
+                android:id="@+id/action_GooglePlayCategoryLauncher"
+                android:icon="@drawable/ic_baseline_accessibility_24"
+                android:title="GooglePlayCategoryLauncher"
+                tools:ignore="HardcodedText" />
+            <item
+                android:id="@+id/action_log_out"
+                android:icon="@drawable/ic_baseline_feedback_24"
+                android:title="LOG_OUT"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/action_permissions"
+                android:icon="@drawable/ic_baseline_feedback_24"
+                android:title="Apps with access"
+                android:visible="false" />
+
+
+            <!--            <item-->
+            <!--                android:id="@+id/action_exit"-->
+            <!--                android:icon="@drawable/ic_exit_to_app_black_24dp"-->
+            <!--                android:title="@string/action_exit" />-->
+
+            <!--            <item-->
+            <!--                android:id="@+id/action_more_app_01"-->
+            <!--                android:icon="@drawable/ic_apps_black_24dp"-->
+            <!--                android:title="@string/action_more_app_01" />-->
+
+            <!--            <item-->
+            <!--                android:id="@+id/action_more_app_02"-->
+            <!--                android:icon="@drawable/ic_apps_black_24dp"-->
+            <!--                android:title="@string/action_more_app_02"-->
+            <!--                android:visible="false" />-->
+
+
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/AppTheme.ItemViewDefault"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingLeft="0dp"
+    android:paddingTop="0dp"
+    android:paddingRight="0dp"
+    android:paddingBottom="0dp">
+
+    <RelativeLayout
+        android:id="@+id/img_container"
+        style="@style/AppTheme.LogItemIcon"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/ic_log_success_bg"
+        android:contentDescription="@string/app_name"
+        android:scaleType="centerCrop">
+
+
+        <ImageView
+            android:id="@+id/image"
+            tools:src="@drawable/ic_dropbox"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerCrop" />
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/text1"
+        style="@style/AppTheme.DefaultText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/img_container"
+        android:layout_toRightOf="@id/img_container"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+        android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="@string/app_name"
+        />
+
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/overflow_menu"-->
+    <!--            android:layout_width="70dp"-->
+    <!--            android:layout_height="@dimen/ic_album_overflow_height"-->
+    <!--            android:layout_alignParentTop="true"-->
+    <!--            android:layout_alignParentEnd="true"-->
+    <!--            android:layout_alignParentRight="true"-->
+    <!--            android:layout_marginTop="@dimen/ic_album_overflow_margin_top"-->
+    <!--            android:background="@null"-->
+    <!--            android:contentDescription="@+id/overflow_menu"-->
+    <!--            android:scaleType="fitEnd"-->
+    <!--            android:tint="@color/colorPrimary"-->
+    <!--            app:srcCompat="@drawable/ic_dots"-->
+    <!--            tools:background="@android:color/holo_red_dark" />-->
+</RelativeLayout>

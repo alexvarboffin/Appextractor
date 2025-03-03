@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_settings">Настройки</string>
+    <string name="dlg_loading_title">Загрузка</string>
+    <string name="search_title">Поиск</string>
+    <string name="data_empty">(Пусто)</string>
+    <string name="search_hint">Поиск</string>
+
+    <string name="google_drive_success">Сохранено в облаке Google Drive!\n%1$s</string>
+    <string name="file_created">Созданный файл: %1$s.</string>
+
+    <string name="telegram_token_title">Token</string>
+    <string name="telegram_chat_id_title">Chat Id</string>
+    <string name="open_on_google_play">Открыть в Google Play</string>
+
+    <string name="action_extract">Извлечь apk</string>
+
+
+    <string name="dlg_loading_body">Загрузка списка установленных приложений…</string>
+    <string name="msg_search_help">Поиск по названию приложения или пакета</string>
+    <string name="toast_extracted">APK-файл был извлечен как %s</string>
+    <string name="toast_failed">Не удалось извлечь файл apk. Смотрите adb log для деталей.</string>
+    <string name="alert_root_title">Попробовать с рутом?</string>
+    <string name="alert_root_body">Кажется, что это приложение не может быть извлечено обычным способом. Это нормально для платных приложений: Android пытается защитить их от копирования. Однако они все еще извлекаются на рутированных устройствах. Если ваше устройство имеет root, %1$s может попытаться извлечь его с помощью root.</string>
+    <string name="alert_root_yes">Попробуем</string>
+    <string name="alert_root_no">Не сейчас</string>
+    <string name="alert_perm_title">Требуется разрешение</string>
+    <string name="alert_perm_body">Для того чтобы сохранить выбранный apk файл, приложению необходимо предоставить разрешение \"Хранилище (SD-Card)\". \nПожалуйста, откройте настройки приложения и предоставьте ему разрешение \"Хранилище\".</string>
+    <string name="alert_perm_btn">Открыть настройки</string>
+    <string name="storage_selection_spinner_title">99999</string>
+    <string name="action_launch_app">Открыть приложение</string>
+    <string name="action_uninstall_app">Удалить приложение</string>
+    <string name="access_error">Ошибка доступа!</string>
+
+
+    <string name="alert_dialog_title">Подождите немного!</string>
+    <string name="alert_dialog_text">Пытаемся извлечь выбранные файлы</string>
+
+    <string name="extract_marked_files">Извлечь отмеченные файлы на диск?\nВыбраны: %1$d файла</string>
+
+    <string name="action_deselect">Отменить выбранные</string>
+    <string name="action_extract_btn">Извлечь выбранное</string>
+    <string name="action_selected">Выбрано</string>
+    <string name="open_file_browser">Open File Browser</string>
+    <string name="install_application">Install Application</string>
+
+    <string name="action_delete_file">Удалить файл</string>
+    <string name="action_open_file_parent_folder">Открыть</string>
+    <string name="action_copy_package_name">Скопировать название пакета</string>
+    <string name="copied_to_clipboard">скопировано в буфер обмена</string>
+    <string name="app_info_basic">Основная информация</string>
+    <string name="app_info_certificate">Сертификат</string>
+    <string name="app_info_data">Данные</string>
+    <string name="app_info_drop_target_label">Информация о приложении</string>
+    <string name="app_info_enable">Состояние пакета</string>
+    <string name="app_info_features">Запрошенные функции</string>
+    <string name="app_info_first_install_time">Первая установка</string>
+    <string name="app_info_installation">Установка</string>
+    <string name="app_info_installation_source">Источник установки</string>
+    <string name="app_info_last_update">Последнее обновление</string>
+    <string name="app_info_package_name" translatable="false">Название пакета</string>
+    <string name="app_info_permissions">Разрешения</string>
+    <string name="app_info_serial_number">Серийный номер</string>
+    <string name="app_info_system">Информация о системном приложении</string>
+    <string name="app_info_min_sdk">Минимальная версия SDK</string>
+    <string name="app_info_target_sdk">Целевая версия SDK</string>
+    <string name="app_info_version">Версия</string>
+    <string name="app_info_version_code">Код версии</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">Кэш</string>
+    <string name="key_value_pair" formatted="false">%s: %s</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="action_app_info">Информация о приложении</string>
+    <string name="app_referer_amazon">Магазин Amazon</string>
+    <string name="app_referer_google_play">Магазин Google Play</string>
+    <string name="action_save_icon" translatable="false">Сохранить иконку</string>
+    <string name="savedicon" translatable="false">Сохранена иконка</string>
+    <string name="err_unable_saved_icon" translatable="false">Не удалось сохранить иконку</string>
+    <string name="app_info_uid">UID</string>
+    <string name="app_info_activities" translatable="false">Активности</string>
+    <string name="app_info_services">Службы</string>
+    <string name="app_info_receivers">Приёмники</string>
+    <string name="app_info_providers">Провайдеры</string>
+    <string name="action_export_icon">Экспортировать иконку</string>
+    <string name="data_to_clipboard">Скопировано в буфер обмена: %s.</string>
+    <string name="app_info_sharedlibraryfiles">Файлы общих библиотек</string>
+    <string name="backup_app_feature_split">Split APK</string>
+    <string name="backup_app_feature_system_app">Системное приложение</string>
+    <string name="backup_app_feature_install_date">Установлено: %s</string>
+    <string name="backup_app_feature_update_date">Обновлено: %s</string>
+    <string name="action_accessibility">Доступность</string>
+    <string name="action_app_manifest">Обозреватель манифеста</string>
+    <string name="menu_popup_copy">Копировать в буфер обмена</string>
+    <string name="action_rate_app">Оценить ApkChief</string>
+    <string name="action_share_text">Поделиться текстом</string>
+    <string name="watermark_label_prefix" translatable="false" />
+    <string name="title_strings">Строки</string>
+
+    <string name="action_save_file">Сохранить Файл</string>
+    <string name="action_share_file">Экспорт Файла</string>
+    <string name="action_read_file">Read File</string>
+
+
+</resources>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.main.MainActivity">
+
+    <!--<android.support.v7.widget.Toolbar-->
+    <!--android:id="@+id/toolbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="?attr/actionBarSize"-->
+    <!--android:background="?attr/colorPrimary"-->
+    <!--android:minHeight="?attr/actionBarSize"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_alignParentStart="true"-->
+    <!--app:theme="@style/AppTheme.PopupOverlay">-->
+
+    <!--<ProgressBar-->
+    <!--android:id="@android:id/onProgress"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="right"-->
+    <!--android:indeterminate="true"-->
+    <!--android:visibility="gone" /> android:layout_below="@+id/toolbar"-->
+    <!--</android.support.v7.widget.Toolbar>-->
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:layout_alignParentTop="true"
+        android:background="#E1E6F1"
+        android:orientation="horizontal"
+        android:paddingTop="7dp"
+        android:weightSum="3">
+
+        <!--            <Button-->
+        <!--                android:id="@+id/action_select_all"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:text="@string/action_select_all" />-->
+
+        <RelativeLayout
+            android:id="@+id/nope"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tt1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:text="@string/action_selected"
+                android:textAlignment="center"
+                android:textColor="#304FFE" />
+
+            <TextView
+                android:id="@+id/tt2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tt1"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:paddingTop="2dp"
+                android:textAlignment="center"
+                android:textColor="#304FFE"
+                android:textStyle="bold"
+                tools:text="0" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/action_deselect_all"
+            style="@style/AppTheme.TButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:minLines="2"
+            android:text="@string/action_deselect"
+            app:backgroundTint="@null" />
+
+        <Button
+            android:id="@+id/action_do_action"
+            style="@style/AppTheme.TButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:minLines="2"
+            android:text="@string/action_extract_btn"
+            app:backgroundTint="@null" />
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/ll1" />
+
+</RelativeLayout>

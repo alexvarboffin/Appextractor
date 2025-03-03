@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/AppTheme.ItemLogCard"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/global_padding"
+    android:paddingTop="8dp"
+    android:paddingRight="@dimen/global_padding"
+    android:paddingBottom="8dp">
+
+    <ImageView
+        android:id="@+id/imageView1"
+        tools:src="@mipmap/ic_launcher_round"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/app_name"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/text1"
+        style="@style/AppTheme.DefaultText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/imageView1"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/overflow_menu"-->
+    <!--            android:layout_width="70dp"-->
+    <!--            android:layout_height="@dimen/ic_album_overflow_height"-->
+    <!--            android:layout_alignParentTop="true"-->
+    <!--            android:layout_alignParentEnd="true"-->
+    <!--            android:layout_alignParentRight="true"-->
+    <!--            android:layout_marginTop="@dimen/ic_album_overflow_margin_top"-->
+    <!--            android:background="@null"-->
+    <!--            android:contentDescription="@+id/overflow_menu"-->
+    <!--            android:scaleType="fitEnd"-->
+    <!--            android:tint="@color/colorPrimary"-->
+    <!--            app:srcCompat="@drawable/ic_dots"-->
+    <!--            tools:background="@android:color/holo_red_dark" />-->
+</RelativeLayout>

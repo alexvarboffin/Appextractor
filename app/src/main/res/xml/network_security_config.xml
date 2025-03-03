@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">*</domain>
+        <!--        <trust-anchors>-->
+        <!--            <certificates src="@raw/my_ca"/>-->
+        <!--        </trust-anchors>-->
+    </domain-config>
+<!--    <base-config cleartextTrafficPermitted="false"/>-->
+    <base-config>
+        <trust-anchors>
+            <!-- Trust preinstalled CAs -->
+            <certificates src="system" />
+            <!-- Additionally trust user added CAs -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+<!--    <debug-overrides>-->
+<!--        <trust-anchors>-->
+<!--            &lt;!&ndash; Trust user added CAs while debuggable only &ndash;&gt;-->
+<!--            <certificates src="user" />-->
+<!--        </trust-anchors>-->
+<!--    </debug-overrides>-->
+
+</network-security-config>

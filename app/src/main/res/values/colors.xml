@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_500">#FF6200EE</color>
+<!--    <color name="purple_700">#FF3700B3</color>-->
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="colorLight">#3F3C3C</color>
+    <!--#212121-->
+
+<!--    <color name="colorPrimary">#262F3E</color>-->
+<!--    <color name="colorPrimaryDark">#2A3446</color>-->
+<!--    <color name="colorAccent">#F50000</color>-->
+
+
+    <color name="colorPrimary">#262450</color>
+    <color name="colorPrimaryDark">#19173D</color>
+
+
+<!--    <color name="colorPrimary">#304FFE</color>-->
+<!--    <color name="colorPrimaryDark">#304FFE</color>-->
+
+
+    <color name="splash_background">#262450</color>
+
+<!--    <color name="fragment_list_background">#262450</color>-->
+    <color name="fragment_list_background">#FFFFFF</color>
+
+<!--    <color name="splash_screen_color">#212835</color>-->
+    <color name="splash_screen_color">#0033cc</color>
+
+    <color name="splash_screen_color_1">#E20309</color>
+    <!--    <color name="selected">#E53935</color>-->
+
+    <!--    <color name="selected">#FFDD60</color>-->
+    <color name="color_selected">#00B8D4</color>
+
+    <color name="color_unselected">#F0F1F3</color>
+    <color name="color_file_log_unselected">#EBF3F9</color>
+
+    <color name="tabIndicatorColor">#FB8C00</color>
+
+    <!--    <color name="ic_google_drive">@android:color/transparent</color>-->
+
+
+<!--    btn color 011C3A  0074E0-->
+<!--    <color name="colorControlActivated">#FD0000</color>-->
+
+    <color name="drugsearch">#B248C7</color>
+    <color name="pillidentifier">#29AFD3</color>
+    <color name="bluecolorPrimary">#5C8FED</color>
+    <color name="bluecolorPrimaryDark">#5068E2</color>
+    <color name="bluecolorAccent">#333333</color>
+
+    <color name="yellowcolorPrimary">#F3BC3D</color>
+    <color name="yellowcolorPrimaryDark">#FF9800</color>
+    <color name="yellowcolorAccent">#333333</color>
+
+    <color name="cyancolorPrimary">#29AFD3</color>
+    <color name="cyancolorPrimaryDark">#2291AF</color>
+    <color name="cyancolorAccent">#333333</color>
+
+    <color name="pinkcolorPrimary">#B248C7</color>
+    <color name="pinkcolorPrimaryDark">#933BA5</color>
+    <color name="pinkcolorAccent">#333333</color>
+
+    <color name="orangecolorPrimary">#F96F26</color>
+    <color name="orangecolorPrimaryDark">#EE6215</color>
+    <color name="orangecolorAccent">#333333</color>
+
+    <color name="graycolorPrimary">#3D739F</color>
+    <color name="graycolorPrimaryDark">#32648F</color>
+    <color name="graycolorAccent">#333333</color>
+    <color name="colorAccent">#FF6D00</color>
+    <color name="fg_drawable_grey">#413F3F</color>
+
+    <color name="tabIconColor">#515151</color>
+    <color name="tabIconUnselected">#a8a8a8</color>
+    <color name="search_hint_color">#F7F5F5</color>
+    <color name="item_header_back">#FFFFFF</color>
+
+
+
+    <!--    @@@@@@@@@@@@ FIX IMAGE COLOR IN TOOLBAR @@@@@@@@@@@@-->
+    <!--
+    colorControlNormal - меняет цвет иконок меню,
+    кнопки назад в тулбаре, кнопки поиск
+    -->
+    <color name="colorControlNormal">#000000</color>
+    <color name="appInfocolorContainer">#52131313</color>
+
+    <!--    <color name="fakeColorControlNormalForTOOLBAR">#FF6D00</color>-->
+
+</resources>

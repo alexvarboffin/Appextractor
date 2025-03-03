@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
+    style="@style/myCardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#000000"
+    android:gravity="center"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:background="@color/color_unselected"
+        android:clickable="false"
+        android:focusable="false"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:orientation="horizontal"
+        android:paddingStart="8dip"
+        android:paddingEnd="3dip">
+
+        <!--android:layout_width="?android:attr/listPreferredItemHeight"-->
+
+        <ImageView
+            android:id="@+id/imgIcon"
+            android:layout_width="44dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="2dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/app_name"
+            android:paddingStart="0dp"
+            android:paddingEnd="8dip"
+            android:paddingRight="8dip"
+            android:scaleType="fitCenter"
+            tools:src="@mipmap/ic_launcher" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="32dp"
+            android:layout_toEndOf="@+id/imgIcon"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtAppName"
+                style="@style/AppTheme.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|bottom"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                tools:text="@string/app_name" />
+
+            <TextView
+                android:id="@+id/txtPackageName"
+                style="@style/AppTheme.PackageName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|top"
+                tools:text="456" />
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/fileSize"-->
+            <!--                -->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="center_horizontal"-->
+            <!--                android:layout_marginTop="5dp"-->
+            <!--                android:gravity="center"-->
+            <!--                tools:text= />-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/version"
+                    style="@style/AppTheme.FileSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".50"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="0dp"
+                    tools:text="00000000000000000000000000000000000000" />
+
+                <TextView
+                    android:id="@+id/size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".50"
+                    android:gravity="right"
+                    android:textColor="#000000"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText"
+                    tools:text="444 mb" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/overflow_menu"
+            android:layout_width="100dp"
+            android:layout_height="64dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
+            android:background="@null"
+            android:contentDescription="@+id/overflow_menu"
+            android:paddingBottom="24dp"
+            android:scaleType="fitEnd"
+            app:srcCompat="@drawable/ic_dots"
+            app:tint="@color/colorPrimary"
+            tools:background="@android:color/holo_red_dark"
+            tools:ignore="ImageContrastCheck" />
+
+    </RelativeLayout>
+
+    <!--        <View-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="1dp"-->
+    <!--            android:background="?attr/dividerVertical" />-->
+
+    <com.walhalla.appextractor.view.NonInteractiveRecyclerView
+        android:id="@+id/rv_backup_app_features"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
+
+</LinearLayout>

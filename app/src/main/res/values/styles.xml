@@ -1,0 +1,219 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!--    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+    <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+    <!--        <item name="colorPrimary">@color/colorPrimary</item>-->
+    <!--        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+    <!--        <item name="colorAccent">@color/colorAccent</item>-->
+    <!--        &lt;!&ndash;<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>&ndash;&gt;-->
+    <!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>-->
+    <!--        <item name="android:windowBackground">@color/colorLight</item>-->
+    <!--    </style>-->
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Launcher" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@drawable/window_gradient</item>
+    </style>
+
+    <style name="myCardView">
+        <!--<item name="android:foreground">?android:selectableItemBackground</item>-->
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+
+    <!--    @@@@@@@@@@@@ FIX IMAGE COLOR IN TOOLBAR @@@@@@@@@@@@-->
+    <!--    parent="ThemeOverlay.AppCompat.Light"-->
+
+    <style name="AppThemePopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+
+
+        <!--    @@@@@@@@@@@@ FIX IMAGE COLOR IN TOOLBAR @@@@@@@@@@@@-->
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+
+
+        <!--        <item name="actionMenuTextColor">?attr/colorOnPrimary</item>-->
+
+        <!--        <item name="android:textColorPrimary">@android:color/white</item>-->
+        <!--        <item name="android:textColorSecondary">@android:color/white</item>-->
+        <!--        <item name="actionMenuTextColor">@android:color/white</item>-->
+        <!--        <item name="android:textColorHint">@android:color/secondary_text_dark</item>-->
+
+
+        <!--        debug-->
+        <!--        <item name="android:background">#D80000</item>-->
+    </style>
+
+    <!--    <style name="AppTheme.CoolBar" parent="Widget.AppCompat.Toolbar"></style>-->
+
+
+    <style name="AppTheme.CoolBar" parent="@style/Widget.MaterialComponents.Toolbar.Primary">
+        <item name="colorControlNormal">#FF0000</item>
+        <item name="android:theme">@style/AppThemePopupOverlay</item>
+    </style>
+
+    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="MyCustomTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="AppTheme.Title" parent="TextAppearance.AppCompat.Medium">
+        <!--        <item name="android:textAppearance">?android:attr/textAppearanceSearchResultTitle</item>-->
+    </style>
+
+
+    <style name="AppTheme.ItemResourceTitle" parent="TextAppearance.AppCompat.Medium">
+        <!--        <item name="android:textAppearance">?android:attr/textAppearanceSearchResultTitle</item>-->
+
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="AppTheme.PackageName" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#181718</item>
+        <!--        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>-->
+    </style>
+
+    <style name="AppTheme.DefaultText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">#D80D0D</item>
+        <item name="android:textStyle">bold</item>
+        <!--        <item name="fontFamily">@font/oxygen_mono</item>-->
+        <!--        <item name="backgroundColor">#0D0C11</item>-->
+    </style>
+
+    <style name="AppTheme.DefaultText1" parent="AppTheme.DefaultText">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+        <!--        <item name="backgroundColor">#0D0C11</item>-->
+    </style>
+
+    <style name="AppTheme.DefaultText2" parent="AppTheme.DefaultText">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+
+        <!--        <item name="backgroundColor">#0D0C11</item>-->
+    </style>
+
+    <style name="AppTheme.TextFileTimestamp" parent="AppTheme.DefaultText">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <!--        <item name="android:textStyle">bold</item>-->
+
+        <!--        <item name="backgroundColor">#0D0C11</item>-->
+    </style>
+
+    <style name="AppTheme.ItemHeader" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textStyle">bold</item>
+        <!--        <item name="backgroundColor">#0D0C11</item>-->
+    </style>
+
+    <style name="AppTheme.FileSize" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#D50000</item>
+        <item name="android:textStyle">bold|italic</item>
+        <item name="android:textSize">9sp</item>
+    </style>
+
+    <style name="AppTheme.ItemLogCard">
+        <item name="backgroundColor">?attr/logCardBackColor</item>
+        <item name="android:background">?attr/logCardBackColor</item>
+        <!--        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>-->
+        <!--        <item name="android:layout_marginTop">2dp</item>-->
+    </style>
+
+    <style name="AppTheme.ItemViewDefault">
+        <item name="backgroundColor">@color/color_unselected</item>
+        <item name="android:background">@color/color_unselected</item>
+        <!--        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>-->
+    </style>
+
+    <style name="AppTheme.ItemViewLoggerFile">
+        <!--        <item name="backgroundColor">@color/color_file_log_unselected</item>-->
+        <!--        <item name="android:background">@color/color_file_log_unselected</item>-->
+
+        <!--        <item name="backgroundColor">?attr/logFileDrawable</item>-->
+        <item name="android:background">?attr/logFileDrawable</item>
+
+
+        <!--<item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>-->
+
+        <!--        <item name="android:background">@drawable/rectangle_4</item>-->
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="AppTheme.LogItemIcon">
+        <item name="android:paddingLeft">@dimen/log_icon_padding</item>
+        <item name="android:paddingRight">@dimen/log_icon_padding</item>
+        <item name="android:paddingBottom">@dimen/log_icon_padding</item>
+        <item name="android:paddingTop">@dimen/log_icon_padding</item>
+        <item name="android:layout_margin">@dimen/log_icon_padding</item>
+    </style>
+
+    <style name="ObjHeader">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="FeatureChipTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="MenuItemStyle" parent="@android:style/Widget.TextView">
+        <!-- Цвет текста пункта меню -->
+        <item name="android:textColor">@color/search_hint_color</item>
+    </style>
+
+    <style name="QTabWidget" parent="Widget.Design.TabLayout">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@android:color/tab_indicator_text</item>
+    </style>
+
+    <style name="AppTheme.AppName" parent="Widget.AppCompat.TextView">
+        <!--        <item name="android:fontFamily">@font/oxygen_mono</item>-->
+        <!--        <item name="textAllCaps">true</item>-->
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="AppTheme.AppName2" parent="Widget.AppCompat.TextView">
+        <!--        <item name="android:fontFamily">@font/oxygen_mono</item>-->
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <!--    !!! android:adjustViewBounds="true" !!!-->
+
+    <style name="AppThemeItemIcon">
+        <item name="android:adjustViewBounds">true</item>
+    </style>
+
+    <style name="AppThemeTabLayout" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+        <!--        <item name="textAllCaps">false</item>-->
+    </style>
+
+</resources>

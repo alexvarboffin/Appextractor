@@ -1,0 +1,79 @@
+{
+  "project_info": {
+    "project_number": "296274470619",
+    "firebase_url": "https://appextractor-540b3.firebaseio.com",
+    "project_id": "appextractor-540b3",
+    "storage_bucket": "appextractor-540b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296274470619:android:68e88f8e4c4dff52",
+        "android_client_info": {
+          "package_name": "com.walhalla.appextractor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "296274470619-i7vasg4go3fksustv95n5kf6rhq4ba1a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walhalla.appextractor",
+            "certificate_hash": "28361a9b4d178349b6f4be60ecf48bfca2f9129e"
+          }
+        },
+        {
+          "client_id": "296274470619-nnonn09rh3h68is1tsjs2ssc6olboumt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walhalla.appextractor",
+            "certificate_hash": "b4ba415ff84acd53faf96b706ae70f9faa85174f"
+          }
+        },
+        {
+          "client_id": "296274470619-n53alr23j01vqdnuad7m8pird6asdskv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walhalla.appextractor",
+            "certificate_hash": "bc2388bfe19be7212211b95e2d2b7abbf0a735e8"
+          }
+        },
+        {
+          "client_id": "296274470619-djkq9be519nnihci9887rne7m8odq7u6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.walhalla.appextractor",
+            "certificate_hash": "96b53f0ca4857918a3a4022492dcf18ec399cf2d"
+          }
+        },
+        {
+          "client_id": "296274470619-lglip5ks5t14va8nkd9pqv55jne4pihj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlIHodDVld6_kZpkqmXrTCM5nzQpzVp24"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "296274470619-lglip5ks5t14va8nkd9pqv55jne4pihj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

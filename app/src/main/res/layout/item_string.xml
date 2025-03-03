@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
+    style="@style/myCardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_unselected"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="2dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/app_name"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/file_any_type" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/overflow_menu"
+            android:layout_toEndOf="@id/icon"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                style="@style/AppTheme.ItemResourceTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/color_unselected"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="start|bottom"
+                android:padding="3dp"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="@string/app_name" />
+
+            <TextView
+                android:id="@+id/value"
+                style="@style/AppTheme.ItemResourceTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:background="@color/color_unselected"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="start|bottom"
+                android:padding="3dp"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="@string/app_name" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/overflow_menu"
+            android:layout_width="72dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
+            android:background="@null"
+            android:contentDescription="@+id/overflow_menu"
+            android:paddingBottom="0dp"
+            android:scaleType="fitEnd"
+            app:srcCompat="@drawable/ic_dots"
+            app:tint="@color/colorPrimary"
+            tools:background="@android:color/holo_red_dark"
+            tools:ignore="ImageContrastCheck" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/dividerVertical" />
+
+    <!--    <com.walhalla.appextractor.view.NonInteractiveRecyclerView-->
+    <!--        android:id="@+id/rv_backup_app_features"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:focusable="false"-->
+    <!--        android:focusableInTouchMode="false" />-->
+
+</LinearLayout>
