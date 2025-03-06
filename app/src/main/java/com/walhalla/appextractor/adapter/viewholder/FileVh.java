@@ -58,7 +58,7 @@ public class FileVh extends BaseVh<LFileViewModel>
         if (model != null) {
             String size = Util.getFileSizeMegaBytes(model.file);
             long aa = model.file.lastModified();
-            mBinding.image.setImageResource(model.getIcon());
+            mBinding.image.setImageResource(model.icon);
             mBinding.text1.setText(model.getText());
             mBinding.fileSize.setText(size);
             mBinding.text3.setText(getDate(aa));

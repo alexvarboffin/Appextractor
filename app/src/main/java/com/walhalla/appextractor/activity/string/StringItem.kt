@@ -4,9 +4,10 @@ import com.walhalla.appextractor.activity.resources.ResType
 import com.walhalla.appextractor.model.ViewModel
 
 class StringItem(
-    @JvmField val name: String, @JvmField val value: String, @JvmField val drawable: Int?, @JvmField val type: ResType?) :
+
+    @JvmField val name: String, @JvmField val value: String, @JvmField val drawable: Int?, @JvmField val type: ResType) :
     ViewModel {
-    constructor(name: String, value: String, type: ResType?) : this(name, value, null, type)
+    constructor(name: String, value: String, type: ResType) : this(name, value, null, type)
 
     override fun getID(): Long {
         return TYPE_ITEM_STRING.toLong()

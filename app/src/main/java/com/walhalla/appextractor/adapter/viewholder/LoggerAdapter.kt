@@ -1,339 +1,309 @@
-package com.walhalla.appextractor.adapter.viewholder;
+package com.walhalla.appextractor.adapter.viewholder
 
-import android.annotation.SuppressLint;
-import android.content.Context;
+import android.R
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.recyclerview.widget.RecyclerView
+import com.walhalla.appextractor.Util
+import com.walhalla.appextractor.abba.IntentReaper
+import com.walhalla.appextractor.databinding.ItemLoggerEmptyBinding
+import com.walhalla.appextractor.databinding.ItemLoggerErrorBinding
+import com.walhalla.appextractor.databinding.ItemLoggerFileBinding
+import com.walhalla.appextractor.databinding.LogItemSuccessBinding
 
-import androidx.annotation.NonNull;
-
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupMenu;
-
-import com.walhalla.appextractor.Util;
-import com.walhalla.appextractor.abba.IntentReaper;
-import com.walhalla.appextractor.adapter.LogErrorViewHolder;
-import com.walhalla.appextractor.databinding.ItemLoggerEmptyBinding;
-import com.walhalla.appextractor.databinding.ItemLoggerErrorBinding;
-import com.walhalla.appextractor.databinding.ItemLoggerFileBinding;
-import com.walhalla.appextractor.model.EmptyViewModel;
-import com.walhalla.appextractor.model.LErrorViewModel;
-import com.walhalla.appextractor.model.LFileViewModel;
-import com.walhalla.appextractor.model.LSuccessViewModel;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.databinding.LogItemSuccessBinding;
-import com.walhalla.appextractor.model.ViewModel;
-import com.walhalla.ui.DLog;
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import com.walhalla.appextractor.model.LFileViewModel
+import com.walhalla.appextractor.model.LogType
+import com.walhalla.appextractor.model.LogViewModel
+import com.walhalla.appextractor.model.ViewModel
+import com.walhalla.ui.DLog
+import java.io.File
 
 
-public class LoggerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    private final IntentReaper reaper;
-    private final PackageManager pm;
-
-    private final Callback mmmm;
+class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private val mmmm: Callback) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val reaper: IntentReaper
+    private val pm: PackageManager
 
 
-    public interface ChildItemClickListener {
-        void onClick0(View v, int position);
+    interface ChildItemClickListener {
+        fun onClick0(v: View, position: Int)
 
-        void removeFileRequest(File file);
+        fun removeFileRequest(file: File)
     }
 
-    private Context context;
+    private var context: Context? = null
 
 
-    private final int TYPE_FILE = 2;
+//    private val TYPE_FILE = 2
+//    private val TYPE_SUCCESS = 4
+
     //private final int TYPE_OPERATION = 3;
-    private final int TYPE_SUCCESS = 4;
+
 
 
     //private final View.OnClickListener listener;
-    private ChildItemClickListener childItemClickListener;
+    private var childItemClickListener: ChildItemClickListener? = null
 
-    private final List<ViewModel> items;
-
-//    public LoggerAdapter() {
-//        //this.listener = listener;
-//    }
+    private var items: MutableList<LogViewModel>? = null
 
 
-    private final FileVh.FileVhCallback _local_listener_ = new FileVh.FileVhCallback() {
-
-        @Override
-        public void onClick0(View v, int position) {
+    //    public LoggerAdapter() {
+    //        //this.listener = listener;
+    //    }
+    private val _local_listener_: FileVh.FileVhCallback = object : FileVh.FileVhCallback {
+        override fun onClick0(v: View, position: Int) {
 //            if (childItemClickListener != null) {
 //                childItemClickListener.onClick0(v, position);
 //            }
 
-            ViewModel aa = items.get(position);
-            if(aa instanceof  LFileViewModel){
-                LFileViewModel o = ((LFileViewModel) aa);
-                DLog.d("@@@" + o.file.getAbsolutePath());
+            val model = items!![position]
+            if (model is LFileViewModel) {
+                val o: LFileViewModel = (model as LFileViewModel)
+                DLog.d("@@@" + o.file.getAbsolutePath())
             }
-
-        }
-
-//        @Override
-//        public void removeFileRequest(File file) {
-//            if (childItemClickListener != null) {
-//                childItemClickListener.removeFileRequest(file);
-//            }
-//        }
-    };
-
-    public LoggerAdapter(Context context, List<ViewModel> items, Callback callback) {
-        this.mmmm = callback;
-        if (items != null) {
-            this.items = items;
-        } else {
-            this.items = new ArrayList<>();
-        }
-        this.pm = context.getPackageManager();
-        this.reaper = new IntentReaper(context);
-
-        //reaper.makeMimeDir();
-        reaper.makeMimeApk();
+        } //        @Override
+        //        public void removeFileRequest(File file) {
+        //            if (childItemClickListener != null) {
+        //                childItemClickListener.removeFileRequest(file);
+        //            }
+        //        }
     }
 
-    public void setChildItemClickListener(ChildItemClickListener listener) {
-        childItemClickListener = listener;
+    init {
+        if (items != null) {
+            this.items = items
+        } else {
+            this.items = ArrayList<LogViewModel>()
+        }
+        this.pm = context.packageManager
+        this.reaper = IntentReaper(context)
+
+        //reaper.makeMimeDir();
+        reaper.makeMimeApk()
+    }
+
+    fun setChildItemClickListener(listener: ChildItemClickListener?) {
+        childItemClickListener = listener
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    @Override
-    public int getItemCount() {
-        return this.items.size();
+    override fun getItemCount(): Int {
+        return items!!.size
     }
 
-    @Override
-    public long getItemId(int position) {
-        return items.get(position).getID();
+    override fun getItemId(position: Int): Long {
+        return items!![position].type.id.toLong()
     }
 
     //Returns the view type of the item at position for the purposes of view recycling.
-    @Override
-    public int getItemViewType(int position) {
-
-//        if (items.get(position) instanceof LogViewModel) {
+    override fun getItemViewType(position: Int): Int {
+        //        if (items.get(position) instanceof LogViewModel) {
 //            return TYPE_OPERATION;
 //        } else
 //        if (items.get(position) instanceof LogViewModel) {
 //            return TYPE_S;
 //        } else
 
-        final ViewModel rrr = items.get(position);
-        if (rrr instanceof LSuccessViewModel) {
-            return TYPE_SUCCESS;
-        } else if (rrr instanceof EmptyViewModel) {
-            return EmptyViewModel.TYPE_EMPTY;
-        } else if (rrr instanceof LFileViewModel) {
-            return TYPE_FILE;
-        } else if (rrr instanceof LErrorViewModel) {
-            return LErrorViewModel.TYPE_ERROR;
+        val model: LogType = items!![position].type
+        if (model is LogType.Success) {
+            return model.id
+        } else if (model is LogType.Empty) {
+            return model.id
+        } else if (model is LogType.File) {
+            return model.id
+        } else if (model is LogType.Error) {
+            return model.id
         }
-        return -1;
+        return -1
     }
 
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        context = parent.context
 
-        context = parent.getContext();
+        val holder: RecyclerView.ViewHolder
+        val inflater = LayoutInflater.from(parent.context)
 
-        RecyclerView.ViewHolder holder;
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        when (viewType) {
+            LogType.Success.id -> {
+                val mBinding = LogItemSuccessBinding.inflate(inflater, parent, false)
+                return LogSuccessViewHolder(mBinding, childItemClickListener)
+            }
 
-        switch (viewType) {
+            LogType.File.id -> {
+                val mBinding0 = ItemLoggerFileBinding.inflate(inflater, parent, false)
+                return FileVh(mBinding0, _local_listener_)
+            }
 
-            case TYPE_SUCCESS:
-                LogItemSuccessBinding mBinding = LogItemSuccessBinding.inflate(inflater, parent, false);
-                return new LogSuccessViewHolder(mBinding, childItemClickListener);
+            LogType.Empty.id -> {
+                val binding = ItemLoggerEmptyBinding.inflate(inflater, parent, false)
+                return EmptyViewHolder(binding, childItemClickListener)
+            }
 
-            case TYPE_FILE:
-                ItemLoggerFileBinding mBinding0 = ItemLoggerFileBinding.inflate(inflater, parent, false);
-                return new FileVh(mBinding0, _local_listener_);
-
-//            case TYPE_OPERATION:
-//                ItemLoggerBinding binding = DataBindingUtil.inflate(inflater, R.layout.item_logger, parent, false);
-//                return new LogViewHolder(binding, childItemClickListener);
-
-            case EmptyViewModel.TYPE_EMPTY:
-                ItemLoggerEmptyBinding binding = ItemLoggerEmptyBinding.inflate(inflater, parent, false);
-                return new EmptyViewHolder(binding, childItemClickListener);
-
-            case LErrorViewModel.TYPE_ERROR:
-                ItemLoggerErrorBinding b = ItemLoggerErrorBinding.inflate(inflater, parent, false);
+            LogType.Error.id -> {
+                val b = ItemLoggerErrorBinding.inflate(inflater, parent, false)
                 //View v2 = inflater.inflate(R.layout.item_logger_error, parent, false);
-                holder = new LogErrorViewHolder(b);
-                break;
+                holder = LogErrorViewHolder(b)
+            }
 
-            default:
-                View v = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                holder = new RecyclerViewSimpleTextViewHolder(v);
-                break;
+            else -> {
+                val v = inflater.inflate(R.layout.simple_list_item_1, parent, false)
+                holder = RecyclerViewSimpleTextViewHolder(v)
+            }
         }
-        return holder;
+        return holder
     }
 
 
     @SuppressLint("DiscouragedPrivateApi")
-    private void showPopupMenu(View v, int adapterPosition) {
-        LFileViewModel obj = (LFileViewModel) items.get(adapterPosition);
-        PopupMenu popup = new PopupMenu(v.getContext(), v);
-        MenuInflater inflater = popup.getMenuInflater();
-        Menu menu = popup.getMenu();
+    private fun showPopupMenu(v: View, adapterPosition: Int) {
+        val obj: LFileViewModel = items!![adapterPosition] as LFileViewModel
+        val popup = PopupMenu(v.context, v)
+        val inflater = popup.menuInflater
+        val menu = popup.menu
 
-        String parent_folder = obj.file.getParent();
+        val parent_folder: String = obj.file.getParent()
         try {
-            Uri uri = Uri.parse(parent_folder);
-            if (Util.check_Android30FileBrowser_AndroidLysesoftFileBrowser(uri, context, pm, false)) {
-                MenuItem sub = menu.add(R.string.action_open_file_parent_folder)
-                        .setIcon(R.drawable.ic_action_launch_app);
-                sub.setOnMenuItemClickListener(item -> {
-                    ///storage/emulated/0/Download/APK_BACKUP
+            val uri = Uri.parse(parent_folder)
+            if (Util.check_Android30FileBrowser_AndroidLysesoftFileBrowser(
+                    uri,
+                    context!!, pm, false
+                )
+            ) {
+                val sub =
+                    menu.add(com.walhalla.appextractor.R.string.action_open_file_parent_folder)
+                        .setIcon(com.walhalla.appextractor.R.drawable.ic_action_launch_app)
+                sub.setOnMenuItemClickListener { item: MenuItem? ->
+                    /**storage/emulated/0/Download/APK_BACKUP */
                     //SharedObjects.externalMemory().getAbsolutePath()
-                    Util.openFolder(context, parent_folder);
-                    return false;
-                });
+                    Util.openFolder(context!!, parent_folder)
+                    false
+                }
             }
-        } catch (Exception e) {
-            DLog.handleException(e);
+        } catch (e: Exception) {
+            DLog.handleException(e)
         }
-//        try {
+
+        //        try {
 //            //Uri uri = Uri.parse(apkUri); //<!--- NOT WORK, EMPTY RESULT
 //            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", obj.file);
 //        } catch (Exception e) {
 //            DLog.handleException(e);
 //        }
         //Util.installApp(context, mModel.file);
-
-        File file = obj.file;
-        reaper.wrapper(menu, file);
+        val file: File = obj.file
+        reaper.wrapper(menu, file)
         if (file.canRead()) {
-            menu.add(0, Menu.FIRST, Menu.NONE, R.string.action_delete_file)
-                    .setIcon(R.drawable.ic_action_uninstall_app)
-                    .setOnMenuItemClickListener(item -> {
-                        childItemClickListener.removeFileRequest(file);
-                        return false;
-                    });
+            menu.add(
+                0,
+                Menu.FIRST,
+                Menu.NONE,
+                com.walhalla.appextractor.R.string.action_delete_file
+            )
+                .setIcon(com.walhalla.appextractor.R.drawable.ic_action_uninstall_app)
+                .setOnMenuItemClickListener { item: MenuItem? ->
+                    childItemClickListener!!.removeFileRequest(file)
+                    false
+                }
         }
-        inflater.inflate(R.menu.poppup_logger, menu);
-        Object menuHelper;
-        Class[] argTypes;
+        inflater.inflate(com.walhalla.appextractor.R.menu.poppup_logger, menu)
+        val menuHelper: Any
+        val argTypes: Array<Class<*>?>
         try {
-            Field fMenuHelper = PopupMenu.class.getDeclaredField("mPopup");
-            fMenuHelper.setAccessible(true);
-            menuHelper = fMenuHelper.get(popup);
-            argTypes = new Class[]{boolean.class};
-            menuHelper.getClass().getDeclaredMethod("setForceShowIcon", argTypes).invoke(menuHelper, true);
-        } catch (Exception e) {
-
+            val fMenuHelper = PopupMenu::class.java.getDeclaredField("mPopup")
+            fMenuHelper.isAccessible = true
+            menuHelper = fMenuHelper[popup]
+            argTypes = arrayOf(Boolean::class.javaPrimitiveType)
+            menuHelper.javaClass.getDeclaredMethod("setForceShowIcon", *argTypes)
+                .invoke(menuHelper, true)
+        } catch (e: Exception) {
         }
-        popup.setOnMenuItemClickListener(new MMCL(mmmm, obj, context));
-        popup.show();
+        popup.setOnMenuItemClickListener(MMCL(mmmm, obj, context))
+        popup.show()
     }
 
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        when (viewHolder.itemViewType) {
+            LogType.Success.id -> {
+                val holder = viewHolder as LogSuccessViewHolder
+                holder.bind(items!![position], position)
+            }
 
-        switch (viewHolder.getItemViewType()) {
+            LogType.File.id -> {
+                val holder0 = viewHolder as FileVh
+                holder0.bind(items!![position] as LFileViewModel, position)
+                holder0.mBinding.overflowMenu.setOnClickListener { view: View ->
+                    showPopupMenu(
+                        view,
+                        position
+                    )
+                }
+            }
 
-            case TYPE_SUCCESS:
-                LogSuccessViewHolder holder = (LogSuccessViewHolder) viewHolder;
-                holder.bind((LSuccessViewModel) items.get(position), position);
-                //holder.mBinding.overflowMenu.setOnClickListener(view -> showPopupMenu(view, position));
-                break;
+            LogType.Empty.id -> {
+                val vh1 = viewHolder as EmptyViewHolder
+                vh1.bind(items!![position], position)
+            }
 
-            case TYPE_FILE:
-                FileVh holder0 = (FileVh) viewHolder;
-                holder0.bind((LFileViewModel) items.get(position), position);
-                holder0.mBinding.overflowMenu.setOnClickListener(view -> showPopupMenu(view, position));
-                break;
+            LogType.Error.id -> {
+                val vh2: LogErrorViewHolder = viewHolder as LogErrorViewHolder
+                vh2.bind(items!![position], position)
+            }
 
-//            case TYPE_OPERATION:
-//                LogViewHolder vh1 = (LogViewHolder) viewHolder;
-//                vh1.bind((LogViewModel) items.get(position), position);
-//                break;
-
-            case EmptyViewModel.TYPE_EMPTY:
-                EmptyViewHolder vh1 = (EmptyViewHolder) viewHolder;
-                vh1.bind((EmptyViewModel) items.get(position), position);
-                break;
-
-            case LErrorViewModel.TYPE_ERROR:
-                LogErrorViewHolder vh2 = (LogErrorViewHolder) viewHolder;
-                vh2.bind((LErrorViewModel) items.get(position), position);
-                break;
-
-            default:
-                RecyclerViewSimpleTextViewHolder vh = (RecyclerViewSimpleTextViewHolder) viewHolder;
-                vh.bind(items.get(position), position);
-                break;
+            else -> {
+                val vh = viewHolder as RecyclerViewSimpleTextViewHolder
+                vh.bind(items!![position], position)
+            }
         }
     }
 
 
-    public void swapList(List<ViewModel> data) {
-        items.clear();
-        items.addAll(data);
-        notifyDataSetChanged();
+    fun swapList(data: MutableList<ViewModel>) {
+        items!!.clear()
+        items!! +(data)
+        notifyDataSetChanged()
     }
 
-    public void swap(ViewModel data) {
-        items.clear();
-        items.add(data);
-        notifyDataSetChanged();
-    }
-
-
-    public void add(ViewModel data) {
-        items.add(data);
-        notifyDataSetChanged();
-    }
-
-    public interface Callback {
-        void removeFileRequest(File file);
+    fun swap(data:  LogViewModel) {
+        items!!.clear()
+        items!!.add(data)
+        notifyDataSetChanged()
     }
 
 
-    public static class MMCL implements PopupMenu.OnMenuItemClickListener {
+    fun add(data: LogViewModel) {
+        items!!.add(data)
+        notifyDataSetChanged()
+    }
+
+    interface Callback {
+        fun removeFileRequest(file: File)
+    }
 
 
-        private final LFileViewModel mModel;
-        private final Callback callBack;
-        private final Context context;
-        private PackageManager pm;
-
-
-        MMCL(Callback callBack, LFileViewModel category, Context context) {
-            this.mModel = category;
-            this.callBack = callBack;
-            this.context = context;
-
-        }
+    class MMCL internal constructor(
+        private val callBack: Callback, category: LFileViewModel,
+        private val context: Context?
+    ) :
+        PopupMenu.OnMenuItemClickListener {
+        private val mModel: LFileViewModel = category
+        private val pm: PackageManager? = null
 
 
         @SuppressLint("NonConstantResourceId")
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
+        override fun onMenuItemClick(menuItem: MenuItem): Boolean {
 //            if (menuItem.getItemId() == R.id.action_delete_file) {
 //                callBack.removeFileRequest(mModel.file);
 //            }
-            return false;
+            return false
         }
     }
 }

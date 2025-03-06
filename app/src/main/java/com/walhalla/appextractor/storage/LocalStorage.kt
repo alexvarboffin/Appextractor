@@ -1,83 +1,62 @@
-package com.walhalla.appextractor.storage;
+package com.walhalla.appextractor.storage
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.text.TextUtils;
+import android.content.Context
+import android.content.SharedPreferences
+import android.text.TextUtils
+import androidx.preference.PreferenceManager
+import com.walhalla.appextractor.BuildConfig
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.SettingsPreferenceFragment
 
-
-import androidx.preference.PreferenceManager;
-
-import com.walhalla.appextractor.BuildConfig;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.SettingsPreferenceFragment;
-
-
-public class LocalStorage {
-
-    private static LocalStorage instance = null;
+class LocalStorage private constructor(context: Context) {
     //private final Context mContext;
-    private SharedPreferences app_prefs;
+    private val app_prefs: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
-    private LocalStorage(Context context) {
-        app_prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        PreferenceManager.setDefaultValues(context, R.xml.fragment_settings_pref, false);//<-- init settings
+    init {
+        PreferenceManager.setDefaultValues(
+            context,
+            R.xml.fragment_settings_pref,
+            false
+        ) //<-- init settings
         //context.getSharedPreferences("PREF_DATA_44", Context.MODE_PRIVATE);
         //mContext = context;
     }
 
-    public synchronized static LocalStorage getInstance(Context context) {
-        if (instance == null) {
-            instance = new LocalStorage(context);
-        }
-
-        return instance;
+    fun sharedPreferences(): SharedPreferences {
+        return app_prefs
     }
 
-    public SharedPreferences sharedPreferences() {
-        return app_prefs;
-    }
+    fun settingsValue(propertyKey: String): Any? {
+        return when (propertyKey) {
+            SettingsPreferenceFragment.KEY_GOOGLE_DRIVE_STORAGE -> enableGoogleDrive()
 
-    public Object settingsValue(String propertyKey) {
+            SettingsPreferenceFragment.KEY_DROP_BOX_STORAGE -> enableDropBox()
 
-        switch (propertyKey) {
-//            case SettingsPreferenceFragment.KEY_APP_LOCATION:
-//                return saveLocation();
+            SettingsPreferenceFragment.KEY_TELEGRAM_STORAGE -> enableTelegram()
 
+            SettingsPreferenceFragment.KEY_TELEGRAM_TOKEN -> telegramToken()
 
-            case SettingsPreferenceFragment.KEY_GOOGLE_DRIVE_STORAGE:
-                return enableGoogleDrive();
+            SettingsPreferenceFragment.KEY_TELEGRAM_CHAT_ID -> telegramChatId()
 
-            case SettingsPreferenceFragment.KEY_DROP_BOX_STORAGE:
-                return enableDropBox();
-
-            case SettingsPreferenceFragment.KEY_TELEGRAM_STORAGE:
-                return enableTelegram();
-
-            case SettingsPreferenceFragment.KEY_TELEGRAM_TOKEN:
-                return telegramToken();
-
-            case SettingsPreferenceFragment.KEY_TELEGRAM_CHAT_ID:
-                return telegramChatId();
-
-            default:
-                return app_prefs.getString(propertyKey, "");
+            else -> app_prefs.getString(propertyKey, "")
         }
     }
 
 
-    public String telegramToken() {
+    fun telegramToken(): String? {
         return app_prefs.getString(
-                SettingsPreferenceFragment.KEY_TELEGRAM_TOKEN,
-                BuildConfig.KEY_TELEGRAM_TOKEN
-        );
+            SettingsPreferenceFragment.KEY_TELEGRAM_TOKEN,
+            BuildConfig.KEY_TELEGRAM_TOKEN
+        )
     }
 
 
-    public String telegramChatId() {
+    fun telegramChatId(): String? {
         return app_prefs.getString(
-                SettingsPreferenceFragment.KEY_TELEGRAM_CHAT_ID,
-                BuildConfig.KEY_TELEGRAM_CHAT_ID
-        );
+            SettingsPreferenceFragment.KEY_TELEGRAM_CHAT_ID,
+            BuildConfig.KEY_TELEGRAM_CHAT_ID
+        )
     }
 
     /**
@@ -85,44 +64,55 @@ public class LocalStorage {
      *
      * @return
      */
-    public boolean enableTelegram() {
-        return this.app_prefs.getBoolean(SettingsPreferenceFragment.KEY_TELEGRAM_STORAGE, false);
-    }
-
-//    public String saveLocation() {
-//        return this.app_prefs.getString(SettingsPreferenceFragment.KEY_APP_LOCATION, defLocation() + File.separator);
-//    }
-
-
-    public boolean enableGoogleDrive() {
-        return this.app_prefs.getBoolean(SettingsPreferenceFragment.KEY_GOOGLE_DRIVE_STORAGE, false);
-    }
-
-    public boolean enableDropBox() {
-        return app_prefs.getBoolean(SettingsPreferenceFragment.KEY_DROP_BOX_STORAGE, false);
+    fun enableTelegram(): Boolean {
+        return app_prefs.getBoolean(SettingsPreferenceFragment.KEY_TELEGRAM_STORAGE, false)
     }
 
 
-    public boolean hasDropBoxToken() {
-        return !TextUtils.isEmpty(dropboxAccessToken());
+    //    public String saveLocation() {
+    //        return this.app_prefs.getString(SettingsPreferenceFragment.KEY_APP_LOCATION, defLocation() + File.separator);
+    //    }
+    fun enableGoogleDrive(): Boolean {
+        return app_prefs.getBoolean(SettingsPreferenceFragment.KEY_GOOGLE_DRIVE_STORAGE, false)
     }
 
-    public String dropboxAccessToken() {
-        return app_prefs.getString("access-token", null);
-    }
-
-    public void dropboxAccessToken(String accessToken) {
-        this.app_prefs.edit().putString("access-token", accessToken).apply();
+    fun enableDropBox(): Boolean {
+        return app_prefs.getBoolean(SettingsPreferenceFragment.KEY_DROP_BOX_STORAGE, false)
     }
 
 
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
-//            return "/Download/apk/"
-//        } else {
-//            return "/apk/"
-//        }
+    fun hasDropBoxToken(): Boolean {
+        return !TextUtils.isEmpty(dropboxAccessToken())
+    }
 
-    public void googleDriveFolderId(String driveId) {
-        this.app_prefs.edit().putString("GD_FOLDER_ID", driveId).apply();
+    fun dropboxAccessToken(): String? {
+        return app_prefs.getString("access-token", null)
+    }
+
+    fun dropboxAccessToken(accessToken: String?) {
+        app_prefs.edit().putString("access-token", accessToken).apply()
+    }
+
+
+    //        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
+    //            return "/Download/apk/"
+    //        } else {
+    //            return "/apk/"
+    //        }
+    fun googleDriveFolderId(driveId: String?) {
+        app_prefs.edit().putString("GD_FOLDER_ID", driveId).apply()
+    }
+
+    companion object {
+        private var instance: LocalStorage? = null
+
+        @Synchronized
+        fun getInstance(context: Context): LocalStorage {
+            if (instance == null) {
+                instance = LocalStorage(context)
+            }
+
+            return instance!!
+        }
     }
 }

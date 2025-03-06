@@ -1,52 +1,49 @@
-package com.walhalla.appextractor;
+package com.walhalla.appextractor
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.os.Environment
+import androidx.core.content.FileProvider
+import com.walhalla.ui.DLog.d
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.InputStream
 
-import androidx.core.content.FileProvider;
+object Troubleshooting {
 
-import com.walhalla.ui.DLog;
+    @JvmStatic
+    @Throws(FileNotFoundException::class)
+    fun streamLoader(context: Context, file: File): InputStream? {
+        d("###" + " --> " + file.absolutePath)
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
-public class Troubleshooting {
-
-    public static InputStream streamLoader(Context context, File file) throws FileNotFoundException {
-
-        DLog.d("###" + " --> " + file.getAbsolutePath());
-
-        InputStream inputStream;
-        if (Build.VERSION.SDK_INT >= 29) //Android 10 level 29 (Android 10).
+        val inputStream: InputStream?
+        if (Build.VERSION.SDK_INT >= 29)  //Android 10 level 29 (Android 10).
         {
             //Uri fileUri = Uri.parse(file.getAbsolutePath());
-            Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+            val fileUri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
 //            final ParcelFileDescriptor pfd;
 //
 //            pfd = context.getContentResolver().openFileDescriptor(fileUri, "r", null);
 //            inputStream = new FileInputStream(pfd.getFileDescriptor());
-            inputStream = context.getContentResolver().openInputStream(fileUri);
+            inputStream = context.contentResolver.openInputStream(fileUri)
         } else {
-            inputStream = new FileInputStream(file);
+            inputStream = FileInputStream(file)
         }
-        return inputStream;
+        return inputStream
     }
 
+    @JvmStatic
     @SuppressLint("ObsoleteSdkInt")
-    public static File defLocation() {
-        File file;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
-            file = Environment.getExternalStorageDirectory();
+    fun defLocation(): File {
+        val file = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
+            Environment.getExternalStorageDirectory()
         } else {
-            file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             //file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         }
-        DLog.d("Out: " + file.getAbsolutePath() + " " + file.exists());
-        return file;
+        println("Out: " + file.absolutePath + " " + file.exists())
+        return file
     }
 }

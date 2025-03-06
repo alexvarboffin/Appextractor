@@ -51,13 +51,14 @@ import com.walhalla.appextractor.databinding.FragmentMainBinding
 import com.walhalla.appextractor.domain.interactors.SimpleMeta
 import com.walhalla.appextractor.domain.interactors.TelegramClient
 import com.walhalla.appextractor.domain.interactors.TelegramInteractorImpl
-import com.walhalla.appextractor.model.LErrorViewModel
-import com.walhalla.appextractor.model.LSuccessViewModel
+import com.walhalla.appextractor.model.LogType
+
 import com.walhalla.appextractor.model.LogViewModel
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.model.ViewModel
 import com.walhalla.appextractor.storage.LocalStorage
 import com.walhalla.appextractor.task.UploadFileTask
+import com.walhalla.appextractor.utils.BitmapUtils
 import com.walhalla.appextractor.utils.PackageMetaUtils
 import com.walhalla.boilerplate.domain.executor.impl.BackgroundExecutor
 import com.walhalla.boilerplate.threading.MainThreadImpl
@@ -155,7 +156,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
     override fun printOutput(viewModel: ViewModel) {}
 
     override fun makeStorageLocalProgressBar(size: Int) {
-        __pd0 = Util.loadDialog(activity, R.drawable.ic_main_logo)
+        __pd0 = Util.loadDialog(requireActivity(), R.drawable.ic_main_logo)
         __pd0?.setButton(
             DialogInterface.BUTTON_NEGATIVE, requireActivity().getString(android.R.string.cancel),
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
@@ -575,7 +576,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
     //        }
     //        super.onDestroy();
     //    }
-    private fun initAndLoadData(accessToken: String, mFile: Map<SimpleMeta, List<File>>) {
+    private fun initAndLoadData(accessToken: String?, mFile: Map<SimpleMeta, List<File>>) {
         DropboxClientFactory.init(accessToken)
 
         //PicassoClient.init(getApplicationContext(), DropboxClientFactory.getClient());
@@ -633,10 +634,10 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
                                 "%1\$s size %2\$s modified %3\$s", result.pathLower, result.size,
                                 DateFormat.getDateTimeInstance().format(result.clientModified)
                             )
-                            showMessage(LSuccessViewModel(R.drawable.ic_log_db, message))
+                            showMessage(LogViewModel(LogType.Success, R.drawable.ic_log_db, message))
                         }
                     } else {
-                        showMessage(LSuccessViewModel(R.drawable.ic_log_db, "Success!"))
+                        showMessage(LogViewModel(LogType.Success, R.drawable.ic_log_db, "Success!"))
                     }
                 }
 
@@ -644,7 +645,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
                     var0?.dismiss()
                     var0 = null
 
-                    val tt = LErrorViewModel(R.drawable.ic_dropbox, e.localizedMessage)
+                    val tt = LogViewModel(LogType.Error, R.drawable.ic_dropbox, e.localizedMessage)
                     mainView!!.printOutput(tt)
                 }
 
@@ -718,7 +719,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
      * Получена ссылка на файл для дальнейшей загрузки в облако
      */
     override fun successExtracted(listMap: Map<SimpleMeta, List<File>>) {
-        var mpm = LocalStorage.getInstance(context)
+        var mpm = LocalStorage.getInstance(requireContext())
         if (mpm.enableGoogleDrive()) {
             //new Storage.GoogleDrive().push(getContext(), path);
             //123 this.driveAdapter.signIn(getContext(), files, appName);
@@ -757,7 +758,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
             }
 
 
-            pd0 = Util.loadDialog(activity, R.drawable.ic_telegram)
+            pd0 = Util.loadDialog(requireActivity(), R.drawable.ic_telegram)
             pd0?.setButton(
                 DialogInterface.BUTTON_NEGATIVE, requireActivity().getString(android.R.string.cancel),
                 DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
@@ -817,10 +818,10 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
 
         val appName = getString(R.string.app_name)
         val extra = ("""$name ${meta.versionCode} ${meta.versionName} ${meta.packageName}
-${activity!!.packageName}
+${requireActivity().packageName}
 $appName""")
-        val bitmap = PackageMetaUtils.drw(activity, meta.packageName)
-        val uri = getLocalBitmapUri(requireActivity(), bitmap)
+        val bitmap = PackageMetaUtils.drw(requireActivity(), meta.packageName)
+        val uri = bitmap?.let { BitmapUtils.getLocalBitmapUri(requireActivity(), it) }
         val intent = Intent(Intent.ACTION_SEND)
         intent.putExtra(Intent.EXTRA_STREAM, uri)
         intent.putExtra(Intent.EXTRA_TEXT, extra)
@@ -849,22 +850,7 @@ $appName""")
     }
 
 
-    private fun getLocalBitmapUri(activity: Activity, bitmap: Bitmap): Uri? {
-        val file = File(activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "icon.png")
 
-        //DLog.d("[]" + file.getAbsolutePath() + " " + (bitmap == null));
-        val APPLICATION_ID = activity.packageName
-        var bmpUri: Uri? = null
-        try {
-            val out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.close()
-            bmpUri = FileProvider.getUriForFile(activity, APPLICATION_ID + KEY_FILE_PROVIDER, file)
-        } catch (e: Exception) {
-            handleException(e)
-        }
-        return bmpUri
-    }
 
 
     /**
@@ -887,7 +873,7 @@ $appName""")
             if (PERMISSIONS.size > 1) {
                 mainView!!.debugHideProgress(adapter!!.selected.size)
                 perm_multiple.launch(PERMISSIONS)
-                //                if (ActivityCompat.shouldShowRequestPermissionRationale(
+//                if (ActivityCompat.shouldShowRequestPermissionRationale(
 //                        getActivity(), "android.permission.WRITE_EXTERNAL_STORAGE")) {
 //                    //Show permission explanation dialog...
 //                    //showPermissionDialog(activity);
@@ -903,7 +889,7 @@ $appName""")
                 perm_single.launch(PERMISSIONS[0])
                 return
             }
-            //            if (PERMISSIONS.length > 0) {
+//            if (PERMISSIONS.length > 0) {
 //                if (DEBUG) {
 //                    //---akeText(getContext(), "Resolved->" + resolve, Toast.LENGTH_SHORT).show();
 //                }
@@ -950,11 +936,11 @@ $appName""")
     }
 
     override fun onMessageRetrieved(message: String) {
-        showMessage(LSuccessViewModel(R.drawable.ic_telegram, message))
+        showMessage(LogViewModel(LogType.Success, R.drawable.ic_telegram, message))
     }
 
     override fun onRetrievalFailed(error: String) {
-        showMessage(LErrorViewModel(R.drawable.ic_telegram, error))
+        showMessage(LogViewModel(LogType.Error, R.drawable.ic_telegram, error))
     }
 
     override fun onRetrievalFailed(e: Exception) {
@@ -962,7 +948,7 @@ $appName""")
         if (e is UnknownHostException) {
             m = "Connection error:\n"
         }
-        showMessage(LErrorViewModel(R.drawable.ic_telegram, m + e.localizedMessage))
+        showMessage(LogViewModel(LogType.Error, R.drawable.ic_telegram, m + e.localizedMessage))
     }
 
     override fun hideProgressDialog() {

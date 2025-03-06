@@ -1,17 +1,10 @@
-package com.walhalla.appextractor.adapter.viewholder;
+package com.walhalla.appextractor.adapter.viewholder
 
-import android.view.View;
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import com.walhalla.appextractor.model.ViewModel
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.walhalla.appextractor.model.ViewModel;
-
-public abstract class BaseVh<T extends ViewModel> extends RecyclerView.ViewHolder {
-
-    public BaseVh(@NonNull View itemView) {
-        super(itemView);
-    }
-
-    public abstract void bind(T viewModel, int position);
+abstract class BaseVh<T : ViewModel>(itemView: View) :
+    RecyclerView.ViewHolder(itemView) {
+    abstract fun bind(viewModel: T, position: Int)
 }

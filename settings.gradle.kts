@@ -47,3 +47,4 @@ project(":features:ui").projectDir = File("G:\\android\\WalhallaUI\\features\\ui
 include(":SdkLibrary")
 project(":SdkLibrary").projectDir = File("D:\\Nonesorted\\Neptune\\SdkLibrary")
 
+include(":extractor")

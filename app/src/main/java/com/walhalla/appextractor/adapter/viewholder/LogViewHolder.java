@@ -30,7 +30,7 @@ public class LogViewHolder extends BaseVh<LogViewModel> implements View.OnClickL
     public void bind(LogViewModel operation, int position) {
         if (operation != null) {
             mBinding.text1.setText(operation.getText());
-            mBinding.imageView1.setImageResource(operation.getIcon());
+            mBinding.imageView1.setImageResource(operation.icon);
         }
     }
 }

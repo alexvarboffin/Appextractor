@@ -1,152 +1,135 @@
-package com.walhalla.appextractor.activity.string;
+package com.walhalla.appextractor.activity.string
 
-import android.annotation.SuppressLint;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupMenu;
+import android.R
+import android.annotation.SuppressLint
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.recyclerview.widget.RecyclerView
+import com.walhalla.appextractor.BaseUtilsCallback
+import com.walhalla.appextractor.activity.resources.ResItem.Companion.isXml
+import com.walhalla.appextractor.activity.resources.ResType
+import com.walhalla.appextractor.adapter.viewholder.EmptyViewHolder
+import com.walhalla.appextractor.adapter.viewholder.LogErrorViewHolder
+import com.walhalla.appextractor.adapter.viewholder.RecyclerViewSimpleTextViewHolder
+import com.walhalla.appextractor.databinding.ItemLoggerEmptyBinding
+import com.walhalla.appextractor.databinding.ItemLoggerErrorBinding
+import com.walhalla.appextractor.databinding.ItemStringBinding
+import com.walhalla.appextractor.model.LogType
+import com.walhalla.appextractor.model.LogViewModel
+import com.walhalla.appextractor.model.ViewModel
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.walhalla.appextractor.BaseUtilsCallback;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.resources.ResItem;
-import com.walhalla.appextractor.activity.resources.ResType;
-
-import com.walhalla.appextractor.adapter.LogErrorViewHolder;
-import com.walhalla.appextractor.adapter.viewholder.EmptyViewHolder;
-import com.walhalla.appextractor.adapter.viewholder.RecyclerViewSimpleTextViewHolder;
-import com.walhalla.appextractor.databinding.ItemLoggerEmptyBinding;
-import com.walhalla.appextractor.databinding.ItemLoggerErrorBinding;
-import com.walhalla.appextractor.databinding.ItemStringBinding;
-import com.walhalla.appextractor.model.EmptyViewModel;
-import com.walhalla.appextractor.model.LErrorViewModel;
-
-import com.walhalla.appextractor.model.ViewModel;
-
-import java.lang.reflect.Field;
-import java.util.List;
-
-public class StringsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-
-    public interface OnItemClickListener extends BaseUtilsCallback {
-        void xmlViewerRequest(String value);
+class StringsAdapter(private val items: MutableList<ViewModel>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    interface OnItemClickListener : BaseUtilsCallback {
+        fun xmlViewerRequest(value: String?)
     }
 
-    private final List<ViewModel> items;
-    private OnItemClickListener mView;
+    private var mView: OnItemClickListener? = null
 
-    public StringsAdapter(List<ViewModel> resources) {
-        this.items = resources;
+    fun setOnItemClickListener(listener: OnItemClickListener?) {
+        this.mView = listener
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.mView = listener;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        final ViewModel rrr = items.get(position);
-        if (rrr instanceof StringItem) {
-            return StringItem.TYPE_ITEM_STRING;
-        } else if (rrr instanceof EmptyViewModel) {
-            return EmptyViewModel.TYPE_EMPTY;
-        } else if (rrr instanceof LErrorViewModel) {
-            return LErrorViewModel.TYPE_ERROR;
+    override fun getItemViewType(position: Int): Int {
+        val model = items[position]
+        if (model is StringItem) {
+            return StringItem.TYPE_ITEM_STRING
+        } else if (model is LogViewModel) {
+            return model.id
         }
-        return -1;
+        return -1
     }
 
 
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         //context = parent.getContext();
-        RecyclerView.ViewHolder holder;
+        val holder: RecyclerView.ViewHolder
 
 
-        switch (viewType) {
+        when (viewType) {
+            StringItem.TYPE_ITEM_STRING -> {
+                val binding = ItemStringBinding.inflate(inflater, parent, false)
+                return StringsViewHolder(binding)
+            }
 
-            case StringItem.TYPE_ITEM_STRING:
-                @NonNull ItemStringBinding binding = ItemStringBinding.inflate(inflater, parent, false);
-                return new StringsViewHolder(binding);
+            EmptyViewModel.TYPE_EMPTY -> {
+                val binding0 = ItemLoggerEmptyBinding.inflate(inflater, parent, false)
+                return EmptyViewHolder(binding0, null)
+            }
 
-            case EmptyViewModel.TYPE_EMPTY:
-                ItemLoggerEmptyBinding binding0 = ItemLoggerEmptyBinding.inflate(inflater, parent, false);
-                return new EmptyViewHolder(binding0, null);
-
-            case LErrorViewModel.TYPE_ERROR:
-                ItemLoggerErrorBinding b = ItemLoggerErrorBinding.inflate(inflater, parent, false);
+            LErrorViewModel.TYPE_ERROR -> {
+                val b = ItemLoggerErrorBinding.inflate(inflater, parent, false)
                 //View v2 = inflater.inflate(R.layout.item_logger_error, parent, false);
-                holder = new LogErrorViewHolder(b);
-                break;
+                holder = LogErrorViewHolder(b)
+            }
 
-            default:
-                View v = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                holder = new RecyclerViewSimpleTextViewHolder(v);
-                break;
+            else -> {
+                val v = inflater.inflate(R.layout.simple_list_item_1, parent, false)
+                holder = RecyclerViewSimpleTextViewHolder(v)
+            }
         }
-        return holder;
+        return holder
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        when (viewHolder.itemViewType) {
+            StringItem.TYPE_ITEM_STRING -> {
+                val holder = (viewHolder as StringsViewHolder)
+                val resource = items[position] as StringItem
+                binderReceiverView(holder.binding, resource)
+                holder.binding.overflowMenu.setOnClickListener { view: View ->
+                    showPopupMenu(
+                        view,
+                        resource
+                    )
+                }
+            }
 
+            EmptyViewModel.TYPE_EMPTY -> {
+                val vh1 = viewHolder as EmptyViewHolder
+                vh1.bind(items[position] as EmptyViewModel, position)
+            }
 
-        switch (viewHolder.getItemViewType()) {
+            LErrorViewModel.TYPE_ERROR -> {
+                val vh2 = viewHolder as LogErrorViewHolder
+                vh2.bind(items[position] as LErrorViewModel, position)
+            }
 
-            case StringItem.TYPE_ITEM_STRING:
-                StringsViewHolder holder = ((StringsViewHolder) viewHolder);
-                StringItem resource = (StringItem) items.get(position);
-                binderReceiverView(holder.binding, resource);
-                holder.binding.overflowMenu.setOnClickListener(view -> showPopupMenu(view, resource));
-                break;
-
-            case EmptyViewModel.TYPE_EMPTY:
-                EmptyViewHolder vh1 = (EmptyViewHolder) viewHolder;
-                vh1.bind((EmptyViewModel) items.get(position), position);
-                break;
-
-            case LErrorViewModel.TYPE_ERROR:
-                LogErrorViewHolder vh2 = (LogErrorViewHolder) viewHolder;
-                vh2.bind((LErrorViewModel) items.get(position), position);
-                break;
-
-            default:
-                RecyclerViewSimpleTextViewHolder vh = (RecyclerViewSimpleTextViewHolder) viewHolder;
-                vh.bind(items.get(position), position);
-                break;
+            else -> {
+                val vh = viewHolder as RecyclerViewSimpleTextViewHolder
+                vh.bind(items[position], position)
+            }
         }
     }
 
 
-    private void showPopupMenu(View v, StringItem resource) {
-        PopupMenu popup = new PopupMenu(v.getContext(), v);
-        MenuInflater inflater = popup.getMenuInflater();
-        Menu menu = popup.getMenu();
-        inflater.inflate(R.menu.popup_string_xml, menu);
-        Object menuHelper;
-        Class<?>[] argTypes;
+    private fun showPopupMenu(v: View, resource: StringItem) {
+        val popup = PopupMenu(v.context, v)
+        val inflater = popup.menuInflater
+        val menu = popup.menu
+        inflater.inflate(com.walhalla.appextractor.R.menu.popup_string_xml, menu)
+        val menuHelper: Any
+        val argTypes: Array<Class<*>?>
         try {
-            @SuppressLint("DiscouragedPrivateApi") Field fMenuHelper = PopupMenu.class.getDeclaredField("mPopup");
-            fMenuHelper.setAccessible(true);
-            menuHelper = fMenuHelper.get(popup);
-            argTypes = new Class[]{boolean.class};
-            menuHelper.getClass().getDeclaredMethod("setForceShowIcon", argTypes).invoke(menuHelper, true);
-        } catch (Exception e) {
+            @SuppressLint("DiscouragedPrivateApi") val fMenuHelper =
+                PopupMenu::class.java.getDeclaredField("mPopup")
+            fMenuHelper.isAccessible = true
+            menuHelper = fMenuHelper[popup]
+            argTypes = arrayOf(Boolean::class.javaPrimitiveType)
+            menuHelper.javaClass.getDeclaredMethod("setForceShowIcon", *argTypes)
+                .invoke(menuHelper, true)
+        } catch (e: Exception) {
         }
-        if (!ResItem.isXml(resource)) {
-            menu.findItem(R.id.actionXmlViewer).setVisible(false);
+        if (!isXml(resource)) {
+            menu.findItem(com.walhalla.appextractor.R.id.actionXmlViewer).setVisible(false)
         }
-        popup.setOnMenuItemClickListener(menuItem -> {
-
-            int itemId = menuItem.getItemId();
-//                case R.id.action_copy_package_name:
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            val itemId = menuItem.itemId
+            //                case R.id.action_copy_package_name:
 //                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 //                    if (clipboard != null) {
 //                        ClipData clip = ClipData.newPlainText("packageName", "" + packageInfo.packageName);
@@ -157,100 +140,85 @@ public class StringsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 //                        }
 //                    }
 //                    return true;
-            if (itemId == R.id.actionXmlViewer) {
+            if (itemId == com.walhalla.appextractor.R.id.actionXmlViewer) {
                 if (mView != null) {
-                    mView.xmlViewerRequest(resource.value);
+                    mView!!.xmlViewerRequest(resource.value)
                 }
-            } else if (itemId == R.id.actionCopyName) {
+            } else if (itemId == com.walhalla.appextractor.R.id.actionCopyName) {
                 if (mView != null) {
-                    mView.copyToBuffer(resource.name);
+                    mView!!.copyToBuffer(resource.name)
                 }
-            } else if (itemId == R.id.actionCopyValue) {
+            } else if (itemId == com.walhalla.appextractor.R.id.actionCopyValue) {
                 if (mView != null) {
-                    mView.copyToBuffer(resource.value);
+                    mView!!.copyToBuffer(resource.value)
                 }
             }
-            return false;
-        });
-        popup.show();
+            false
+        }
+        popup.show()
     }
 
-    @Override
-    public int getItemCount() {
-        return items.size();
+    override fun getItemCount(): Int {
+        return items.size
     }
 
-    public void swap(List<StringItem> list) {
-        items.clear();
-        items.addAll(list);
-        notifyDataSetChanged();
+    fun swap(list: List<StringItem>) {
+        items.clear()
+        items.addAll(list)
+        notifyDataSetChanged()
     }
 
-    public void swap(ViewModel data) {
-        items.clear();
-        items.add(data);
-        notifyDataSetChanged();
+    fun swap(data: ViewModel) {
+        items.clear()
+        items.add(data)
+        notifyDataSetChanged()
     }
 
-    private void binderReceiverView(ItemStringBinding binding, StringItem var0) {
-        binding.name.setText(var0.name);
-        binding.value.setText(var0.value);
+    private fun binderReceiverView(binding: ItemStringBinding, var0: StringItem) {
+        binding.name.text = var0.name
+        binding.value.text = var0.value
 
         if (var0.type == ResType.DIR) {
-            binding.icon.setVisibility(View.VISIBLE);
-            binding.icon.setImageResource(R.drawable.ic_folder_blue_36dp);
-            binding.overflowMenu.setVisibility(View.GONE);
+            binding.icon.visibility = View.VISIBLE
+            binding.icon.setImageResource(com.walhalla.appextractor.R.drawable.ic_folder_blue_36dp)
+            binding.overflowMenu.visibility = View.GONE
         } else if (var0.type == ResType.XML) {
-            binding.icon.setVisibility(View.VISIBLE);
-            binding.icon.setImageResource(R.drawable.ic_res_xml);
-        }
-
-        else if (var0.type == ResType.STRING) {
-            binding.icon.setVisibility(View.VISIBLE);
-            binding.icon.setImageResource(R.drawable.file_any_type);
-        }
-
-
-        else {
+            binding.icon.visibility = View.VISIBLE
+            binding.icon.setImageResource(com.walhalla.appextractor.R.drawable.ic_res_xml)
+        } else if (var0.type == ResType.STRING) {
+            binding.icon.visibility = View.VISIBLE
+            binding.icon.setImageResource(com.walhalla.appextractor.R.drawable.file_any_type)
+        } else {
             if (var0.drawable != null) {
-                binding.overflowMenu.setVisibility(View.VISIBLE);
-                binding.icon.setVisibility(View.VISIBLE);
-                binding.icon.setImageResource(var0.drawable);
+                binding.overflowMenu.visibility = View.VISIBLE
+                binding.icon.visibility = View.VISIBLE
+                binding.icon.setImageResource(var0.drawable)
             } else {
-                binding.overflowMenu.setVisibility(View.VISIBLE);
+                binding.overflowMenu.visibility = View.VISIBLE
                 //binding.icon.setVisibility(View.GONE);
                 //binding.icon.setImageDrawable(null);
-                binding.icon.setImageResource(R.drawable.ic_folder_blue_36dp);
+                binding.icon.setImageResource(com.walhalla.appextractor.R.drawable.ic_folder_blue_36dp)
             }
         }
-//            itemView.setOnClickListener(v -> {
+
+        //            itemView.setOnClickListener(v -> {
 //                if (listener != null) {
 //                    listener.onItemClick(var0);
 //                }
 //            });
-
-        binding.name.setOnClickListener(v -> {
+        binding.name.setOnClickListener { v: View? ->
             if (mView != null) {
-                mView.copyToBuffer(var0.name);
+                mView!!.copyToBuffer(var0.name)
             }
-        });
+        }
 
-        binding.value.setOnClickListener(v -> {
+        binding.value.setOnClickListener { v: View? ->
             if (mView != null) {
-                mView.copyToBuffer(var0.value);
+                mView!!.copyToBuffer(var0.value)
             }
-        });
-    }
-
-    public static class StringsViewHolder extends RecyclerView.ViewHolder {
-
-        private final ItemStringBinding binding;
-
-        StringsViewHolder(@NonNull ItemStringBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
         }
     }
 
-
+    class StringsViewHolder internal constructor(val binding: ItemStringBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

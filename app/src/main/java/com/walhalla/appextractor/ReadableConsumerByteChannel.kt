@@ -1,61 +1,53 @@
-package com.walhalla.appextractor;
+package com.walhalla.appextractor
 
-import com.walhalla.ui.DLog;
+import com.walhalla.ui.DLog.d
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.channels.ReadableByteChannel
+import java.util.function.IntConsumer
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
-import java.util.function.IntConsumer;
+class ReadableConsumerByteChannel(
+    private val rbc: ReadableByteChannel,
+    private val onRead: IntConsumer
+) :
+    ReadableByteChannel {
+    private var totalByteRead = 0
+    private val expectedSize: Long = 0
 
+    @Throws(IOException::class)
+    override fun read(dst: ByteBuffer): Int {
+        var nRead: Int
+        val progress: Double
 
-public class ReadableConsumerByteChannel implements ReadableByteChannel {
-
-    private final ReadableByteChannel rbc;
-    private final IntConsumer onRead;
-
-    private int totalByteRead;
-    private long expectedSize;
-
-    public ReadableConsumerByteChannel(ReadableByteChannel rbc, IntConsumer onBytesRead) {
-        this.rbc = rbc;
-        this.onRead = onBytesRead;
-    }
-
-    public int read(ByteBuffer dst) throws IOException {
-        int nRead;
-        double progress;
-
-        if ((nRead = rbc.read(dst)) > 0) {
-            totalByteRead += nRead;
-            progress = expectedSize > 0 ? (double) totalByteRead / (double) expectedSize * 100.0 : -1.0;
+        if ((rbc.read(dst).also { nRead = it }) > 0) {
+            totalByteRead += nRead
+            progress = if (expectedSize > 0) totalByteRead.toDouble() / expectedSize.toDouble() * 100.0 else -1.0
             //delegate.rbcProgressCallback(this, progress);
-            DLog.d("@ --> " + progress);
+            d("@ --> $progress")
         }
-        return nRead;
+        return nRead
     }
 
-//    @Override
-//    public int read(ByteBuffer dst) throws IOException {
-//        int nRead = rbc.read(dst);
-//        notifyBytesRead(nRead);
-//        return nRead;
-//    }
-//
-//    protected void notifyBytesRead(int nRead){
-//        if(nRead<=0) {
-//            return;
-//        }
-//        totalByteRead += nRead;
-//        onRead.accept(totalByteRead);
-//    }
-
-    @Override
-    public boolean isOpen() {
-        return rbc.isOpen();
+    //    @Override
+    //    public int read(ByteBuffer dst) throws IOException {
+    //        int nRead = rbc.read(dst);
+    //        notifyBytesRead(nRead);
+    //        return nRead;
+    //    }
+    //
+    //    protected void notifyBytesRead(int nRead){
+    //        if(nRead<=0) {
+    //            return;
+    //        }
+    //        totalByteRead += nRead;
+    //        onRead.accept(totalByteRead);
+    //    }
+    override fun isOpen(): Boolean {
+        return rbc.isOpen
     }
 
-    @Override
-    public void close() throws IOException {
-        rbc.close();
+    @Throws(IOException::class)
+    override fun close() {
+        rbc.close()
     }
 }

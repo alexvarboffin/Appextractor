@@ -1,88 +1,73 @@
-package com.walhalla.appextractor.fragment;
+package com.walhalla.appextractor.fragment
 
-import android.os.Bundle;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.walhalla.appextractor.BuildConfig
+import com.walhalla.appextractor.Config
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.Troubleshooting
+import com.walhalla.appextractor.adapter.viewholder.LoggerAdapter
+import com.walhalla.appextractor.adapter.viewholder.LoggerAdapter.ChildItemClickListener
+import com.walhalla.appextractor.databinding.FragmentLogBinding
+import com.walhalla.appextractor.model.LFileViewModel
+import com.walhalla.appextractor.model.LogType
+import com.walhalla.appextractor.model.LogViewModel
+import com.walhalla.appextractor.model.ViewModel
+import com.walhalla.ui.DLog.d
+import java.io.File
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+class LogFragment : Fragment(), ChildItemClickListener, LoggerAdapter.Callback {
+    private var aaa: LoggerAdapter? = null
+    private var mBinding: FragmentLogBinding? = null
 
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.walhalla.appextractor.BuildConfig;
-import com.walhalla.appextractor.Config;
-import com.walhalla.appextractor.Troubleshooting;
-import com.walhalla.appextractor.model.EmptyViewModel;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.model.LFileViewModel;
-import com.walhalla.appextractor.adapter.viewholder.LoggerAdapter;
-import com.walhalla.appextractor.databinding.FragmentLogBinding;
-import com.walhalla.appextractor.model.ViewModel;
-import com.walhalla.ui.DLog;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-public class LogFragment extends Fragment
-        implements LoggerAdapter.ChildItemClickListener, LoggerAdapter.Callback {
-
-    private LoggerAdapter aaa;
-    private FragmentLogBinding mBinding;
-
-    public static LogFragment newInstance() {
-        LogFragment pageFragment = new LogFragment();
-//        Bundle arguments = new Bundle();
-//        arguments.putInt(ARGUMENT_PAGE_NUMBER, page);
-//        pageFragment.setArguments(arguments);
-        return pageFragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         if (aaa == null) {
-            aaa = new LoggerAdapter(getContext(), new ArrayList<>(), this);
+            aaa = LoggerAdapter(requireContext(), ArrayList(), this)
         }
-        aaa.setChildItemClickListener(this);
+        aaa!!.setChildItemClickListener(this)
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentLogBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        mBinding = FragmentLogBinding.inflate(inflater, container, false)
+        return mBinding!!.root
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mBinding.recyclerView.setHasFixedSize(true);
-        LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        manager.setOrientation(RecyclerView.VERTICAL);
-        mBinding.recyclerView.setLayoutManager(manager);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mBinding!!.recyclerView.setHasFixedSize(true)
+        val manager = LinearLayoutManager(
+            context
+        )
+        manager.orientation = RecyclerView.VERTICAL
+        mBinding!!.recyclerView.layoutManager = manager
 
-        if(getContext()!=null){
+        if (context != null) {
 //            DividerItemDecoration itemDecorator = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
 //            itemDecorator.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.item_divider));
 //            mBinding.recyclerView.addItemDecoration(itemDecorator);
-            mBinding.recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
+            mBinding!!.recyclerView.addItemDecoration(
+                DividerItemDecoration(
+                    context,
+                    LinearLayoutManager.VERTICAL
+                )
+            )
         }
 
         //mBinding.recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
-        mBinding.recyclerView.setAdapter(aaa);
+        mBinding!!.recyclerView.adapter = aaa
 
         //loggerAdapter.swap(new LErrorViewModel(0,""));
-        aaa.swap(new EmptyViewModel(R.drawable.ic_main_logo_110, getString(R.string.data_empty)));
+        aaa!!.swap(LogViewModel(LogType.Empty, R.drawable.ic_main_logo_110, getString(R.string.data_empty)))
+
+
         //((MainActivity) getActivity()).setLogTag(getTag());
 
 
@@ -109,70 +94,76 @@ public class LogFragment extends Fragment
     }
 
 
-    @Override
-    public void onClick0(View v, int position) {
-        DLog.d("");
+    override fun onClick0(v: View, position: Int) {
+        d("")
     }
 
-    public void showData(List<ViewModel> data) {
-        aaa.swapList(data);
+
+    fun showData(data: MutableList<ViewModel>) {
+        aaa!!.swapList(data)
     }
 
-    public void makeLog(ViewModel message) {
-
+    fun makeLog(message: LogViewModel) {
         //DLog.d("@@@@@@@@@@@@@@@@@@@" + (aaa.getItemCount() > 0));
         //DLog.d("@@@@@@@@@@@@@@@@@@@" + (aaa.getItemId(0)));
 
         if (aaa != null) {
-            if (aaa.getItemCount() > 0) {
-                if (aaa.getItemId(0) == EmptyViewModel.TYPE_EMPTY) {
-                    aaa.swap(message);//Clear and add
-                    return;
+            if (aaa!!.itemCount > 0) {
+                if (aaa!!.getItemId(0) == LogType.Empty.id.toLong()) {
+                    aaa!!.swap(message) //Clear and add
+                    return
                 }
             }
-            aaa.add(message);//add new
+            aaa!!.add(message) //add new
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        updatelist();
+    override fun onResume() {
+        super.onResume()
+        updateList()
     }
 
-    private void updatelist() {
-        List<ViewModel> data = new ArrayList<>();
-        File[] aa = Troubleshooting.defLocation()
-                .listFiles(pathname ->
-                        pathname.getName().endsWith(".apk")
-                                ||pathname.getName().startsWith(Config.PREV));
+    private fun updateList() {
+        val data: MutableList<ViewModel> = ArrayList()
+        val aa = Troubleshooting.defLocation()
+            .listFiles { pathname: File ->
+                pathname.name.endsWith(".apk")
+                        || pathname.name.startsWith(Config.PREV)
+            }
         if (aa != null) {
-            for (File file : aa) {
-                data.add(new LFileViewModel(
-                        file,
-                        file.getName(),
-                        R.drawable.ic_android)
-                );
+            for (file in aa) {
+                data.add(LFileViewModel(file, R.drawable.ic_android, file.name))
             }
         }
 
         if (BuildConfig.DEBUG) {
-
-            File file = new File("/data/app/SmokeTestApp/SmokeTestApp.apk");
-            data.add(new LFileViewModel(
+            val file = File("/data/app/SmokeTestApp/SmokeTestApp.apk")
+            data.add(
+                LFileViewModel(
                     file,
-                    file.getName(),
-                    R.drawable.ic_android)
-            );
+                    R.drawable.ic_android,
+                    file.name
+                )
+            )
         }
-        showData(data);
+        showData(data)
     }
 
-    @Override
-    public void removeFileRequest(File file) {
+    override fun removeFileRequest(file: File) {
         if (file.delete()) {
-            Toast.makeText(getContext(), "Success!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Success!!!", Toast.LENGTH_SHORT).show()
         }
-        updatelist();
+        updateList()
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(): LogFragment {
+            val pageFragment = LogFragment()
+//        Bundle arguments = new Bundle();
+//        arguments.putInt(ARGUMENT_PAGE_NUMBER, page);
+//        pageFragment.setArguments(arguments);
+            return pageFragment
+        }
     }
 }

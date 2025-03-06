@@ -42,9 +42,7 @@ class MetaFragment : BaseFragment(), DetailsF0.View {
         adapter = AppDetailInfoAdapter(
             activity,
             { `object`: PermissionLine? ->
-                mPresenter!!.openSettingsRequest(
-                    context
-                )
+                mPresenter!!.openSettingsRequest(requireContext())
             }, object : DetailAdapterCallback {
                 override fun copyToBuffer(value: String) {
                     if (callback != null) {
@@ -112,8 +110,8 @@ class MetaFragment : BaseFragment(), DetailsF0.View {
     }
 
     private fun makeUI(context: Context) {
-        mPresenter = MetaPresenter(context, meta, this)
-        mPresenter!!.doStuff(context)
+        mPresenter = meta?.let { MetaPresenter(context, it, this) }
+        mPresenter?.doStuff(context)
     }
 
 

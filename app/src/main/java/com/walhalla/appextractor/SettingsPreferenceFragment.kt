@@ -158,10 +158,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(),
 
 
         //Устанавливаем настройки из сохраненных в LocalStorage
-        val obj = LocalStorage.getInstance(context).settingsValue(preference.key)
+        val obj = LocalStorage.getInstance(requireContext()).settingsValue(preference.key)
         //String obj = mPreferences.getString(preference.getKey(),"");//Crash if boolean
         /*listener*/
-        this.onPreferenceChange(preference, obj)
+        if (obj != null) {
+            this.onPreferenceChange(preference, obj)
+        }
     }
 
     companion object {

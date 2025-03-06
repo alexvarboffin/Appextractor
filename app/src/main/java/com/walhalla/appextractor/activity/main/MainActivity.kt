@@ -250,7 +250,7 @@ class MainActivity : AppCompatActivity(), MainView {
             aboutDialog(this)
             return true
 
-            //            case R.id.action_home:
+//            case R.id.action_home:
 //                mbinding.container.setCurrentItem(0);
 //                return true;
         } else if (id == R.id.action_privacy_policy) {
@@ -266,7 +266,7 @@ class MainActivity : AppCompatActivity(), MainView {
             moreApp(this)
             return true
 
-            //            case R.id.action_exit:
+//            case R.id.action_exit:
 //                this.finish();
 //                System.exit(0);
 //                return true;
@@ -548,6 +548,7 @@ class MainActivity : AppCompatActivity(), MainView {
     //        Log.d(Config.TAG, "set-tag: " + tag);
     //    }
     //
+
     override fun printOutput(viewModel: LogViewModel) {
         val fragment = supportFragmentManager.fragments[1]
         if (fragment != null && fragment is LogFragment) {
@@ -602,10 +603,10 @@ class MainActivity : AppCompatActivity(), MainView {
         val mm = Util.getFileSizeMegaBytes(file)
         printOutput(
             LFileViewModel(
-                file, """
+                file, R.drawable.ic_baseline_sd_card_24, """
      $text
      $mm
-     """.trimIndent(), R.drawable.ic_baseline_sd_card_24
+     """.trimIndent()
             )
         )
 

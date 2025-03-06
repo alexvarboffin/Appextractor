@@ -1,38 +1,43 @@
-package com.walhalla.appextractor.activity.resources;
+package com.walhalla.appextractor.activity.resources
 
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Drawable
+import com.walhalla.appextractor.activity.string.StringItem
 
-import com.walhalla.appextractor.activity.string.StringItem;
+class ResItem {
+    @JvmField
+    val drawable: Drawable?
 
-public class ResItem {
-
-    public final Drawable drawable;
-
-    public ResItem(String name, ResType type) {
-        this.fullPath = name;
-        this.type = type;
-        this.drawable = null;
+    constructor(name: String, type: ResType) {
+        this.fullPath = name
+        this.type = type
+        this.drawable = null
     }
 
-    public final String fullPath;
-    public final ResType type;
+    @JvmField
+    val fullPath: String
+    @JvmField
+    val type: ResType
 
-    public ResItem(String name, Drawable drawable, ResType type) {
-        this.fullPath = name;
-        this.type = type;
-        this.drawable = drawable;
+    constructor(name: String, drawable: Drawable?, type: ResType) {
+        this.fullPath = name
+        this.type = type
+        this.drawable = drawable
     }
 
-    public static boolean isImages(ResItem item) {
-        return item.fullPath.endsWith(".jpg") || item.fullPath.endsWith(".png");
-    }
+    companion object {
+        @JvmStatic
+        fun isImages(item: ResItem): Boolean {
+            return item.fullPath.endsWith(".jpg") || item.fullPath.endsWith(".png")
+        }
 
-    public static boolean isImages(String fullPath) {
-        return fullPath.endsWith(".jpg") || fullPath.endsWith(".png");
-    }
+        fun isImages(fullPath: String): Boolean {
+            return fullPath.endsWith(".jpg") || fullPath.endsWith(".png")
+        }
 
-    public static boolean isXml(StringItem resource) {
-        //return resource.value.startsWith("res/xml");
-        return resource.value.endsWith(".xml");
+        @JvmStatic
+        fun isXml(resource: StringItem): Boolean {
+            //return resource.value.startsWith("res/xml");
+            return resource.value.endsWith(".xml")
+        }
     }
 }

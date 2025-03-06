@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     id("kotlin-kapt")
-
+    id("kotlin-parcelize")
 }
 
 fun versionCodeDate(): Int {

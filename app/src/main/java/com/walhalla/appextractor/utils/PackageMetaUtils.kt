@@ -1,41 +1,41 @@
-package com.walhalla.appextractor.utils;
+package com.walhalla.appextractor.utils
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 
-import com.walhalla.appextractor.model.PackageMeta;
+object PackageMetaUtils {
 
-public class PackageMetaUtils {
-
-    public static Bitmap drw(Context context, String packageName) {
-        Bitmap bitmap = null;
-        final PackageManager pm = context.getPackageManager();
+    fun drw(context: Context, packageName: String): Bitmap? {
+        var bitmap: Bitmap? = null
+        val pm = context.packageManager
 
         //am = context.createPackageContext(packageName, 0).getAssets();
         //Drawable drawable = packageInfo.applicationInfo.loadIcon(pm);
         try {
-            ApplicationInfo applicationInfo = pm.getApplicationInfo(packageName, 0);
-            Drawable drawable = applicationInfo.loadIcon(pm);
+            val applicationInfo = pm.getApplicationInfo(packageName, 0)
+            val drawable = applicationInfo.loadIcon(pm)
             //AdaptiveIconDrawable
-            if (drawable instanceof BitmapDrawable) {
-                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-                bitmap = bitmapDrawable.getBitmap();
+            if (drawable is BitmapDrawable) {
+                bitmap = drawable.bitmap
             } else {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {//26
-                    bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-                    final Canvas canvas = new Canvas(bitmap);
-                    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                    drawable.draw(canvas);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { //26
+                    bitmap = Bitmap.createBitmap(
+                        drawable.intrinsicWidth,
+                        drawable.intrinsicHeight,
+                        Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = Canvas(bitmap)
+                    drawable.setBounds(0, 0, canvas.width, canvas.height)
+                    drawable.draw(canvas)
                 }
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            return bitmap;
+        } catch (e: PackageManager.NameNotFoundException) {
+            return bitmap
         }
-        return bitmap;
+        return bitmap
     }
 }
