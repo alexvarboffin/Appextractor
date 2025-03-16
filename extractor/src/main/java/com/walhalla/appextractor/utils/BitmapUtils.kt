@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Environment
 import androidx.core.content.FileProvider
 
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.handleException
 import com.walhalla.appextractor.utils.ShareUtils.KEY_FILE_PROVIDER
 
 import java.io.File

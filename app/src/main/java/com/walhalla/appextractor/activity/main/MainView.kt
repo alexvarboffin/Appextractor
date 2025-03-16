@@ -1,28 +1,25 @@
-package com.walhalla.appextractor.activity.main;
+package com.walhalla.appextractor.activity.main
 
-import androidx.annotation.StringRes;
+import androidx.annotation.StringRes
+import com.walhalla.appextractor.model.LogViewModel
+import com.walhalla.appextractor.model.PackageMeta
+import java.io.File
 
-import com.walhalla.appextractor.model.LogViewModel;
-import com.walhalla.appextractor.model.PackageMeta;
+interface MainView {
+    fun debugHideProgress(size: Int)
 
-import java.io.File;
-
-public interface MainView {
-    void debugHideProgress(int size);
-
-    void printOutput(LogViewModel message);
+    fun printOutput(message: LogViewModel)
 
     //void makeProgressBar(int size);
+    fun debugShowProgress(i: Int, v0: Int)
 
-    void debugShowProgress(int i, int v0);
+    fun makeSnackBar(file: File)
 
-    void makeSnackBar(File file);
+    fun failureExtracted(@StringRes id: Int)
 
-    void failureExtracted(@StringRes int id);
+    fun successToast(s: String)
 
-    void successToast(String s);
+    fun errorToast(s: String)
 
-    void errorToast(String s);
-
-    void saveIconRequest(PackageMeta packageInfo);
+    fun saveIconRequest(packageInfo: PackageMeta)
 }

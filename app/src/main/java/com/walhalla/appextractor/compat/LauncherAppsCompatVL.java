@@ -10,7 +10,6 @@ import android.content.pm.ShortcutInfo;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.UserHandle;
-import android.widget.Toast;
 
 import com.walhalla.ui.DLog;
 

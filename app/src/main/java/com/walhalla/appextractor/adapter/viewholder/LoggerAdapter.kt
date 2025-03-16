@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import com.walhalla.appextractor.Util
+import com.walhalla.appextractor.utils.Util
 import com.walhalla.appextractor.abba.IntentReaper
 import com.walhalla.appextractor.databinding.ItemLoggerEmptyBinding
 import com.walhalla.appextractor.databinding.ItemLoggerErrorBinding

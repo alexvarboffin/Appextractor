@@ -209,7 +209,7 @@
         </provider>
 
         <receiver
-            android:name="com.walhalla.appextractor.IntentReceiver"
+            android:name="com.walhalla.appextractor.receiver.IntentReceiver"
             android:enabled="true"
             android:exported="true"
             tools:ignore="ExportedReceiver">

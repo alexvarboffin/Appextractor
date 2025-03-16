@@ -14,7 +14,7 @@ import com.dropbox.core.v2.files.SearchResult;
 import com.dropbox.core.v2.files.WriteMode;
 import com.walhalla.appextractor.Config;
 import com.walhalla.appextractor.Troubleshooting;
-import com.walhalla.appextractor.Util;
+import com.walhalla.appextractor.utils.Util;
 import com.walhalla.db.DropboxClientFactory;
 import com.walhalla.ui.DLog;
 

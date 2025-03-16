@@ -1,7 +1,7 @@
-package com.walhalla.appextractor;
+package com.walhalla.appextractor
 
-public interface BaseUtilsCallback {
-    void copyToBuffer(String value);
+interface BaseUtilsCallback {
+    fun copyToBuffer(value: String)
 
-    void shareText(String value);
+    fun shareText(value: String)
 }

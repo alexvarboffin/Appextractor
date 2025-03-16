@@ -1,5 +1,6 @@
 package com.walhalla.appextractor.activity.debug
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -28,7 +29,7 @@ class DebugFR1 : BaseFragment(), AppListAdapterCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        adapter = ApkListAdapter(this, context!!)
+        adapter = ApkListAdapter(this, requireContext())
         binding = DebugListBinding.inflate(inflater, container, false)
         return binding!!.root
     }
@@ -74,6 +75,10 @@ class DebugFR1 : BaseFragment(), AppListAdapterCallback {
     }
 
     override fun launchApp(context: Context, packageName: String) {
+    }
+
+    override fun provideActivity(): Activity {
+        return activity as Activity
     }
 
     override fun uninstallApp(packageName: String) {

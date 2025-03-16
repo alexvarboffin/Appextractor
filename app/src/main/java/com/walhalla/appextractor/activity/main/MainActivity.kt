@@ -33,11 +33,11 @@ import com.google.android.gms.ads.initialization.InitializationStatus
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
-import com.walhalla.appextractor.ApkUtils
+import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.BuildConfig
 import com.walhalla.appextractor.EasyPermissions
 import com.walhalla.appextractor.R
-import com.walhalla.appextractor.Util
+import com.walhalla.appextractor.utils.Util
 import com.walhalla.appextractor.activity.debug.GooglePlayCategoryLauncher
 import com.walhalla.appextractor.activity.detail.AppDetailInfoActivity
 import com.walhalla.appextractor.databinding.MainBinding
@@ -443,7 +443,7 @@ class MainActivity : AppCompatActivity(), MainView {
 
         mSectionsPagerAdapter!!.addFragment(getString(R.string.tab_text_1))
         mSectionsPagerAdapter!!.addFragment(getString(R.string.tab_text_3))
-        mSectionsPagerAdapter!!.addFragment(getString(R.string.action_settings))
+        mSectionsPagerAdapter!!.addFragment(getString(R.string.tab_text_2))
 
         mBinding!!.container.adapter = mSectionsPagerAdapter
         mBinding!!.container.addOnPageChangeListener(

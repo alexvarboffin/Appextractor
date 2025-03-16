@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.content.res.XmlResourceParser
-import com.walhalla.appextractor.activity.manifest.ManifestPresenterXml
+import com.walhalla.manifest.ManifestPresenterXml
 import com.walhalla.ui.DLog.d
 import java.io.FileNotFoundException
 import java.io.IOException

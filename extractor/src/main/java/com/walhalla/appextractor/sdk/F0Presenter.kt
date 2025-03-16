@@ -27,8 +27,8 @@ import androidx.annotation.RequiresApi
 import com.walhalla.appextractor.activity.detail.DetailsF0
 
 
-import com.walhalla.appextractor.utils.DLog.d
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.d
+import com.walhalla.ui.DLog.handleException
 import com.walhalla.appextractor.utils.IntentUtil
 import com.walhalla.extractor.R
 import org.qiyi.pluginlibrary.utils.ManifestParser
@@ -226,7 +226,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         }
 
         data.add(CertLine("BackupAgentName", applicationInfo.backupAgentName))
-        data.add(CertLine("ManageSpaceActivityName", applicationInfo.manageSpaceActivityName))
+        data.add(CertLine("ManageSpaceActivityName", applicationInfo.manageSpaceActivityName?:"Unknown"))
         //
         data.add(CertLine("ProcessName", applicationInfo.processName))
 

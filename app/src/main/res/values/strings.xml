@@ -107,4 +107,9 @@
     <string name="app_info_instrumentation">Instrumentation</string>
     <string name="actionExportFile">Export File</string>
 
+
+    <string name="tab_text_1">Applications</string>
+    <string name="tab_text_2">Settings</string>
+    <string name="tab_text_3">Log</string>
+
 </resources>

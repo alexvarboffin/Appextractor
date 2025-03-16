@@ -13,12 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.google.android.material.tabs.TabLayout
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.manifest.ManifestFragment.Companion.newInstance
 import com.walhalla.appextractor.fragment.BaseFragment
-import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.ui.DLog.d
 import java.util.Arrays
 import java.util.TreeSet

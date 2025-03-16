@@ -3,8 +3,7 @@ package com.walhalla.appextractor.utils
 import android.annotation.SuppressLint
 import android.os.Build
 import com.walhalla.appextractor.Config
-import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.handleException
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException

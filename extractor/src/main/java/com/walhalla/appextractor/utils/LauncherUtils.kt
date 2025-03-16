@@ -7,8 +7,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AlertDialog
 import com.walhalla.appextractor.sdk.ProviderLine
-import com.walhalla.appextractor.utils.DLog.d
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.d
+import com.walhalla.ui.DLog.handleException
 
 
 object LauncherUtils {

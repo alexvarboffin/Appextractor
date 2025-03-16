@@ -182,7 +182,7 @@ class DebugPagerFr2 : BaseFragment(), View.OnClickListener {
             val meta = PackageMeta.Builder(
                 applicationInfo!!.packageName
             )
-                .setLabel(
+                .label(
                     applicationInfo.loadLabel(pm).toString()
                 ) //                    .setHasSplits(hasSplits)
                 //                    .setIsSystemApp((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0)

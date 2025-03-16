@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.walhalla.appextractor.AppListAdapterCallback
 import com.walhalla.appextractor.R
-import com.walhalla.appextractor.Util.getDate
+import com.walhalla.appextractor.utils.Util.getDate
 import com.walhalla.appextractor.activity.detail.AppDetailInfoActivity
 import com.walhalla.appextractor.activity.manifest.ManifestActivity
 import com.walhalla.appextractor.adapter.appInfo.AppVh
@@ -54,7 +54,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
     private val executorServiceIcons: ExecutorService = Executors.newFixedThreadPool(3, tFactory)
     private val handler = Handler()
 
-    private val pm: PackageManager = mView.activity.packageManager
+    private val pm: PackageManager = mView.provideActivity().packageManager
 
     var names_to_load: Int = 0
     private val cache_appName: MutableMap<String?, String?> = Collections.synchronizedMap(
@@ -137,11 +137,10 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
      * @param meta
      * @return
      */
-    private fun GENERATE_APP_NAME(meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta): String? {
+    private fun GENERATE_APP_NAME(meta: PackageMeta): String {
         return if (cache_appName.containsKey(meta.packageName))
-            cache_appName[meta.packageName]
-        else
-            meta.label /*(String) meta.applicationInfo.loadLabel(pm)*/
+            cache_appName[meta.packageName]?:"Unknown"
+        else meta.label /*(String) meta.applicationInfo.loadLabel(pm)*/
     }
 
 
@@ -278,7 +277,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
     @SuppressLint("NonConstantResourceId")
     private fun showPopupMenu(v: View, adapterPosition: Int) {
         val packageInfo = items[adapterPosition]
-        val popup = PopupMenu(mView.activity, v)
+        val popup = PopupMenu(mView.provideActivity(), v)
         val inflater = popup.menuInflater
 
         val menu = popup.menu

@@ -10,11 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
-
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.walhalla.ui.DLog;

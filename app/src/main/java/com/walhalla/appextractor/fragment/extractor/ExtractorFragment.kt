@@ -34,11 +34,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dropbox.core.android.Auth
 import com.dropbox.core.v2.files.FileMetadata
-import com.walhalla.appextractor.ApkUtils
+import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.AppListAdapterCallback
 import com.walhalla.appextractor.ExtractorHelper
 import com.walhalla.appextractor.R
-import com.walhalla.appextractor.Util
 import com.walhalla.appextractor.activity.main.MainActivity
 import com.walhalla.appextractor.activity.main.MainView
 import com.walhalla.appextractor.adapter.ApkListAdapter
@@ -151,7 +150,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
     override fun printOutput(viewModel: ViewModel) {}
 
     override fun makeStorageLocalProgressBar(size: Int) {
-        __pd0 = Util.loadDialog(requireActivity(), R.drawable.ic_main_logo)
+        __pd0 = DialogUtils.loadDialog(requireActivity(), R.drawable.ic_main_logo)
         __pd0?.setButton(
             DialogInterface.BUTTON_NEGATIVE, requireActivity().getString(android.R.string.cancel),
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
@@ -465,8 +464,12 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         }
     }
 
+    override fun provideActivity(): Activity {
+        return requireActivity()
+    }
+
     override fun uninstallApp(packageName: String) {
-        ApkUtils.uninstallApp0(activity, packageName)
+        ApkUtils.uninstallApp0(requireActivity(), packageName)
     }
 
     override fun count(size: Int) {
@@ -593,7 +596,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
     }
 
     private fun uploadFile(activity: Activity, array: List<String>) {
-        var0 = Util.loadDialog(activity, R.drawable.ic_dropbox)
+        var0 = DialogUtils.loadDialog(activity, R.drawable.ic_dropbox)
         var0?.setButton(
             DialogInterface.BUTTON_NEGATIVE, activity.getString(android.R.string.cancel),
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
@@ -707,7 +710,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
     //    }
     fun showMessage(model: LogViewModel?) {
         if (mainView != null) {
-            mainView!!.printOutput(model)
+            model?.let { mainView!!.printOutput(it) }
             //mExtractorExtractorViewCallback.
         }
     }
@@ -755,7 +758,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
             }
 
 
-            pd0 = Util.loadDialog(requireActivity(), R.drawable.ic_telegram)
+            pd0 = DialogUtils.loadDialog(requireActivity(), R.drawable.ic_telegram)
             pd0?.setButton(
                 DialogInterface.BUTTON_NEGATIVE, requireActivity().getString(android.R.string.cancel),
                 DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->

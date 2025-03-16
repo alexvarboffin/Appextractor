@@ -2,7 +2,7 @@ package com.walhalla.appextractor.adapter.viewholder
 
 import android.graphics.Color
 import android.view.View
-import com.walhalla.appextractor.Util.getFileSizeMegaBytes
+import com.walhalla.appextractor.utils.Util.getFileSizeMegaBytes
 import com.walhalla.appextractor.databinding.ItemLoggerFileBinding
 import com.walhalla.appextractor.model.LFileViewModel
 import java.text.SimpleDateFormat

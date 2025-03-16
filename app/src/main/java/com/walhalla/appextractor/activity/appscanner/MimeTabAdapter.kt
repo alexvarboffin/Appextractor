@@ -12,19 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.appscanner.MimeTabAdapter.MimeViewHolder
 
-/**
- * ServiceIntentScanner
- *
- * Этот класс предназначен для сканирования устройства на наличие служб, соответствующих определённым Intent действиям.
- *
- * Он используется для поиска и отображения информации о службах, которые могут обрабатывать определённые действия Intent.
- * Это полезно для анализа и отладки приложений, а также для понимания того, какие службы доступны на устройстве для
- * обработки различных намерений.
- *
- * Пример использования:
- * ServiceIntentScanner scanner = new ServiceIntentScanner(context);
- * scanner.scanAndDisplayServices();
- */
+
 class MimeTabAdapter(private val mContext: Context) :
     RecyclerView.Adapter<MimeViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MimeViewHolder {

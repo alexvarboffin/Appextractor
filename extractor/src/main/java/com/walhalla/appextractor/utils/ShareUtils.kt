@@ -11,8 +11,8 @@ import com.walhalla.appextractor.Troubleshooting.defLocation
 import com.walhalla.appextractor.core.RBCWrapperDelegate
 
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.utils.DLog.d
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.d
+import com.walhalla.ui.DLog.handleException
 import com.walhalla.appextractor.utils.FileUtil.buildDstPath
 
 import java.io.File

@@ -16,7 +16,7 @@ import android.text.TextUtils
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.walhalla.appextractor.activity.detail.DetailsF0
-import com.walhalla.appextractor.utils.DLog
+import com.walhalla.ui.DLog
 import com.walhalla.appextractor.utils.IntentUtil
 import java.text.SimpleDateFormat
 import java.util.Date

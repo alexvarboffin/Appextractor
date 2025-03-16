@@ -6,7 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Build
-import com.walhalla.appextractor.ApkUtils
+import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.XmlUtils
 import java.io.File
@@ -44,7 +44,7 @@ class PackageInfoLoader(a: Context, private val callback: Callback) : AsyncTask<
                 val pining = XmlUtils.isPinningEnabled(a, applicationInfo!!.packageName)
 
                 val meta = PackageMeta.Builder(applicationInfo.packageName)
-                    .setLabel(applicationInfo.loadLabel(pm).toString())
+                    .label(applicationInfo.loadLabel(pm).toString())
                     .setHasSplits(hasSplits).setHasPining(pining)
                     .setIsSystemApp((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)
                     .setVersionCode(if (ApkUtils.apiIsAtLeast(Build.VERSION_CODES.P)) packageInfo.longVersionCode else packageInfo.versionCode.toLong())

@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.FileProvider
-import com.walhalla.appextractor.utils.DLog.d
+import com.walhalla.ui.DLog.d
 
 import java.io.File
 import java.io.FileInputStream

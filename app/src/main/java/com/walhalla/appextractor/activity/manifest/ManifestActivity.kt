@@ -18,6 +18,8 @@ import com.walhalla.appextractor.activity.debug.DemoData
 import com.walhalla.appextractor.databinding.ManifestTabsExplorerBinding
 import com.walhalla.appextractor.fragment.QCallback
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.manifest.MainManifestPresenter
+import com.walhalla.manifest.ManifestContract
 
 class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
     private var meta: PackageMeta? = null

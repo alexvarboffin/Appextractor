@@ -10,7 +10,7 @@ class PackageMeta : Parcelable {
 
     var packageName: String
 
-    var label: String?
+    var label: String
     var hasSplits: Boolean = false
     var hasPinning: Boolean = false
     var isSystemApp: Boolean = false
@@ -37,7 +37,7 @@ class PackageMeta : Parcelable {
 
     var isGranted: Boolean = false
 
-    constructor(packageName: String, label: String?) {
+    constructor(packageName: String, label: String) {
         this.packageName = packageName
         this.label = label
     }
@@ -46,7 +46,7 @@ class PackageMeta : Parcelable {
     class Builder(packageName: String) {
         private val mPackageMeta = PackageMeta(packageName, "?")
 
-        fun setLabel(label: String?): Builder {
+        fun label(label: String): Builder {
             mPackageMeta.label = label
             return this
         }
@@ -138,7 +138,7 @@ class PackageMeta : Parcelable {
 
     protected constructor(`in`: Parcel) {
         packageName = `in`.readString() ?: ""
-        label = `in`.readString()
+        label = `in`.readString() ?: ""
         hasSplits = `in`.readByte().toInt() != 0
         isSystemApp = `in`.readByte().toInt() != 0
         versionCode = `in`.readLong()

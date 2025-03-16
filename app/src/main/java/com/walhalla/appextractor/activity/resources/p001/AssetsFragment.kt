@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.walhalla.appextractor.activity.main.MainActivity
 import com.walhalla.appextractor.resources.ResItem
 import com.walhalla.appextractor.activity.resources.ResourceAdapter
-import com.walhalla.appextractor.activity.resources.ResourceAdapter.ResourceViewHolder
 import com.walhalla.appextractor.databinding.ActivityResourcesBinding
 import com.walhalla.appextractor.fragment.BaseFragment
 import com.walhalla.appextractor.model.PackageMeta

@@ -2,7 +2,7 @@ package com.walhalla.appextractor.domain.interactors
 
 import android.content.Context
 import com.walhalla.appextractor.R
-import com.walhalla.appextractor.Util
+import com.walhalla.appextractor.utils.Util
 import com.walhalla.appextractor.domain.interactors.TelegramClient.TClientCallback
 import com.walhalla.threader.AbstractInteractor
 

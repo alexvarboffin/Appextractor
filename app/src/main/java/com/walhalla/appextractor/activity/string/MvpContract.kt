@@ -1,22 +1,18 @@
-package com.walhalla.appextractor.activity.string;
+package com.walhalla.appextractor.activity.string
 
-import androidx.annotation.StringRes;
+import androidx.annotation.StringRes
+import com.walhalla.appextractor.resources.StringItemViewModel
 
-import com.walhalla.appextractor.resources.StringItemViewModel;
-
-import java.util.List;
-
-public interface MvpContract {
+interface MvpContract {
     interface View {
-        void showResourceRawText(StringItemViewModel resource, String content);
+        fun showResourceRawText(resource: StringItemViewModel, content: String)
 
-        void showError(String message);
+        fun showError(message: String)
 
-        void showSuccess(List<StringItemViewModel> list);
+        fun showSuccess(list: List<StringItemViewModel>)
 
-        void successToast(@StringRes int res, String aaa);
+        fun successToast(@StringRes res: Int, aaa: String)
 
-        void errorToast(@StringRes int res, String aaa);
-
+        fun errorToast(@StringRes res: Int, aaa: String)
     }
 }

@@ -1,33 +1,30 @@
-package com.walhalla.appextractor;
+package com.walhalla.appextractor
 
-import android.content.Context;
-import android.view.View;
+import android.app.Activity
+import android.content.Context
+import android.view.View
+import com.walhalla.appextractor.model.PackageMeta
 
-import com.walhalla.appextractor.model.PackageMeta;
+interface AppListAdapterCallback : NotificationToast {
+    fun nowExtractOneSelected(info: List<PackageMeta>, appName: Array<String>)
 
-import java.util.List;
+    fun openPackageOnGooglePlay(packageName: String)
 
-public interface AppListAdapterCallback extends NotificationToast{
+    fun hideProgressBar()
 
-    void nowExtractOneSelected(List<PackageMeta> info, String[] appName);
+    fun launchApp(context: Context, packageName: String)
 
-    void openPackageOnGooglePlay(String packageName);
+    fun provideActivity(): Activity
 
-    void hideProgressBar();
+    fun uninstallApp(packageName: String)
 
-    void launchApp(Context context, String packageName);
+    fun count(size: Int)
 
-    Context getActivity();
+    fun shareToOtherApp(generate_app_name: String)
 
-    void uninstallApp(String packageName);
+    fun menuExtractSelected(v: View)
 
-    void count(int size);
+    fun saveIconRequest(packageInfo: PackageMeta)
 
-    void shareToOtherApp(String generate_app_name);
-
-    void menuExtractSelected(View v);
-
-    void saveIconRequest(PackageMeta packageInfo);
-
-    void exportIconRequest(PackageMeta packageInfo);
+    fun exportIconRequest(packageInfo: PackageMeta)
 }

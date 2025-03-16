@@ -402,7 +402,7 @@
 -keep class com.google.firebase.provider.FirebaseInitProvider { <init>(); }
 -keep class com.google.firebase.sessions.SessionLifecycleService { <init>(); }
 -keep class com.walhalla.appextractor.App { <init>(); }
--keep class com.walhalla.appextractor.IntentReceiver { <init>(); }
+-keep class com.walhalla.appextractor.receiver.IntentReceiver { <init>(); }
 -keep class com.walhalla.appextractor.activity.appscanner.ServiceIntentScanner { <init>(); }
 -keep class com.walhalla.appextractor.activity.debug.ButtonListActivity { <init>(); }
 -keep class com.walhalla.appextractor.activity.debug.DebugActivity { <init>(); }

@@ -6,7 +6,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.fragment.app.Fragment
-import com.walhalla.appextractor.ApkUtils
+import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.model.PackageMeta
 import java.io.File
 
@@ -46,7 +46,7 @@ open class DemoFragment : Fragment() {
             }
             val meta = PackageMeta.Builder(
                 applicationInfo!!.packageName
-            ).setLabel(applicationInfo.loadLabel(pm).toString()).setHasSplits(hasSplits)
+            ).label(applicationInfo.loadLabel(pm).toString()).setHasSplits(hasSplits)
                 .setIsSystemApp((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)
                 .setVersionCode(
                     if (ApkUtils.apiIsAtLeast(

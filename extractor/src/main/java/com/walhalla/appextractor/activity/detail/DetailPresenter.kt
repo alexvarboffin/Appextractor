@@ -2,8 +2,7 @@ package com.walhalla.appextractor.activity.detail
 
 import android.content.Context
 import android.content.pm.PackageManager
-import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.handleException
 
 
 class DetailPresenter(context: Context, meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta, view: DetailContract.View) :

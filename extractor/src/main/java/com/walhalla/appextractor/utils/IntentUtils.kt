@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import com.walhalla.appextractor.utils.DLog.handleException
+import com.walhalla.ui.DLog.handleException
 
 
 object IntentUtils {

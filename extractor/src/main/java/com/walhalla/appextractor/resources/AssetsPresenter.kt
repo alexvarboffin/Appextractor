@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Environment
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+import com.walhalla.abcsharedlib.Share
 import com.walhalla.appextractor.utils.IntentUtil.Companion.shareFile
 import com.walhalla.extractor.R
 
@@ -201,7 +202,7 @@ class AssetsPresenter(private val context: Context, private val view: ManifestCo
 
             val description =
                 "" + name + " file extracted by " + context.resources.getString(R.string.app_name)
-            shareFile(context, context.packageName, description, outputZipPath)
+            Share.shareFile(context, context.packageName, description, outputZipPath)
             println("success: $name")
         } catch (e: IOException) {
             handleException(e)
@@ -235,7 +236,7 @@ class AssetsPresenter(private val context: Context, private val view: ManifestCo
             outputStream.close()
             inputStream.close()
             val description = "" + name + " file extracted by " + context.resources.getString(R.string.app_name)
-            shareFile(context, context.packageName, description, filePath)
+            Share.shareFile(context, context.packageName, description, filePath)
             println("success: $name")
         } catch (e: IOException) {
             handleException(e)
