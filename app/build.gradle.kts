@@ -152,7 +152,7 @@ dependencies {
     //    testImplementation "junit:junit:4.12"
     //    androidTestImplementation "com.android.support.test:runner:1.0.2"
     //    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
-    implementation("com.dropbox.core:dropbox-core-sdk:3.1.5")
+    implementation(libs.dropbox.core.sdk)
     //    implementation("com.google.android.gms:play-services-drive:15.0.0") {
     //        exclude group: "org.apache.httpcomponents"
     //    }
