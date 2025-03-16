@@ -107,13 +107,13 @@ android {
         jvmTarget = "17"
     }
 
-    flavorDimensions += "W"
-
-    productFlavors {
-        create("pro") {
-            dimension = "W"
-        }
-    }
+//    flavorDimensions += "W"
+//
+//    productFlavors {
+//        create("pro") {
+//            dimension = "W"
+//        }
+//    }
 
     lint {
         abortOnError = false
@@ -187,7 +187,11 @@ dependencies {
     //implementation(project(":wads"))
 
     implementation(project(":features:ui"))
-    implementation(project(":threader"))
+    implementation(project(":extractor"))
+    implementation(project(":shared"))
+
+
+    //implementation(project(":threader"))
 
     implementation(libs.androidx.core.ktx)
 
@@ -204,7 +208,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     //implementation("org.jetbrains.kotlin:kotlin-stdlib:$rootProject.kotlin_version")
     //implementation@@@@@@@@@@@@@@@core:1.10.3"
-    implementation("com.google.android:flexbox:2.0.1")
+    implementation(libs.flexbox)
     implementation(libs.glide)
 
 //    implementation("com.facebook.react:hermes-engine:+")

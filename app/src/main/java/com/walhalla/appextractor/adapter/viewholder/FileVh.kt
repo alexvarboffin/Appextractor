@@ -1,52 +1,40 @@
-package com.walhalla.appextractor.adapter.viewholder;
+package com.walhalla.appextractor.adapter.viewholder
 
-import android.graphics.Color;
-import android.view.View;
+import android.graphics.Color
+import android.view.View
+import com.walhalla.appextractor.Util.getFileSizeMegaBytes
+import com.walhalla.appextractor.databinding.ItemLoggerFileBinding
+import com.walhalla.appextractor.model.LFileViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-import com.walhalla.appextractor.Util;
-import com.walhalla.appextractor.databinding.ItemLoggerFileBinding;
-import com.walhalla.appextractor.model.LFileViewModel;
+class FileVh(val mBinding: ItemLoggerFileBinding, listener: FileVhCallback?) :
+    BaseVh<LFileViewModel>(mBinding.root), View.OnClickListener {
+    private val listener: FileVhCallback?
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-
-public class FileVh extends BaseVh<LFileViewModel>
-        implements View.OnClickListener {
-
-    private final FileVhCallback listener;
-    public final ItemLoggerFileBinding mBinding;
-
-    public interface FileVhCallback {
-
-        void onClick0(View v, int adapterPosition);
+    interface FileVhCallback {
+        fun onClick0(v: View, adapterPosition: Int)
     }
 
-    public FileVh(ItemLoggerFileBinding binding, FileVhCallback listener) {
-        super(binding.getRoot());
-        this.mBinding = binding;
-        this.mBinding.getRoot().setOnClickListener(this);
-        this.listener = listener;
+    init {
+        mBinding.root.setOnClickListener(this)
+        this.listener = listener
         //Log.d("@hash=" + this.hashCode());
     }
 
 
-    @Override
-    public void onClick(View v) {
-        if (listener != null) {
-            listener.onClick0(v, getAdapterPosition());//clicker...
-        }
+    override fun onClick(v: View) {
+        listener?.onClick0(v, adapterPosition)
     }
 
-    @Override
-    public void bind(LFileViewModel model, int position) {
+    override fun bind(model: LFileViewModel, position: Int) {
         if (position % 2 > 0) {
-            this.mBinding.getRoot().setBackgroundColor(Color.WHITE);
+            mBinding.root.setBackgroundColor(Color.WHITE)
         }
 
 
-//        if (position % Const.colors.length > 0) {
+        //        if (position % Const.colors.length > 0) {
 //            //@drawable/ic_log_file_bg
 //            int jk = position;
 //            //if(jk>colors.length){
@@ -54,30 +42,29 @@ public class FileVh extends BaseVh<LFileViewModel>
 //            //}
 //            //this.mBinding.imgContainer.setBackgroundColor(itemView.getResources().getColor(Const.colors[jk]));
 //        }
-
         if (model != null) {
-            String size = Util.getFileSizeMegaBytes(model.file);
-            long aa = model.file.lastModified();
-            mBinding.image.setImageResource(model.icon);
-            mBinding.text1.setText(model.getText());
-            mBinding.fileSize.setText(size);
-            mBinding.text3.setText(getDate(aa));
+            val size = getFileSizeMegaBytes(model.file)
+            val aa = model.file.lastModified()
+            mBinding.image.setImageResource(model.icon)
+            mBinding.text1.text = model.text
+            mBinding.fileSize.text = size
+            mBinding.text3.text = getDate(aa)
         }
     }
 
-    public String getDate(long aa) {
+    fun getDate(aa: Long): String {
         if (aa > 0) {
             try {
 //            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
 //            Date netDate = (new Date(timeStamp));
 //            return sdf.format(netDate);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
-                String fut = sdf.format(new Date(aa));
-                return "" + fut;
-            } catch (Exception ex) {
-                return "";
+                val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+                val fut = sdf.format(Date(aa))
+                return "" + fut
+            } catch (ex: Exception) {
+                return ""
             }
         }
-        return "";
+        return ""
     }
 }

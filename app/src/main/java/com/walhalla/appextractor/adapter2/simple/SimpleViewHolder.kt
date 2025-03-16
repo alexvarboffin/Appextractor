@@ -1,44 +1,31 @@
-package com.walhalla.appextractor.adapter2.simple;
+package com.walhalla.appextractor.adapter2.simple
 
-import android.graphics.Color;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.graphics.Color
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import com.walhalla.appextractor.R
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter;
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter
+import com.walhalla.appextractor.sdk.SimpleLine
+import pokercc.android.expandablerecyclerview.ExpandableAdapter
 
-import pokercc.android.expandablerecyclerview.ExpandableAdapter;
+class SimpleViewHolder(view: View, private val presenter: AppDetailInfoAdapter) :
+    ExpandableAdapter.ViewHolder(view) {
+    private val layout: ViewGroup = view.findViewById(R.id.lLayout1)
+    private val btn: View = view.findViewById(R.id.searchBtn)
 
-public class SimpleViewHolder extends
-        //RecyclerView.ViewHolder
-        ExpandableAdapter.ViewHolder {
-
-    private final ViewGroup layout;
-    private final View btn;
-    private final AppDetailInfoAdapter presenter;
-
-    public void bind(SimpleLine object, int position) {
+    fun bind(o: SimpleLine, position: Int) {
         if (position % 2 > 0) {
-            this.layout.setBackgroundColor(Color.WHITE);
+            layout.setBackgroundColor(Color.WHITE)
         }
-        this.text1.setText(object.res0);
-        this.text2.setText(object.value);
-        btn.setOnClickListener(v -> {
-            presenter.onItemClicked(v, object);
-        });
+        text1.setText(o.res0)
+        text2.text = o.value
+        btn.setOnClickListener { v: View? ->
+            presenter.onItemClicked(v, o)
+        }
     }
 
-    private final TextView text1;
-    private final TextView text2;
-
-    public SimpleViewHolder(View view, AppDetailInfoAdapter presenter) {
-        super(view);
-        text1 = view.findViewById(R.id.text1);
-        text2 = view.findViewById(R.id.text2);
-        layout = view.findViewById(R.id.lLayout1);
-        btn = view.findViewById(R.id.searchBtn);
-        this.presenter = presenter;
-    }
-
+    private val text1: TextView = view.findViewById(R.id.text1)
+    private val text2: TextView = view.findViewById(R.id.text2)
 }

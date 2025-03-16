@@ -1,36 +1,30 @@
-package com.walhalla.appextractor.adapter.viewholder;
+package com.walhalla.appextractor.adapter.viewholder
 
-import android.view.View;
+import android.view.View
+import com.walhalla.appextractor.adapter.viewholder.LoggerAdapter.ChildItemClickListener
+import com.walhalla.appextractor.databinding.ItemLoggerBinding
+import com.walhalla.appextractor.model.LogViewModel
 
-import com.walhalla.appextractor.databinding.ItemLoggerBinding;
+class LogViewHolder(private val mBinding: ItemLoggerBinding, listener: ChildItemClickListener) :
+    BaseVh<LogViewModel>(mBinding.root), View.OnClickListener {
+    private val listener: ChildItemClickListener
 
-import com.walhalla.appextractor.model.LogViewModel;
-
-public class LogViewHolder extends BaseVh<LogViewModel> implements View.OnClickListener {
-
-    private final LoggerAdapter.ChildItemClickListener listener;
-    private final ItemLoggerBinding mBinding;
-
-    public LogViewHolder(ItemLoggerBinding binding, LoggerAdapter.ChildItemClickListener listener) {
-        super(binding.getRoot());
-        this.mBinding = binding;
-        this.mBinding.getRoot().setOnClickListener(this);
-        this.listener = listener;
+    init {
+        mBinding.root.setOnClickListener(this)
+        this.listener = listener
 
         //Log.d("@hash=" + this.hashCode());
     }
 
 
-    @Override
-    public void onClick(View view) {
-        listener.onClick0(view, getAdapterPosition());
+    override fun onClick(view: View) {
+        listener.onClick0(view, adapterPosition)
     }
 
-    @Override
-    public void bind(LogViewModel operation, int position) {
+    override fun bind(operation: LogViewModel, position: Int) {
         if (operation != null) {
-            mBinding.text1.setText(operation.getText());
-            mBinding.imageView1.setImageResource(operation.icon);
+            mBinding.text1.text = operation.text
+            mBinding.imageView1.setImageResource(operation.icon)
         }
     }
 }

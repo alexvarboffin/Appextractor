@@ -17,7 +17,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.walhalla.appextractor.activity.manifest.ManifestPresenterXml
-import com.walhalla.appextractor.activity.string.StringItem
+import com.walhalla.appextractor.resources.StringItemViewModel
 import com.walhalla.appextractor.utils.NetworkUtils
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.e
@@ -112,9 +112,9 @@ class PlaylistFragment : DemoFragment() {
     }
 
     private fun handlePos(context: Context, i: Int) {
-        if (a == null) {
+        if (a.isEmpty()) {
             pm = context.packageManager
-            fullMeta(pm)
+            fullMeta(pm!!)
         }
         if (i == 0) {
             d("" + "Нажата кнопка: " + i + ", " + a.size)
@@ -210,7 +210,7 @@ ${otherContext.resources.displayMetrics} ${DisplayMetrics()} """ + otherContext
             am = initAM
             resources = initRes
         }
-        val m: List<StringItem> = ArrayList()
+        val m: List<StringItemViewModel> = ArrayList()
         //loadApplicationResources(this, m, getPackageName());
         loadApplicationResources0(context, m, packageName)
         //mView.showSuccess(m);
@@ -221,7 +221,7 @@ ${otherContext.resources.displayMetrics} ${DisplayMetrics()} """ + otherContext
     )
 
     private fun loadApplicationResources0(
-        context: Context, iconPackResources: List<StringItem>,
+        context: Context, iconPackResources: List<StringItemViewModel>,
         packageName: String
     ) { /*from w w w.  j a  va 2s. co  m*/
         val drawableItems: Array<Field>
@@ -247,7 +247,7 @@ ${otherContext.resources.displayMetrics} ${DisplayMetrics()} """ + otherContext
     }
 
     private fun loadApplicationResources(
-        context: Context, iconPackResources: MutableList<StringItem>,
+        context: Context, iconPackResources: MutableList<StringItemViewModel>,
         packageName: String
     ) { /*from w w w.  j a  va 2s. co  m*/
         val drawableItems: Array<Field>
@@ -291,7 +291,7 @@ ${otherContext.resources.displayMetrics} ${DisplayMetrics()} """ + otherContext
                 continue
             }
             //iconPackResources.add(new ResItem(iconPackage + "." + iconActivity + " " + icon, null));
-            iconPackResources.add(StringItem(icon, stringValue, null))
+            iconPackResources.add(StringItemViewModel(icon, stringValue, null))
 
             for (s in aa) {
                 if (stringValue.contains(s) || icon.contains(s)) {

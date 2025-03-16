@@ -14,22 +14,25 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter.DetailAdapterCallback
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter.DetailAdapterCallback
 import com.walhalla.appextractor.activity.detail.DetailsF0
 import com.walhalla.appextractor.activity.manifest.ManifestActivity
-import com.walhalla.appextractor.adapter2.base.ViewModel
-import com.walhalla.appextractor.adapter2.perm.PermissionLine
-import com.walhalla.appextractor.adapter2.provider.ProviderLine
+
+import com.walhalla.appextractor.adapter2.perm.PermissionViewHolder
+
 import com.walhalla.appextractor.databinding.IncludeAppDetailInfoBinding
-import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.presenter.F0Presenter
+import com.walhalla.appextractor.sdk.F0Presenter
+import com.walhalla.appextractor.sdk.BaseViewModel
+import com.walhalla.appextractor.sdk.PermissionLine
+import com.walhalla.appextractor.sdk.ProviderLine
 import com.walhalla.appextractor.utils.LauncherUtils
+import com.walhalla.appextractor.utils.ShareUtils
 import com.walhalla.ui.plugins.Module_U.shareText
 import java.util.Locale
 
 class FR0 : BaseFragment(), DetailsF0.View {
-    private var meta: PackageMeta? = null
+    private var meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta? = null
     private var mPresenter: F0Presenter? = null
 
     private var binding: IncludeAppDetailInfoBinding? = null
@@ -41,12 +44,13 @@ class FR0 : BaseFragment(), DetailsF0.View {
         if (arguments != null) {
             meta = requireArguments().getParcelable(ARG_PARAM1)
         }
-        adapter = AppDetailInfoAdapter(
-            activity,
-            { `object`: PermissionLine? ->
-                mPresenter!!.openSettingsRequest(
-                    context
-                )
+        adapter = AppDetailInfoAdapter(requireActivity(),
+            object : PermissionViewHolder.PermissionViewHolderCallback {
+
+                override fun onItemClicked(o: PermissionLine) {
+                    mPresenter!!.openSettingsRequest(requireContext())
+                }
+
             }, object : DetailAdapterCallback {
                 override fun copyToBuffer(value: String) {
                     if (callback != null) {
@@ -55,7 +59,7 @@ class FR0 : BaseFragment(), DetailsF0.View {
                 }
 
                 override fun onLaunchExportedActivity0(className: String) {
-                    LauncherUtils.onLaunchExportedActivity(activity, meta!!.packageName, className)
+                    LauncherUtils.onLaunchExportedActivity(requireActivity(), meta!!.packageName, className)
                 }
 
                 override fun onLaunchExportedService(class_name: String) {
@@ -63,20 +67,21 @@ class FR0 : BaseFragment(), DetailsF0.View {
                 }
 
                 override fun onLaunchAuthorityRequest(provider: ProviderLine) {
-                    LauncherUtils.onLaunchProvider(
-                        context, provider
-                    ) { s ->
-                        Toast.makeText(context, s, Toast.LENGTH_LONG)
-                            .show()
-                    }
+
+                    LauncherUtils.onLaunchProvider(requireContext(), provider, object : LauncherUtils.LauCallback {
+                        override fun showError(errorMessage: String) {
+                            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                        }
+
+                    })
                 }
 
                 override fun manifestViewerRequest(value: String) {
-                    ManifestActivity.newIntent(activity, meta, arrayOf(value), null)
+                    ManifestActivity.newIntent(requireActivity(), meta, arrayOf(value), null)
                 }
 
                 override fun exportFile(filePath: String) {
-                    ShareUtils.shareApkFile(context, meta, filePath)
+                    meta?.let { ShareUtils.shareApkFile(requireContext(), it, filePath) }
                 }
 
                 override fun shareText(value: String) {
@@ -115,7 +120,9 @@ class FR0 : BaseFragment(), DetailsF0.View {
     }
 
     private fun makeUI(context: Context) {
-        mPresenter = F0Presenter(context, meta, this)
+        mPresenter = meta?.let {
+            F0Presenter(context, it, this)
+        }
         mPresenter!!.doStuff(context)
     }
 
@@ -142,14 +149,14 @@ class FR0 : BaseFragment(), DetailsF0.View {
         }
     }
 
-    override fun swap(data: List<ViewModel>) {
+    override fun swap(data: List<BaseViewModel>) {
         adapter!!.swap(data)
     }
 
     companion object {
         private const val ARG_PARAM1 = "param1"
         @JvmStatic
-        fun newInstance(meta: PackageMeta?): FR0 {
+        fun newInstance(meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta?): FR0 {
             val fragment = FR0()
             val args = Bundle()
             args.putParcelable(ARG_PARAM1, meta)

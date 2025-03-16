@@ -10,17 +10,18 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.walhalla.appextractor.activity.manifest.ManifestActivity
+import com.walhalla.appextractor.resources.ResType
+import com.walhalla.appextractor.adapter.ResourceAdapter
 import com.walhalla.appextractor.databinding.TabStringsBinding
 import com.walhalla.appextractor.fragment.BaseFragment
-import com.walhalla.appextractor.model.LogType
-import com.walhalla.appextractor.model.LogViewModel
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.resources.StringItemViewModel
 
-class StrFragment : BaseFragment(), MvpContract.View, StringsAdapter.OnItemClickListener {
+class StrFragment : BaseFragment(), MvpContract.View, ResourceAdapter.OnItemClickListener {
     private var meta: PackageMeta? = null
     var resourceType: String? = null
     private var presenter: StringsPresenter? = null
-    private var adapter: StringsAdapter? = null
+    private var adapter: ResourceAdapter? = null
     private var binding: TabStringsBinding? = null
 
 
@@ -30,8 +31,8 @@ class StrFragment : BaseFragment(), MvpContract.View, StringsAdapter.OnItemClick
             meta = requireArguments().getParcelable(KEY_OBJ_NAME)
             resourceType = requireArguments().getString(KEY_RES_TYPE)
         }
-        adapter = StringsAdapter(ArrayList())
-        presenter = StringsPresenter(activity, this)
+        adapter = ResourceAdapter(ArrayList())
+        presenter = StringsPresenter(requireContext(), this)
     }
 
     override fun onCreateView(
@@ -61,7 +62,7 @@ class StrFragment : BaseFragment(), MvpContract.View, StringsAdapter.OnItemClick
         //TextView textView = findViewById(R.id.manifest_content);
         adapter!!.setOnItemClickListener(this)
         if (meta != null && savedInstanceState == null) {
-            presenter!!.loadManifestContent(meta!!.packageName, resourceType)
+            presenter!!.loadManifestContent(meta!!.packageName, resourceType!!)
         }
     }
 
@@ -75,15 +76,22 @@ class StrFragment : BaseFragment(), MvpContract.View, StringsAdapter.OnItemClick
     }
 
 
-    override fun showResourceRawText(resource: StringItem, content: String) {
+    override fun showResourceRawText(resource: StringItemViewModel, content: String) {
     }
 
     override fun showError(message: String) {
         //message
-        adapter!!.swap(LogViewModel(LogType.Empty, 0, message))
+        adapter!!.swap(
+            StringItemViewModel(
+                type = ResType.Empty,
+                icon = null,
+                text = message,
+                name = ""
+            )
+        )
     }
 
-    override fun showSuccess(list: List<StringItem>) {
+    override fun showSuccess(list: List<StringItemViewModel>) {
         adapter!!.swap(list)
     }
 
@@ -102,9 +110,9 @@ class StrFragment : BaseFragment(), MvpContract.View, StringsAdapter.OnItemClick
     override fun shareText(value: String) {
     }
 
-    override fun xmlViewerRequest(value: String) {
+    override fun xmlViewerRequest(value: String?) {
         //Toast.makeText(getActivity(), value, Toast.LENGTH_SHORT).show();
-        ManifestActivity.newIntent(activity, meta, null, value)
+        ManifestActivity.newIntent(requireActivity(), meta, null, value)
     }
 
     companion object {

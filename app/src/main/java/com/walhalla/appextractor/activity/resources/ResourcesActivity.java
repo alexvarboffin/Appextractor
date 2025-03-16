@@ -2,24 +2,14 @@ package com.walhalla.appextractor.activity.resources;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.detail.DetailPresenter;
-import com.walhalla.appextractor.fragment.PagerFragment;
 import com.walhalla.appextractor.fragment.QCallback;
 import com.walhalla.appextractor.model.PackageMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ResourcesActivity extends AppCompatActivity implements QCallback {
     private static final String KEY_OBJ_NAME = "key_obj_name"; //"app_component"

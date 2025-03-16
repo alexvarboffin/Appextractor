@@ -1,75 +1,69 @@
-package com.walhalla.appextractor.activity.resources;
+package com.walhalla.appextractor.activity.resources
 
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupMenu;
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.recyclerview.widget.RecyclerView
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.activity.resources.ResourceAdapter.ResourceViewHolder
+import com.walhalla.appextractor.databinding.ItemResourceBinding
+import com.walhalla.appextractor.resources.OnResourceItemClickListener
+import com.walhalla.appextractor.resources.ResItem
+import com.walhalla.appextractor.resources.ResType
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class ResourceAdapter(private val items: MutableList<ResItem>) : RecyclerView.Adapter<ResourceViewHolder>() {
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.databinding.ItemResourceBinding;
+    private var mView: com.walhalla.appextractor.resources.OnResourceItemClickListener? = null
 
-import java.lang.reflect.Field;
-import java.util.List;
-
-public class ResourceAdapter extends RecyclerView.Adapter<ResourceAdapter.ResourceViewHolder> {
-    private final List<ResItem> items;
-    private ResourceViewHolder.OnItemClickListener mView;
-
-    public ResourceAdapter(List<ResItem> resources) {
-        this.items = resources;
+    fun setOnItemClickListener(listener: OnResourceItemClickListener?) {
+        this.mView = listener
     }
 
-    public void setOnItemClickListener(ResourceViewHolder.OnItemClickListener listener) {
-        this.mView = listener;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResourceViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemResourceBinding.inflate(inflater, parent, false)
+        return ResourceViewHolder(binding)
     }
 
-    @NonNull
-    @Override
-    public ResourceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        @NonNull ItemResourceBinding binding = ItemResourceBinding.inflate(inflater, parent, false);
-        return new ResourceViewHolder(binding);
+    override fun onBindViewHolder(holder: ResourceViewHolder, position: Int) {
+        val resource = items[position]
+        holder.bind(resource)
+        holder.binding.overflowMenu.setOnClickListener { view: View ->
+            showPopupMenu(
+                view,
+                position
+            )
+        }
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ResourceViewHolder holder, int position) {
-        ResItem resource = items.get(position);
-        holder.bind(resource);
-        holder.binding.overflowMenu.setOnClickListener(view -> showPopupMenu(view, position));
-    }
+    private fun showPopupMenu(v: View, adapterPosition: Int) {
+        val resource = items[adapterPosition]
+        val popup = PopupMenu(v.context, v)
+        val inflater = popup.menuInflater
+        val menu = popup.menu
 
-    private void showPopupMenu(View v, int adapterPosition) {
-        ResItem resource = items.get(adapterPosition);
-        PopupMenu popup = new PopupMenu(v.getContext(), v);
-        MenuInflater inflater = popup.getMenuInflater();
-        Menu menu = popup.getMenu();
-
-        inflater.inflate(R.menu.abc_popup_resource_image, menu);
-        Object menuHelper;
-        Class<?>[] argTypes;
+        inflater.inflate(R.menu.abc_popup_resource_image, menu)
+        val menuHelper: Any
+        val argTypes: Array<Class<*>?>
         try {
-            Field fMenuHelper = PopupMenu.class.getDeclaredField("mPopup");
-            fMenuHelper.setAccessible(true);
-            menuHelper = fMenuHelper.get(popup);
-            argTypes = new Class[]{boolean.class};
-            menuHelper.getClass().getDeclaredMethod("setForceShowIcon", argTypes).invoke(menuHelper, true);
-        } catch (Exception e) {
-
+            val fMenuHelper = PopupMenu::class.java.getDeclaredField("mPopup")
+            fMenuHelper.isAccessible = true
+            menuHelper = fMenuHelper[popup]
+            argTypes = arrayOf(Boolean::class.javaPrimitiveType)
+            menuHelper.javaClass.getDeclaredMethod("setForceShowIcon", *argTypes)
+                .invoke(menuHelper, true)
+        } catch (e: Exception) {
         }
 
         if (ResItem.isImages(resource)) {
-            menu.findItem(R.id.action_read_file).setVisible(false);
+            menu.findItem(R.id.action_read_file).setVisible(false)
         }
 
-        popup.setOnMenuItemClickListener(menuItem -> {
-
-            int itemId = menuItem.getItemId();
-//                case R.id.action_copy_package_name:
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            val itemId = menuItem.itemId
+            //                case R.id.action_copy_package_name:
 //                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 //                    if (clipboard != null) {
 //                        ClipData clip = ClipData.newPlainText("packageName", "" + packageInfo.packageName);
@@ -82,76 +76,59 @@ public class ResourceAdapter extends RecyclerView.Adapter<ResourceAdapter.Resour
 //                    return true;
             if (itemId == R.id.action_save_icon) {
                 if (mView != null) {
-                    mView.saveIconRequest(resource);
+                    mView!!.saveIconRequest(resource)
                 }
             } else if (itemId == R.id.action_share_icon) {
                 if (mView != null) {
-                    mView.exportIconRequest(resource);
+                    mView!!.exportIconRequest(resource)
                 }
             } else if (itemId == R.id.action_read_file) {
                 if (mView != null) {
-                    mView.readAssetRequest(resource);
+                    mView!!.readAssetRequest(resource)
                 }
             } else if (itemId == R.id.action_zip_all_assets) {
                 if (mView != null) {
-                    mView.zipAllAssetsRequest(resource);
+                    mView!!.zipAllAssetsRequest(resource)
                 }
             }
-            return false;
-        });
-        popup.show();
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    public void swap(List<ResItem> list) {
-        items.clear();
-        items.addAll(list);
-        notifyDataSetChanged();
-    }
-
-    public static class ResourceViewHolder extends RecyclerView.ViewHolder {
-        public interface OnItemClickListener {
-            void readAssetRequest(ResItem resource);
-
-            void saveIconRequest(ResItem resource);
-
-            void exportIconRequest(ResItem resource);
-
-            void zipAllAssetsRequest(ResItem resource);
+            false
         }
+        popup.show()
+    }
 
-        private final ItemResourceBinding binding;
+    override fun getItemCount(): Int {
+        return items.size
+    }
 
-        ResourceViewHolder(@NonNull ItemResourceBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
+    fun swap(list: List<ResItem>) {
+        items.clear()
+        items.addAll(list)
+        notifyDataSetChanged()
+    }
 
-        void bind(ResItem resource) {
-            binding.resourceText.setText(resource.fullPath);
-            if (resource.type == ResType.DIR) {
-                binding.icon0.setVisibility(View.VISIBLE);
-                binding.icon0.setImageResource(R.drawable.ic_folder_blue_36dp);
-                binding.overflowMenu.setVisibility(View.GONE);
+    class ResourceViewHolder internal constructor(internal val binding: ItemResourceBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-                binding.icon1.setVisibility(View.GONE);
+        fun bind(resource: ResItem) {
+            binding.resourceText.text = resource.fullPath
+            if (resource.type === ResType.Dir) {
+                binding.icon0.visibility = View.VISIBLE
+                binding.icon0.setImageResource(R.drawable.ic_folder_blue_36dp)
+                binding.overflowMenu.visibility = View.GONE
 
+                binding.icon1.visibility = View.GONE
             } else {
                 if (resource.drawable != null) {
-                    binding.overflowMenu.setVisibility(View.VISIBLE);
-                    binding.icon1.setVisibility(View.VISIBLE);
-                    binding.icon1.setImageDrawable(resource.drawable);
+                    binding.overflowMenu.visibility = View.VISIBLE
+                    binding.icon1.visibility = View.VISIBLE
+                    binding.icon1.setImageDrawable(resource.drawable)
 
-                    binding.icon0.setVisibility(View.VISIBLE);
+                    binding.icon0.visibility = View.VISIBLE
                 } else {
-                    binding.overflowMenu.setVisibility(View.VISIBLE);
+                    binding.overflowMenu.visibility = View.VISIBLE
 
-                    binding.icon1.setVisibility(View.GONE);
-                    binding.icon1.setImageDrawable(null);
+                    binding.icon1.visibility = View.GONE
+                    binding.icon1.setImageDrawable(null)
                 }
             }
 //            itemView.setOnClickListener(v -> {
@@ -161,6 +138,5 @@ public class ResourceAdapter extends RecyclerView.Adapter<ResourceAdapter.Resour
 //            });
         }
     }
-
 
 }

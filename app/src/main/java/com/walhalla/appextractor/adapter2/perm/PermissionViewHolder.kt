@@ -1,53 +1,38 @@
-package com.walhalla.appextractor.adapter2.perm;
+package com.walhalla.appextractor.adapter2.perm
 
-import android.graphics.Color;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.graphics.Color
+import android.view.View
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.databinding.ItemLinePermissionBinding
+import com.walhalla.appextractor.sdk.PermissionLine
+import com.walhalla.appextractor.utils.PermissionUtils.protectionLevelToString
+import pokercc.android.expandablerecyclerview.ExpandableAdapter
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.databinding.ItemLinePermissionBinding;
-import com.walhalla.appextractor.utils.PermissionUtils;
-
-import pokercc.android.expandablerecyclerview.ExpandableAdapter;
-
-public class PermissionViewHolder extends
-        //RecyclerView.ViewHolder
-        ExpandableAdapter.ViewHolder {
-
-    public final ItemLinePermissionBinding binding;
-
-    public interface PermissionViewHolderCallback {
-
-        void onItemClicked(PermissionLine object);
+class PermissionViewHolder(
+    val binding: ItemLinePermissionBinding,
+    private val presenter: PermissionViewHolderCallback
+) :
+    ExpandableAdapter.ViewHolder(binding.root) {
+    interface PermissionViewHolderCallback {
+        fun onItemClicked(`object`: PermissionLine)
     }
 
-    private final PermissionViewHolderCallback presenter;
-
-    public void bindPermItem(final PermissionLine object, int position) {
+    fun bindPermItem(`object`: PermissionLine, position: Int) {
         if (position % 2 > 0) {
-            this.binding.lLayout1.setBackgroundColor(Color.WHITE);
+            binding.lLayout1.setBackgroundColor(Color.WHITE)
         }
-        if (object != null) {
-            this.binding.text1.setText(object.res0);
-            int n = (object.isGranted()) ? R.drawable.ic_granted : R.drawable.ic_denied;
-            this.binding.lock.setImageResource(n);
+        if (`object` != null) {
+            binding.text1.text = `object`.res0
+            val n = if (`object`.isGranted) R.drawable.ic_granted else R.drawable.ic_denied
+            binding.lock.setImageResource(n)
 
 
-            String mm = PermissionUtils.protectionLevelToString(object.getProtectionLevel());
-            this.binding.protectionLevel.setText(mm);
+            val mm = protectionLevelToString(`object`.protectionLevel)
+            binding.protectionLevel.text = mm
         }
 
-        binding.searchBtn.setOnClickListener(v -> {
-            presenter.onItemClicked(object);
-        });
-    }
-
-
-    public PermissionViewHolder(ItemLinePermissionBinding binding, PermissionViewHolderCallback presenter) {
-        super(binding.getRoot());
-        this.binding = binding;
-        this.presenter = presenter;
+        binding.searchBtn.setOnClickListener { v: View? ->
+            presenter.onItemClicked(`object`)
+        }
     }
 }

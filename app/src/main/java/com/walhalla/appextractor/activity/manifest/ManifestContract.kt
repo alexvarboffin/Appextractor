@@ -1,14 +1,11 @@
-package com.walhalla.appextractor.activity.manifest;
+package com.walhalla.appextractor.activity.manifest
 
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Drawable
 
-public interface ManifestContract {
-
+interface ManifestContract {
     interface View {
-        void setTitleWithIcon(String title, String packageName, Drawable icon);
+        fun setTitleWithIcon(title: String?, packageName: String?, icon: Drawable?)
     }
 
-    interface Presenter {
-    }
-
+    interface Presenter
 }

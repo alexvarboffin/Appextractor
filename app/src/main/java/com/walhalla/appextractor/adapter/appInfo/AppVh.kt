@@ -20,7 +20,7 @@ import com.walhalla.appextractor.model.common.AppFeature
 import java.util.Locale
 
 class AppVh(
-    @JvmField val mBinding: ItemAppBinding,
+    val mBinding: ItemAppBinding,
     mFeatureViewPool: RecyclerView.RecycledViewPool?, //private BackupPackagesFilterConfig mFilterConfig;
     val mAdapter: ApkListAdapter
 ) :

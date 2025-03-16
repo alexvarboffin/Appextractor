@@ -1,51 +1,43 @@
-package com.walhalla.appextractor.adapter2.v2line;
+package com.walhalla.appextractor.adapter2.v2line
 
-import android.graphics.Color;
+import android.graphics.Color
+import android.view.View
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter.DetailAdapterCallback
+import com.walhalla.appextractor.databinding.ItemV2LineBinding
+import com.walhalla.appextractor.sdk.V2Line
+import pokercc.android.expandablerecyclerview.ExpandableAdapter
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter;
-import com.walhalla.appextractor.databinding.ItemV2LineBinding;
-
-import pokercc.android.expandablerecyclerview.ExpandableAdapter;
-
-public class V2ViewHolder extends ExpandableAdapter.ViewHolder {
-
-    private final ItemV2LineBinding bind;
+class V2ViewHolder //this.presenter = presenter;
+    (private val bind: ItemV2LineBinding, presenter: AppDetailInfoAdapter?) :
+    ExpandableAdapter.ViewHolder(bind.root) {
     //private final AppDetailInfoAdapter presenter;
-
-    public void bind(V2Line object, int position, AppDetailInfoAdapter.DetailAdapterCallback clb) {
+    fun bind(`object`: V2Line, position: Int, clb: DetailAdapterCallback?) {
         if (position % 2 > 0) {
-            bind.lLayout1.setBackgroundColor(Color.WHITE);
+            bind.lLayout1.setBackgroundColor(Color.WHITE)
         }
-        bind.text1.setText(object.key);
-        bind.text2.setText(object.value);
-        if (object.drawable == null) {
-            bind.icon.setImageResource(R.drawable.ic_item_key);
+        bind.text1.text = `object`.key
+        bind.text2.text = `object`.value
+        if (`object`.drawable == null) {
+            bind.icon.setImageResource(R.drawable.ic_item_key)
         } else {
-            bind.icon.setImageResource(object.drawable);
+            bind.icon.setImageResource(`object`.drawable!!)
         }
 
         //this.text2.setBackgroundColor(Color.YELLOW);
+        bind.searchBtn.setOnClickListener { v: View? -> }
 
-        bind.searchBtn.setOnClickListener(v -> {
-            //presenter.onItemClicked(v, object);
-        });
-
-        bind.lLayout1.setOnClickListener(v -> {
-            if (clb != null) {
-                clb.shareText(object.key + "\n" + object.value);
-            }
-        });
-        bind.text2.setOnClickListener(v -> {
-            if (clb != null) {
-                clb.shareText(object.value);
-            }
-        });
-    }
-
-    public V2ViewHolder(ItemV2LineBinding binding, AppDetailInfoAdapter presenter) {
-        super(binding.getRoot());
-        this.bind = binding;
-        //this.presenter = presenter;
+        bind.lLayout1.setOnClickListener { v: View? ->
+            clb?.shareText(
+                """
+                    ${`object`.key}
+                    ${`object`.value}
+                    """.trimIndent()
+            )
+        }
+        bind.text2.setOnClickListener { v: View? ->
+            clb?.shareText(`object`.value)
+        }
     }
 }

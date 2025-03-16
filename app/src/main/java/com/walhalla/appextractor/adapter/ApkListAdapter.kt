@@ -1,165 +1,132 @@
-package com.walhalla.appextractor.adapter;
+package com.walhalla.appextractor.adapter
 
-import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.pm.PackageManager;
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Handler
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.walhalla.appextractor.AppListAdapterCallback
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.Util.getDate
+import com.walhalla.appextractor.activity.detail.AppDetailInfoActivity
+import com.walhalla.appextractor.activity.manifest.ManifestActivity
+import com.walhalla.appextractor.adapter.appInfo.AppVh
+import com.walhalla.appextractor.databinding.ItemAppBinding
+import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.ui.DLog.d
+import java.util.Collections
+import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 
-import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupMenu;
-
-import com.bumptech.glide.Glide;
-import com.walhalla.appextractor.AppListAdapterCallback;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.Util;
-import com.walhalla.appextractor.activity.detail.AppDetailInfoActivity;
-import com.walhalla.appextractor.activity.manifest.ManifestActivity;
-import com.walhalla.appextractor.databinding.ItemAppBinding;
-import com.walhalla.appextractor.adapter.appInfo.AppVh;
-import com.walhalla.appextractor.model.PackageMeta;
-import com.walhalla.ui.DLog;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-public class ApkListAdapter extends RecyclerView.Adapter<AppVh> {
-
-
-    private final RecyclerView.RecycledViewPool mFeatureViewPool;
-
-    private final AppListAdapterCallback mView;
-    private final Context context;
-
-
-    private final ThreadFactory tFactory = r -> {
-        Thread t = new Thread(r);
-        t.setDaemon(true);
-        return t;
-    };
-
-
-    private final int selectedItemColor;
-    private final int unselectedItemColor;
-
-    //private final IntentReaper reaper;
-
-    private List<PackageMeta> items = new ArrayList<>();
-    private static final List<PackageMeta> selected = new ArrayList<>();
-
-    private final List<PackageMeta> list_original = new ArrayList<>();
-    private final ExecutorService executorServiceNames = Executors.newFixedThreadPool(3, tFactory);
-    private final ExecutorService executorServiceIcons = Executors.newFixedThreadPool(3, tFactory);
-    private final Handler handler = new Handler();
-
-    private final PackageManager pm;
-
-    int names_to_load = 0;
-    private final Map<String, String> cache_appName = Collections.synchronizedMap(new LinkedHashMap<>(10, 1.5f, true));
-
-    //private final Map<String, Drawable> cache_appIcon = Collections.synchronizedMap(new LinkedHashMap<>(10, 1.5f, true));
-    private final Map<String, Object> cache_appIcon = Collections.synchronizedMap(new LinkedHashMap<>(10, 1.5f, true));
-
-    private String search_pattern;
-    private String[] appNames;
-
-    public ApkListAdapter(AppListAdapterCallback appListAdapterCallback, Context context) {
-        this.pm = appListAdapterCallback.getActivity().getPackageManager();
-        this.mView = appListAdapterCallback;
-        this.context = context;
-
+class ApkListAdapter(private val mView: AppListAdapterCallback, private val context: Context) :
+    RecyclerView.Adapter<AppVh>() {
 //        reaper= new IntentReaper(context);
 //        reaper.makeMimeApk();
+    private val mFeatureViewPool =
+        RecyclerView.RecycledViewPool()
 
-        mFeatureViewPool = new RecyclerView.RecycledViewPool();
-        mFeatureViewPool.setMaxRecycledViews(0, 16);
-        selectedItemColor = ContextCompat.getColor(context, R.color.color_selected);
-        unselectedItemColor = ContextCompat.getColor(context,
-                //android.R.color.transparent
-                R.color.color_unselected
-        );
+
+    private val tFactory = ThreadFactory { r: Runnable? ->
+        val t = Thread(r)
+        t.isDaemon = true
+        t
     }
 
 
-    private class AppNameLoader implements Runnable {
-        private final PackageMeta package_info;
+    private val selectedItemColor: Int
+    private val unselectedItemColor: Int
 
-        AppNameLoader(PackageMeta info) {
-            package_info = info;
-        }
+    //private final IntentReaper reaper;
+    private val items: MutableList<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta> = ArrayList()
+    private val list_original: MutableList<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta> = ArrayList()
+    private val executorServiceNames: ExecutorService = Executors.newFixedThreadPool(3, tFactory)
+    private val executorServiceIcons: ExecutorService = Executors.newFixedThreadPool(3, tFactory)
+    private val handler = Handler()
 
-        @Override
-        public void run() {
-            cache_appName.put(package_info.packageName, (String) package_info.label);/*package_info.applicationInfo.loadLabel(pm)*/
-            handler.post(() -> {
-                names_to_load--;
+    private val pm: PackageManager = mView.activity.packageManager
+
+    var names_to_load: Int = 0
+    private val cache_appName: MutableMap<String?, String?> = Collections.synchronizedMap(
+        LinkedHashMap(10, 1.5f, true)
+    )
+
+    //private final Map<String, Drawable> cache_appIcon = Collections.synchronizedMap(new LinkedHashMap<>(10, 1.5f, true));
+    private val cache_appIcon: MutableMap<String?, Any> =
+        Collections.synchronizedMap(LinkedHashMap(10, 1.5f, true))
+
+    private var search_pattern: String? = null
+    private var appNames: Array<String> = emptyArray()
+
+    init {
+        mFeatureViewPool.setMaxRecycledViews(0, 16)
+        selectedItemColor = ContextCompat.getColor(context, R.color.color_selected)
+        unselectedItemColor = ContextCompat.getColor(
+            context,  //android.R.color.transparent
+            R.color.color_unselected
+        )
+    }
+
+
+    private inner class AppNameLoader(private val package_info: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta) : Runnable {
+        override fun run() {
+            cache_appName[package_info.packageName] =
+                package_info.label /*package_info.applicationInfo.loadLabel(pm)*/
+            handler.post {
+                names_to_load--
                 if (names_to_load == 0) {
-                    mView.hideProgressBar();
+                    mView.hideProgressBar()
                     //@@@ executorServiceNames.shutdown();
                 }
-            });
+            }
         }
     }
 
-    class GuiLoader implements Runnable {
-
-        private final AppVh applicationViewHolder;
-        private final PackageMeta packageMeta;
-
-        GuiLoader(AppVh h, PackageMeta meta) {
-            applicationViewHolder = h;
-            this.packageMeta = meta;
-        }
-
-        @Override
-        public void run() {
-            boolean first = true;
+    internal inner class GuiLoader(
+        private val applicationViewHolder: AppVh,
+        private val packageMeta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta
+    ) : Runnable {
+        override fun run() {
+            var first = true
             do {
                 try {
-                    final String appName = GENERATE_APP_NAME(packageMeta);
+                    val appName = GENERATE_APP_NAME(packageMeta)
                     if (appName != null) {
-                        cache_appName.put(packageMeta.packageName, appName);
+                        cache_appName[packageMeta.packageName] = appName
                     }
 
                     //final Drawable icon = package_info.applicationInfo.loadIcon(pm);
-                    final Object icon = packageMeta.iconUri != null ? packageMeta.iconUri : R.drawable.placeholder_app_icon;
-                    cache_appIcon.put(packageMeta.packageName, icon);
-                    handler.post(() -> {
-                        applicationViewHolder.setAppName(appName, search_pattern);
+                    val icon: Any =
+                        (if (packageMeta.iconUri != null) packageMeta.iconUri else R.drawable.placeholder_app_icon)!!
+                    cache_appIcon[packageMeta.packageName] = icon
+                    handler.post {
+                        applicationViewHolder.setAppName(appName!!, search_pattern)
                         //applicationViewHolder.mBinding.imgIcon.setImageDrawable00(icon);
                         Glide.with(applicationViewHolder.mBinding.imgIcon)
-                                .load(icon)
-                                .placeholder(R.drawable.placeholder_app_icon)
-                                .into(applicationViewHolder.mBinding.imgIcon);
-                    });
-
-                } catch (OutOfMemoryError ex) {
-                    cache_appIcon.clear();
-                    cache_appName.clear();
+                            .load(icon)
+                            .placeholder(R.drawable.placeholder_app_icon)
+                            .into(applicationViewHolder.mBinding.imgIcon)
+                    }
+                } catch (ex: OutOfMemoryError) {
+                    cache_appIcon.clear()
+                    cache_appName.clear()
                     if (first) {
-                        first = false;
-                        continue;
+                        first = false
+                        continue
                     }
                 }
-                break;
-            } while (true);
+                break
+            } while (true)
         }
     }
 
@@ -170,324 +137,334 @@ public class ApkListAdapter extends RecyclerView.Adapter<AppVh> {
      * @param meta
      * @return
      */
-    private String GENERATE_APP_NAME(PackageMeta meta) {
-        return cache_appName.containsKey(meta.packageName)
-                ? cache_appName.get(meta.packageName)
-                : (String) meta.label; /*(String) meta.applicationInfo.loadLabel(pm)*/
-
+    private fun GENERATE_APP_NAME(meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta): String? {
+        return if (cache_appName.containsKey(meta.packageName))
+            cache_appName[meta.packageName]
+        else
+            meta.label /*(String) meta.applicationInfo.loadLabel(pm)*/
     }
 
 
     /**
      * View holder
      */
-
-
-    @NonNull
-    @Override
-    public AppVh onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-        ItemAppBinding binding = ItemAppBinding.inflate(inflater, viewGroup, false);
-        return new AppVh(binding, mFeatureViewPool, this);
+    override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): AppVh {
+        val inflater = LayoutInflater.from(viewGroup.context)
+        val binding = ItemAppBinding.inflate(inflater, viewGroup, false)
+        return AppVh(binding, mFeatureViewPool, this)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull AppVh holder, int position) {
-        PackageMeta item = items.get(position);
-        holder.setPackageName(item.packageName, search_pattern, position);
-        holder.mBinding.version.setText(Util.getDate(item));
+    override fun onBindViewHolder(holder: AppVh, position: Int) {
+        val item = items[position]
+        holder.setPackageName(item.packageName!!, search_pattern, position)
+        holder.mBinding.version.text = getDate(item)
 
 
         //String uid = String.valueOf(item.applicationInfo.uid);
-        holder.mBinding.size.setText(item.size);
+        holder.mBinding.size.text = item.size
 
         if (cache_appIcon.containsKey(item.packageName) && cache_appName.containsKey(item.packageName)) {
-            holder.setAppName(cache_appName.get(item.packageName), search_pattern);
+            holder.setAppName(cache_appName[item.packageName]!!, search_pattern)
             //holder.mBinding.imgIcon.setImageDrawable00(cache_appIcon.get(item.packageName));
             Glide.with(holder.mBinding.imgIcon)
-                    .load(cache_appIcon.get(item.packageName))
-                    .placeholder(R.drawable.placeholder_app_icon)
-                    .into(holder.mBinding.imgIcon);
+                .load(cache_appIcon[item.packageName])
+                .placeholder(R.drawable.placeholder_app_icon)
+                .into(holder.mBinding.imgIcon)
         } else {
-            holder.setAppName(item.packageName, search_pattern);
-            holder.mBinding.imgIcon.setImageDrawable(null);
-            executorServiceIcons.submit(new GuiLoader(holder, item));
+            holder.setAppName(item.packageName!!, search_pattern)
+            holder.mBinding.imgIcon.setImageDrawable(null)
+            executorServiceIcons.submit(GuiLoader(holder, item))
         }
 
 
         //Onclick
-        holder.mBinding.overflowMenu.setOnClickListener(view -> showPopupMenu(view, position));
-        holder.mBinding.getRoot().setOnClickListener(view -> {
-            final PackageMeta item1 = getItem(position);
-            if (selected.contains(item1)) {
-                selected.remove(item1);
-                unhighlightView(holder);
+        holder.mBinding.overflowMenu.setOnClickListener { view: View ->
+            showPopupMenu(
+                view,
+                position
+            )
+        }
+        holder.mBinding.root.setOnClickListener { view: View? ->
+            val item1 = getItem(position)
+            if (Companion.selected.contains(item1)) {
+                Companion.selected.remove(item1)
+                unhighlightView(holder)
             } else {
-                selected.add(item1);
-                highlightView(holder);
+                Companion.selected.add(item1)
+                highlightView(holder)
             }
             //mAdapter.appListAdapterCallback.doExtractRequest(item, mBinding.txtAppName.getText().toString());
-            mView.count(selected.size());
-        });
+            mView.count(Companion.selected.size)
+        }
 
-        if (selected.contains(item)) {
-            highlightView(holder);
+        if (Companion.selected.contains(item)) {
+            highlightView(holder)
         } else {
-            unhighlightView(holder);
+            unhighlightView(holder)
         }
 
         if (item.isGranted) {
-            highlightGrantedPermission(holder);
+            highlightGrantedPermission(holder)
         }
 
-        holder.bindTo(item);
+        holder.bindTo(item)
     }
 
-    private void highlightView(AppVh holder) {
-        holder.itemView.setBackgroundColor(selectedItemColor);
-        holder.mBinding.rl2.setBackgroundColor(selectedItemColor);
+    private fun highlightView(holder: AppVh) {
+        holder.itemView.setBackgroundColor(selectedItemColor)
+        holder.mBinding.rl2.setBackgroundColor(selectedItemColor)
     }
 
-    private void highlightGrantedPermission(AppVh holder) {
-        holder.itemView.setBackgroundColor(selectedItemColor);
-        holder.mBinding.rl2.setBackgroundColor(selectedItemColor);
+    private fun highlightGrantedPermission(holder: AppVh) {
+        holder.itemView.setBackgroundColor(selectedItemColor)
+        holder.mBinding.rl2.setBackgroundColor(selectedItemColor)
     }
 
-    private void unhighlightView(AppVh holder) {
-        holder.itemView.setBackgroundColor(unselectedItemColor);
-        holder.mBinding.rl2.setBackgroundColor(unselectedItemColor);
+    private fun unhighlightView(holder: AppVh) {
+        holder.itemView.setBackgroundColor(unselectedItemColor)
+        holder.mBinding.rl2.setBackgroundColor(unselectedItemColor)
     }
 
-    private PackageMeta getItem(int pos) {
-        return items.get(pos);
+    private fun getItem(pos: Int): _root_ide_package_.com.walhalla.appextractor.model.PackageMeta {
+        return items[pos]
     }
 
-    @Override
-    public int getItemCount() {
-        return items.size();
+    override fun getItemCount(): Int {
+        return items.size
     }
 
 
-    public void setSearchPattern(String pattern) {
-        search_pattern = pattern.toLowerCase();
-        filterListByPattern();
-        this.notifyDataSetChanged();
+    fun setSearchPattern(pattern: String) {
+        search_pattern = pattern.lowercase(Locale.getDefault())
+        filterListByPattern()
+        this.notifyDataSetChanged()
     }
 
-    private void filterListByPattern() {
-        items.clear();
-        for (PackageMeta meta : list_original) {
-            boolean add = true;
+    private fun filterListByPattern() {
+        items.clear()
+        for (meta in list_original) {
+            var add = true
             do {
-                if (search_pattern == null || search_pattern.isEmpty()) {
-                    break;// empty search pattern: add everything
+                if (search_pattern == null || search_pattern!!.isEmpty()) {
+                    break // empty search pattern: add everything
                 }
-                if (meta.packageName.toLowerCase().contains(search_pattern)) {
-                    break;// search in package name
+                if (meta.packageName!!.lowercase(Locale.getDefault()).contains(
+                        search_pattern!!
+                    )
+                ) {
+                    break // search in package name
                 }
-                if (cache_appName.containsKey(meta.packageName) && cache_appName.get(meta.packageName).toLowerCase().contains(search_pattern)) {
-                    break;// search in application name
+                if (cache_appName.containsKey(meta.packageName) && cache_appName[meta.packageName]!!
+                        .lowercase(Locale.getDefault()).contains(search_pattern!!)
+                ) {
+                    break // search in application name
                 }
-                add = false;
-            } while (false);
+                add = false
+            } while (false)
 
-            if (add) items.add(meta);
+            if (add) items.add(meta)
         }
     }
 
     //Button pressed or permission Granted
-    public void doExtractClick() {
-        appNames = new String[selected.size()];
-        for (int i = 0; i < selected.size(); i++) {
-            appNames[i] = GENERATE_APP_NAME(selected.get(i));
+    fun doExtractClick() {
+        appNames = emptyArray()//Companion.selected.size
+        for (i in Companion.selected.indices) {
+            appNames[i] = GENERATE_APP_NAME(Companion.selected[i])?:""
         }
-        this.mView.nowExtractOneSelected(selected, appNames);
+        mView.nowExtractOneSelected(Companion.selected, appNames)
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void showPopupMenu(View v, int adapterPosition) {
+    private fun showPopupMenu(v: View, adapterPosition: Int) {
+        val packageInfo = items[adapterPosition]
+        val popup = PopupMenu(mView.activity, v)
+        val inflater = popup.menuInflater
 
-        PackageMeta packageInfo = items.get(adapterPosition);
-        PopupMenu popup = new PopupMenu(mView.getActivity(), v);
-        MenuInflater inflater = popup.getMenuInflater();
+        val menu = popup.menu
 
-        Menu menu = popup.getMenu();
-
-//        MenuPopupHelper menuHelper = new MenuPopupHelper(
+        //        MenuPopupHelper menuHelper = new MenuPopupHelper(
 //                mView.getActivity(), (MenuBuilder) menu, v);
 //        menuHelper.setForceShowIcon(true);
 //        menuHelper.show();
 
         //reaper.wrapper(menu, new File(packageInfo.applicationInfo.sourceDir));
-
-        inflater.inflate(R.menu.abc_popup_app, menu);
-        Object menuHelper;
-        Class<?>[] argTypes;
+        inflater.inflate(R.menu.abc_popup_app, menu)
+        val menuHelper: Any
+        val argTypes: Array<Class<*>?>
         try {
-            @SuppressLint("DiscouragedPrivateApi") Field fMenuHelper = PopupMenu.class.getDeclaredField("mPopup");
-            fMenuHelper.setAccessible(true);
-            menuHelper = fMenuHelper.get(popup);
-            argTypes = new Class[]{boolean.class};
-            if (menuHelper != null) {
-                menuHelper.getClass().getDeclaredMethod("setForceShowIcon", argTypes).invoke(menuHelper, true);
-            }
-        } catch (Exception ignored) {
+            @SuppressLint("DiscouragedPrivateApi") val fMenuHelper =
+                PopupMenu::class.java.getDeclaredField("mPopup")
+            fMenuHelper.isAccessible = true
+            menuHelper = fMenuHelper[popup]
+            argTypes = arrayOf(Boolean::class.javaPrimitiveType)
+            menuHelper?.javaClass?.getDeclaredMethod("setForceShowIcon", *argTypes)
+                ?.invoke(menuHelper, true)
+        } catch (ignored: Exception) {
         }
-        popup.setOnMenuItemClickListener(menuItem -> {
-
-            int itemId = menuItem.getItemId();
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            val itemId = menuItem.itemId
             if (itemId == R.id.action_open_link) {
-                DLog.d("Open on Google Play" + packageInfo.packageName);
-                mView.openPackageOnGooglePlay(packageInfo.packageName);
-                return true;
+                d("Open on Google Play" + packageInfo.packageName)
+                mView.openPackageOnGooglePlay(packageInfo.packageName)
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_extract) {
-                clearSelected();
-                selectOne(packageInfo);
-                appNames = new String[]{GENERATE_APP_NAME(packageInfo)
-                        //cache_appName.get(info.packageName)
-                };
+                clearSelected()
+                selectOne(packageInfo)
+                appNames = arrayOf(
+                    GENERATE_APP_NAME(packageInfo)?:"" //cache_appName.get(info.packageName)
+                )
                 //DLog.d("@@@" + Arrays.toString(appName) + "\t|\t" + cache_appName.get(info.packageName));
                 //this.mView.nowExtractOneSelected(selected, appnames);
-                this.mView.menuExtractSelected(v);
+                mView.menuExtractSelected(v)
             } else if (itemId == R.id.action_launch_app) {
-                mView.launchApp(context, packageInfo.packageName);
-                return true;
+                mView.launchApp(context, packageInfo.packageName)
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_share_app) {
-                mView.shareToOtherApp(GENERATE_APP_NAME(packageInfo));
-                return true;
+                mView.shareToOtherApp(GENERATE_APP_NAME(packageInfo))
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_uninstall_app) {
-                mView.uninstallApp(packageInfo.packageName);
-                return true;
+                mView.uninstallApp(packageInfo.packageName)
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_copy_package_name) {
-                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                val clipboard =
+                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 if (clipboard != null) {
-                    ClipData clip = ClipData.newPlainText("packageName", "" + packageInfo.packageName);
-                    clipboard.setPrimaryClip(clip);
+                    val clip = ClipData.newPlainText(
+                        "packageName",
+                        "" + packageInfo.packageName
+                    )
+                    clipboard.setPrimaryClip(clip)
                     if (mView != null) {
-                        mView.successMessage(context.getString(R.string.copied_to_clipboard).toUpperCase());
+                        mView.successMessage(
+                            context.getString(R.string.copied_to_clipboard)
+                                .uppercase(Locale.getDefault())
+                        )
                     }
                 }
-                return true;
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_app_info) {
-                AppDetailInfoActivity.newIntent(context, packageInfo);
-                return true;
+                AppDetailInfoActivity.newIntent(context, packageInfo)
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_manifest) {
-                ManifestActivity.newIntent(context, packageInfo, null, null);
-                return true;
+                ManifestActivity.newIntent(context, packageInfo, null, null)
+                return@setOnMenuItemClickListener true
             } else if (itemId == R.id.action_save_icon) {
                 if (mView != null) {
-                    mView.saveIconRequest(packageInfo);
+                    mView.saveIconRequest(packageInfo)
                 }
             } else if (itemId == R.id.action_share_icon) {
                 if (mView != null) {
-                    mView.exportIconRequest(packageInfo);
+                    mView.exportIconRequest(packageInfo)
                 }
                 //                case R.id.action_share_link:
 ////                    ---akeText(mContext, "Play next", Toast.LENGTH_SHORT).show();
 //                    //getPresenter().onItemClicked(menuItem.getItemId(), category);
 //                    return true;
             }
-            return false;
-        });
-        popup.show();
+            false
+        }
+        popup.show()
     }
 
-//    @SuppressLint("NonConstantResourceId")
-//    private void showPopupMenu(View v, int adapterPosition) {
-//
-//        PackageInfo info = items.get(adapterPosition);
-//        PopupMenu popup = new PopupMenu(mView.getActivity(), v);
-//        MenuInflater inflater = popup.getMenuInflater();
-//        inflater.inflate(R.menu.menu_album, popup.getMenu());
-//        popup.setOnMenuItemClickListener(menuItem -> {
-//
-//            switch (menuItem.getItemId()) {
-//
-//                case R.id.action_open_link:
-//                    //Open on Google Play
-//                    mView.openOnGooglePlay(info.packageName);
-//                    return true;
-//
-//                case R.id.action_extract:
-//                    clearSelected();
-//                    selectOne(info);
-//                    appnames = new String[]{GENERATE_APP_NAME(info)
-//                            //cache_appName.get(info.packageName)
-//                    };
-//                    //DLog.d("@@@" + Arrays.toString(appName) + "\t|\t" + cache_appName.get(info.packageName));
-//                    //this.mView.nowExtractOneSelected(selected, appnames);
-//                    this.mView.menuExtractSelected(v);
-//                    break;
-//
-//                case R.id.action_launch_app:
-//                    mView.launchApp(context, info.packageName);
-//                    return true;
-//
-//                case R.id.action_share_app:
-//                    mView.shareToOtherApp(GENERATE_APP_NAME(info));
-//                    return true;
-//
-//                case R.id.action_uninstall_app:
-//                    mView.uninstallApp(info.packageName);
-//                    return true;
-//
-////                case R.id.action_share_link:
-//////                    ---akeText(mContext, "Play next", Toast.LENGTH_SHORT).show();
-////                    //getPresenter().onItemClicked(menuItem.getItemId(), category);
-////                    return true;
-//                default:
-//            }
-//            return false;
-//        });
-//        popup.show();
-//    }
 
-
+    //    @SuppressLint("NonConstantResourceId")
+    //    private void showPopupMenu(View v, int adapterPosition) {
+    //
+    //        PackageInfo info = items.get(adapterPosition);
+    //        PopupMenu popup = new PopupMenu(mView.getActivity(), v);
+    //        MenuInflater inflater = popup.getMenuInflater();
+    //        inflater.inflate(R.menu.menu_album, popup.getMenu());
+    //        popup.setOnMenuItemClickListener(menuItem -> {
+    //
+    //            switch (menuItem.getItemId()) {
+    //
+    //                case R.id.action_open_link:
+    //                    //Open on Google Play
+    //                    mView.openOnGooglePlay(info.packageName);
+    //                    return true;
+    //
+    //                case R.id.action_extract:
+    //                    clearSelected();
+    //                    selectOne(info);
+    //                    appnames = new String[]{GENERATE_APP_NAME(info)
+    //                            //cache_appName.get(info.packageName)
+    //                    };
+    //                    //DLog.d("@@@" + Arrays.toString(appName) + "\t|\t" + cache_appName.get(info.packageName));
+    //                    //this.mView.nowExtractOneSelected(selected, appnames);
+    //                    this.mView.menuExtractSelected(v);
+    //                    break;
+    //
+    //                case R.id.action_launch_app:
+    //                    mView.launchApp(context, info.packageName);
+    //                    return true;
+    //
+    //                case R.id.action_share_app:
+    //                    mView.shareToOtherApp(GENERATE_APP_NAME(info));
+    //                    return true;
+    //
+    //                case R.id.action_uninstall_app:
+    //                    mView.uninstallApp(info.packageName);
+    //                    return true;
+    //
+    ////                case R.id.action_share_link:
+    //////                    ---akeText(mContext, "Play next", Toast.LENGTH_SHORT).show();
+    ////                    //getPresenter().onItemClicked(menuItem.getItemId(), category);
+    ////                    return true;
+    //                default:
+    //            }
+    //            return false;
+    //        });
+    //        popup.show();
+    //    }
     //Other function
-    public void addAll0(List<PackageMeta> items) {
-        this.items.clear();
-        this.list_original.clear();
-        this.selected.clear();
+    fun addAll0(items: List<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta>) {
+        this.items.clear()
+        list_original.clear()
+        Companion.selected.clear()
 
-        this.items.addAll(items);
-        this.list_original.addAll(items);
-        notifyDataSetChanged();
+        this.items.addAll(items)
+        list_original.addAll(items)
+        notifyDataSetChanged()
     }
 
-    private void selectOne(PackageMeta info) {
-        selected.add(info);
-        mView.count(selected.size());
+    private fun selectOne(info: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta) {
+        Companion.selected.add(info)
+        mView.count(Companion.selected.size)
     }
 
-    public void addItem(PackageMeta item) {
-        names_to_load++;
-        executorServiceNames.submit(new AppNameLoader(item));
-        list_original.add(item);
-        filterListByPattern();
-        notifyDataSetChanged();
+    fun addItem(item: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta) {
+        names_to_load++
+        executorServiceNames.submit(AppNameLoader(item))
+        list_original.add(item)
+        filterListByPattern()
+        notifyDataSetChanged()
     }
 
-    public void clearAll0(boolean isNotify) {
-        items.clear();
-        list_original.clear();
-        selected.clear();
-        if (isNotify) notifyDataSetChanged();
+    fun clearAll0(isNotify: Boolean) {
+        items.clear()
+        list_original.clear()
+        Companion.selected.clear()
+        if (isNotify) notifyDataSetChanged()
     }
 
-    public void clearSelected() {
-        selected.clear();
-        notifyDataSetChanged();
-        mView.count(selected.size());
+    fun clearSelected() {
+        Companion.selected.clear()
+        notifyDataSetChanged()
+        mView.count(Companion.selected.size)
     }
 
-    public void selectAll() {
-        selected.clear();
-        selected.addAll(items);
-        notifyDataSetChanged();
-        mView.count(selected.size());
+    fun selectAll() {
+        Companion.selected.clear()
+        Companion.selected.addAll(items)
+        notifyDataSetChanged()
+        mView.count(Companion.selected.size)
     }
 
-    public List<PackageMeta> getSelected() {
-        return selected;
+    val selected: List<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta>
+        get() = Companion.selected
+
+    companion object {
+        private val selected: MutableList<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta> = ArrayList()
     }
 }

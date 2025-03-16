@@ -1,34 +1,29 @@
-package com.walhalla.appextractor.activity.manifest;
+package com.walhalla.appextractor.activity.manifest
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
+import android.content.Context
+import android.content.pm.PackageManager
+import com.walhalla.appextractor.model.PackageMeta
 
-import com.walhalla.appextractor.activity.detail.DetailContract;
-import com.walhalla.appextractor.model.PackageMeta;
+class MainManifestPresenter(context: Context, meta: PackageMeta, view: ManifestContract.View) :
+    ManifestContract.Presenter {
+    private val mView: ManifestContract.View
+    private val context: Context
 
-public class MainManifestPresenter implements ManifestContract.Presenter {
-
-    private final ManifestContract.View mView;
-    private final Context context;
-
-    public MainManifestPresenter(Context context, PackageMeta meta, ManifestContract.View view) {
-        final PackageManager manager = context.getPackageManager();
-        this.context = context;
-        this.mView = view;
-        doStuff(manager, meta);
+    init {
+        val manager = context.packageManager
+        this.context = context
+        this.mView = view
+        doStuff(manager, meta)
     }
 
-    private void doStuff(PackageManager packageManager, PackageMeta meta) {
+    private fun doStuff(packageManager: PackageManager, meta: PackageMeta) {
         try {
-            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(meta.packageName, 0);
-            CharSequence title = applicationInfo.loadLabel(packageManager);
-            Drawable icon = applicationInfo.loadIcon(packageManager);
-            mView.setTitleWithIcon(title.toString(), applicationInfo.packageName, icon);
-
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException(e);
+            val applicationInfo = packageManager.getApplicationInfo(meta.packageName, 0)
+            val title = applicationInfo.loadLabel(packageManager)
+            val icon = applicationInfo.loadIcon(packageManager)
+            mView.setTitleWithIcon(title.toString(), applicationInfo.packageName, icon)
+        } catch (e: PackageManager.NameNotFoundException) {
+            throw RuntimeException(e)
         }
     }
 }

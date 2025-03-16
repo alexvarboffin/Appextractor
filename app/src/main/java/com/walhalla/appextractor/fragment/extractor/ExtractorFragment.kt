@@ -9,11 +9,8 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
@@ -31,14 +28,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dropbox.core.android.Auth
 import com.dropbox.core.v2.files.FileMetadata
-import com.walhalla.abcsharedlib.Share.KEY_FILE_PROVIDER
 import com.walhalla.appextractor.ApkUtils
 import com.walhalla.appextractor.AppListAdapterCallback
 import com.walhalla.appextractor.ExtractorHelper
@@ -60,15 +55,15 @@ import com.walhalla.appextractor.storage.LocalStorage
 import com.walhalla.appextractor.task.UploadFileTask
 import com.walhalla.appextractor.utils.BitmapUtils
 import com.walhalla.appextractor.utils.PackageMetaUtils
-import com.walhalla.boilerplate.domain.executor.impl.BackgroundExecutor
-import com.walhalla.boilerplate.threading.MainThreadImpl
+
 import com.walhalla.db.DropboxClientFactory
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.handleException
 import com.walhalla.ui.plugins.Launcher.openMarketApp
 import es.dmoral.toasty.Toasty
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.io.File
-import java.io.FileOutputStream
 import java.net.UnknownHostException
 import java.text.DateFormat
 import java.util.Locale
@@ -179,7 +174,9 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         extractorHelper = ExtractorHelper(
-            BackgroundExecutor.getInstance(), MainThreadImpl.getInstance(),
+            //BackgroundExecutor.getInstance(), MainThreadImpl.getInstance(),
+            mThreadExecutor = CoroutineScope(Dispatchers.Default),
+            mMainThread = CoroutineScope(Dispatchers.Main),
             this
         )
         //123 driveAdapter = GoogleDrivePresenterImpl.newInstance(this);
@@ -245,7 +242,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         super.onViewCreated(view, savedInstanceState)
 
         if (adapter == null) {
-            adapter = ApkListAdapter(this, context)
+            adapter = ApkListAdapter(this, requireContext())
         }
         binding!!.recyclerView.layoutManager = LinearLayoutManager(
             activity
@@ -311,7 +308,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         adapter!!.clearAll0(true) //Clear old data...
         mTask = activity?.let {
             PackageInfoLoader(it, object : PackageInfoLoader.Callback {
-                override fun onProgressUpdate(info: PackageMeta?) {
+                override fun onProgressUpdate(info: PackageMeta) {
                     adapter!!.addItem(info)
                 }
 
@@ -770,8 +767,10 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
 
             val telegramClient = TelegramClient(chatId, token)
             interactor = TelegramInteractorImpl(
-                BackgroundExecutor.getInstance(),
-                MainThreadImpl.getInstance(),
+//                BackgroundExecutor.getInstance(),
+//                MainThreadImpl.getInstance(),
+                mThreadExecutor = CoroutineScope(Dispatchers.Default),
+                mMainThread = CoroutineScope(Dispatchers.Main),
                 telegramClient
             )
 

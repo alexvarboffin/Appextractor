@@ -48,7 +48,6 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
     //private final int TYPE_OPERATION = 3;
 
 
-
     //private final View.OnClickListener listener;
     private var childItemClickListener: ChildItemClickListener? = null
 
@@ -64,12 +63,13 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
 //                childItemClickListener.onClick0(v, position);
 //            }
 
-            val model = items!![position]
+            val model = items[position]
             if (model is LFileViewModel) {
                 val o: LFileViewModel = (model as LFileViewModel)
                 DLog.d("@@@" + o.file.getAbsolutePath())
             }
-        } //        @Override
+        }
+        //        @Override
         //        public void removeFileRequest(File file) {
         //            if (childItemClickListener != null) {
         //                childItemClickListener.removeFileRequest(file);
@@ -100,29 +100,20 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
     }
 
     override fun getItemId(position: Int): Long {
-        return items!![position].type.id.toLong()
+        return items!![position].type.longId()
     }
 
     //Returns the view type of the item at position for the purposes of view recycling.
     override fun getItemViewType(position: Int): Int {
-        //        if (items.get(position) instanceof LogViewModel) {
+//        if (items.get(position) instanceof LogViewModel) {
 //            return TYPE_OPERATION;
 //        } else
 //        if (items.get(position) instanceof LogViewModel) {
 //            return TYPE_S;
 //        } else
 
-        val model: LogType = items!![position].type
-        if (model is LogType.Success) {
-            return model.id
-        } else if (model is LogType.Empty) {
-            return model.id
-        } else if (model is LogType.File) {
-            return model.id
-        } else if (model is LogType.Error) {
-            return model.id
-        }
-        return -1
+        val model = items!![position].id
+        return model
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -144,7 +135,7 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
 
             LogType.Empty.id -> {
                 val binding = ItemLoggerEmptyBinding.inflate(inflater, parent, false)
-                return EmptyViewHolder(binding, childItemClickListener)
+                return LogEmptyViewHolder(binding, childItemClickListener)
             }
 
             LogType.Error.id -> {
@@ -231,15 +222,19 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
 
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+
+
+        val it: LogViewModel = items!![position]
+
         when (viewHolder.itemViewType) {
             LogType.Success.id -> {
                 val holder = viewHolder as LogSuccessViewHolder
-                holder.bind(items!![position], position)
+                holder.bind(it, position)
             }
 
             LogType.File.id -> {
                 val holder0 = viewHolder as FileVh
-                holder0.bind(items!![position] as LFileViewModel, position)
+                holder0.bind(it as LFileViewModel, position)
                 holder0.mBinding.overflowMenu.setOnClickListener { view: View ->
                     showPopupMenu(
                         view,
@@ -249,18 +244,19 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
             }
 
             LogType.Empty.id -> {
-                val vh1 = viewHolder as EmptyViewHolder
-                vh1.bind(items!![position], position)
+                val vh1 = viewHolder as LogEmptyViewHolder
+                vh1.bind(it, position)
             }
 
             LogType.Error.id -> {
-                val vh2: LogErrorViewHolder = viewHolder as LogErrorViewHolder
-                vh2.bind(items!![position], position)
+                val holder: LogErrorViewHolder = viewHolder as LogErrorViewHolder
+                holder.binding.image.setImageResource(it.icon)
+                holder.binding.text1.setText(it.text)
             }
 
             else -> {
                 val vh = viewHolder as RecyclerViewSimpleTextViewHolder
-                vh.bind(items!![position], position)
+                vh.bind(it, position)
             }
         }
     }
@@ -268,11 +264,11 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
 
     fun swapList(data: MutableList<ViewModel>) {
         items!!.clear()
-        items!! +(data)
+        items!! + (data)
         notifyDataSetChanged()
     }
 
-    fun swap(data:  LogViewModel) {
+    fun swap(data: LogViewModel) {
         items!!.clear()
         items!!.add(data)
         notifyDataSetChanged()
@@ -307,4 +303,3 @@ class LoggerAdapter(context: Context, items: MutableList<LogViewModel>, private 
         }
     }
 }
-

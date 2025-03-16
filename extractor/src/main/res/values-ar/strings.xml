@@ -1,0 +1,94 @@
+<resources>
+    <string name="action_settings">الإعدادات</string>
+    <string name="dlg_loading_title">جار التحميل</string>
+    <string name="dlg_loading_body">جار تحميل قائمة التطبيقات المثبتة...</string>
+    <string name="search_title">البحث</string>
+    <string name="msg_search_help">البحث حسب اسم التطبيق أو الحزمة</string>
+    <string name="toast_extracted">تم استخراج ملف APK كـ %s</string>
+    <string name="toast_failed">فشلت عملية استخراج ملف APK. راجع سجل adb للتفاصيل.</string>
+    <string name="alert_root_title">هل ترغب باستخدام الصلاحية الجذرية؟</string>
+    <string name="alert_root_body">يبدو أن هذا التطبيق لا يمكن استخراجه بالطريقة العادية. هذا أمر مقبول لتطبيقات الدفع: يحاول نظام Android حمايتها من النسخ. ومع ذلك، يمكن استخراجها على الأجهزة المجذرة. إذا كان جهازك مجذرًا، يمكن لـ %1$s محاولة استخراجه باستخدام الصلاحية الجذرية.</string>
+    <string name="alert_root_yes">لنحاول مع الصلاحية الجذرية</string>
+    <string name="alert_root_no">ليس الآن</string>
+    <string name="alert_perm_title">الإذن مطلوب</string>
+    <string name="alert_perm_body">لكتابة ملف APK، يجب منح التطبيق إذن "التخزين".\nمن فضلك، افتح إعدادات التطبيق وامنح الإذن "التخزين".</string>
+    <string name="alert_perm_btn">افتح الإعدادات</string>
+    <string name="action_extract">استخراج APK</string>
+    <string name="search_hint">البحث</string>
+    <string name="data_empty">(لا توجد عناصر)</string>
+    <string name="google_drive_success">تم الحفظ في سحابة Google Drive!\n%s</string>
+    <string name="file_created">تم إنشاء الملف: %1$s.</string>
+    <string name="telegram_token_title">رمز مميز</string>
+    <string name="telegram_chat_id_title">معرّف الدردشة</string>
+    <string name="open_on_google_play">فتح على Google Play</string>
+    <string name="action_launch_app">فتح التطبيق</string>
+    <string name="action_uninstall_app">إلغاء تثبيت التطبيق</string>
+    <string name="access_error">خطأ في الوصول</string>
+    <string name="alert_dialog_title">انتظر!</string>
+    <string name="alert_dialog_text">جار محاولة استخراج الملفات المحددة</string>
+    <string name="extract_marked_files">استخراج الملفات المحددة إلى القرص؟\nالمحدد: %1$d ملفات</string>
+    <string name="action_extract_btn">استخراج المحدد</string>
+    <string name="action_deselect">إلغاء التحديد</string>
+    <string name="action_selected">المحدد</string>
+    <string name="open_file_browser">فتح مستعرض الملفات</string>
+    <string name="install_application">تثبيت التطبيق</string>
+    <string name="action_open_file_parent_folder">فتح</string>
+    <string name="action_copy_package_name">نسخ اسم الحزمة</string>
+    <string name="copied_to_clipboard">تم النسخ إلى الحافظة</string>
+    <string name="menu_popup_copy">نسخ إلى الحافظة</string>
+    <string name="action_rate_app">تقييم ApkChief</string>
+    <string name="action_share_text">مشاركة النص</string>
+    <string name="action_delete_file">حذف الملف</string>
+    <string name="app_info_basic">المعلومات الأساسية</string>
+    <string name="app_info_certificate">الشهادة</string>
+    <string name="app_info_data">البيانات</string>
+    <string name="app_info_drop_target_label">معلومات التطبيق</string>
+    <string name="app_info_enable">حالة الحزمة</string>
+    <string name="app_info_features">الميزات المطلوبة</string>
+    <string name="app_info_first_install_time">تاريخ التثبيت الأول</string>
+    <string name="app_info_installation">التثبيت</string>
+    <string name="app_info_installation_source">مصدر التثبيت</string>
+    <string name="app_info_last_update">آخر تحديث</string>
+    <string name="app_info_package_name" translatable="false">اسم الحزمة</string>
+    <string name="app_info_permissions">الأذونات</string>
+    <string name="app_info_serial_number">الرقم التسلسلي</string>
+    <string name="app_info_system">معلومات تطبيق النظام</string>
+    <string name="app_info_min_sdk">الإصدار الأدنى لـ SDK</string>
+    <string name="app_info_target_sdk">الإصدار المستهدف لـ SDK</string>
+    <string name="app_info_version">الإصدار</string>
+    <string name="app_info_version_code">رمز الإصدار</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">التخزين المؤقت</string>
+    <string name="key_value_pair" formatted="false">%s : %s</string>
+    <string name="unknown">غير معروف</string>
+    <string name="action_app_info">معلومات التطبيق</string>
+    <string name="app_referer_amazon">متجر Amazon App</string>
+    <string name="app_referer_google_play">متجر Google Play</string>
+    <string name="action_save_icon" translatable="false">حفظ الأيقونة</string>
+    <string name="savedicon" translatable="false">تم حفظ الأيقونة من</string>
+    <string name="err_unable_saved_icon" translatable="false">غير قادر على حفظ الأيقونة من</string>
+    <string name="app_info_uid">معرف المستخدم</string>
+    <string name="app_info_activities" translatable="false">الأنشطة</string>
+    <string name="app_info_services">الخدمات</string>
+    <string name="app_info_receivers">المستقبلات</string>
+    <string name="app_info_providers">مزودات</string>
+    <string name="action_export_icon">تصدير الأيقونة</string>
+    <string name="data_to_clipboard">تم النسخ إلى الحافظة: %s.</string>
+    <string name="app_info_sharedlibraryfiles">ملفات مكتبات مشتركة</string>
+    <string name="backup_app_feature_split">APK مقسم</string>
+    <string name="backup_app_feature_system_app">تطبيق النظام</string>
+    <string name="backup_app_feature_install_date">تم التثبيت: %s</string>
+    <string name="backup_app_feature_update_date">تم التحديث: %s</string>
+    <string name="action_accessibility">الوصولية</string>
+    <string name="action_app_manifest">مستكشف البيانات</string>
+    <string name="watermark_label_prefix" translatable="false" />
+    <string name="title_strings">سلاسل النصوص</string>
+    <string name="savedfile">تم حفظ الملف كـ</string>
+    <string name="err_unable_saved_file">غير قادر على الحفظ من</string>
+    <string name="action_save_file">حفظ الملف</string>
+    <string name="action_share_file">تصدير الملف</string>
+    <string name="action_read_file">قراءة الملف</string>
+    <string name="actionCopyName">نسخ الاسم</string>
+    <string name="actionCopyValue">نسخ القيمة</string>
+    <string name="action_xml_viewer">عارض XML</string>
+</resources>

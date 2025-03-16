@@ -1,12 +1,16 @@
 [versions]
 compileSdk = "35"
 buildTools = "35.0.0"
+flexbox = "2.0.1"
 glide = "4.16.0"
 lifecycleViewmodel = "2.6.2"
 minSdk = "24"
 targetSdk = "35"
 accompanistSwiperefresh = "0.32.0"
+
 agp = "8.7.3"
+#agp = "8.6.1"
+
 coilNetworkKtor2 = "3.0.4"
 coilNetworkKtor3 = "3.0.4"
 firebaseCrashlytics = "19.4.0"
@@ -114,6 +118,7 @@ androidx-lifecycle-runtime-compose = { version.ref = "androidx-lifecycle", group
 androidx-lifecycle-runtime-ktx = { version.ref = "lifecycle-runtime-ktx", group = "androidx.lifecycle", name = "lifecycle-runtime-ktx"}
 androidx-lifecycle-viewmodel = { version.ref = "androidx-lifecycle", group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel"}
 androidx-lifecycle-viewmodel-ktx = { version.ref = "lifecycleViewmodelKtx", module = "androidx.lifecycle:lifecycle-viewmodel-ktx"}
+flexbox = { module = "com.google.android:flexbox", version.ref = "flexbox" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
 material = { version.ref = "androidx-material", group = "com.google.android.material", name = "material"}

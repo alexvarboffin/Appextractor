@@ -1,166 +1,174 @@
-package com.walhalla.appextractor.activity.resources.p001;
+package com.walhalla.appextractor.activity.resources.p001
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
+import android.Manifest
+import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.walhalla.appextractor.activity.main.MainActivity
+import com.walhalla.appextractor.resources.ResItem
+import com.walhalla.appextractor.activity.resources.ResourceAdapter
+import com.walhalla.appextractor.activity.resources.ResourceAdapter.ResourceViewHolder
+import com.walhalla.appextractor.databinding.ActivityResourcesBinding
+import com.walhalla.appextractor.fragment.BaseFragment
+import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.resources.AssetsPresenter
+import com.walhalla.appextractor.resources.ManifestContract
+import com.walhalla.appextractor.resources.OnResourceItemClickListener
+import com.walhalla.ui.DLog.d
+import es.dmoral.toasty.Toasty
+import java.util.Locale
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.main.MainActivity;
-import com.walhalla.appextractor.activity.resources.ResItem;
-import com.walhalla.appextractor.activity.resources.ResourceAdapter;
-import com.walhalla.appextractor.databinding.ActivityResourcesBinding;
-import com.walhalla.appextractor.fragment.BaseFragment;
-import com.walhalla.appextractor.model.PackageMeta;
-import com.walhalla.ui.DLog;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import es.dmoral.toasty.Toasty;
-
-public class AssetsFragment extends BaseFragment implements ManifestContract.View,
-        ResourceAdapter.ResourceViewHolder.OnItemClickListener {
-
-    private static final String ARG_PARAM1 = "key_arg_0";
-    private ResourceAdapter adapter;
-    private ManifestContract.Presenter presenter;
-    private PackageMeta meta;
-    private ActivityResourcesBinding binding;
+class AssetsFragment : BaseFragment(), ManifestContract.View, OnResourceItemClickListener {
+    private var adapter: ResourceAdapter? = null
+    private var presenter: ManifestContract.Presenter? = null
+    private var meta: PackageMeta? = null
+    private var binding: ActivityResourcesBinding? = null
 
 
-    public static AssetsFragment newInstance(PackageMeta meta) {
-        AssetsFragment fragment = new AssetsFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, meta);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            meta = getArguments().getParcelable(ARG_PARAM1);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (arguments != null) {
+            meta = requireArguments().getParcelable(ARG_PARAM1)
         }
-        adapter = new ResourceAdapter(new ArrayList<>());
-        presenter = new AssetsPresenter(getActivity(), this);
+        adapter = ResourceAdapter(ArrayList())
+        presenter = AssetsPresenter(requireActivity(), this)
 
         if (meta != null && savedInstanceState == null) {
-            presenter.loadManifestContent(meta.packageName);
+            presenter?.loadManifestContent(meta!!.packageName)
         }
-
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = ActivityResourcesBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = ActivityResourcesBinding.inflate(inflater, container, false)
+        return binding!!.root
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        this.binding.recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-        this.binding.recyclerView.setItemAnimator(new DefaultItemAnimator());
-        this.binding.recyclerView.setAdapter(adapter);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding!!.recyclerView.layoutManager =
+            LinearLayoutManager(
+                context
+            )
+        binding!!.recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                LinearLayoutManager.VERTICAL
+            )
+        )
+        binding!!.recyclerView.itemAnimator =
+            DefaultItemAnimator()
+        binding!!.recyclerView.adapter = adapter
         //TextView textView = findViewById(R.id.manifest_content);
-        adapter.setOnItemClickListener(this);
+        adapter!!.setOnItemClickListener(this)
     }
 
-    @Override
-    public void fab() {
-
+    override fun fab() {
     }
 
-    @Override
-    public void showResourceRawText(ResItem resource, String content) {
-
+    override fun showResourceRawText(resource: ResItem, content: String) {
         //html support
 
         //textView.setText(content);
         //Toast.makeText(getActivity(), ""+content, Toast.LENGTH_SHORT).show();
-        if (getActivity() != null) {
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(resource.fullPath)
-                    .setMessage(content)
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    })
-                    //.setNegativeButton(R.string.alert_root_no, (dialog, which) -> DLog.d("cancel"))
-                    .show();
+
+        if (activity != null) {
+            AlertDialog.Builder(requireActivity())
+                .setTitle(resource.fullPath)
+                .setMessage(content)
+                .setPositiveButton(android.R.string.ok)
+                { dialog: DialogInterface?, which: Int -> } //.setNegativeButton(R.string.alert_root_no, (dialog, which) -> DLog.d("cancel"))
+                .show()
         }
     }
 
-    @Override
-    public void showError(String message) {
-        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    override fun showError(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 
-    @Override
-    public void showSuccess(List<ResItem> list) {
-        adapter.swap(list);
-        DLog.d("@@@@@@@" + list.size());
+    override fun showSuccess(list: List<ResItem>) {
+        adapter!!.swap(list)
+        d("@@@@@@@" + list.size)
     }
 
-    @Override
-    public void successToast(@StringRes int res, String name) {
-        String s = getResources().getString(res) + " " + name + " ✔";
-        Toast toast = Toasty.info(getActivity(), s.toUpperCase(), Toast.LENGTH_SHORT);
-        toast.show();
+    override fun successToast(@StringRes res: Int, name: String) {
+        val s = resources.getString(res) + " " + name + " ✔"
+        val toast =
+            Toasty.info(requireActivity(), s.uppercase(Locale.getDefault()), Toast.LENGTH_SHORT)
+        toast.show()
     }
 
-    @Override
-    public void errorToast(@StringRes int res, String name) {
-        String s = getResources().getString(res) + " " + name + " ✘";
-        Toast toast = Toasty.error(getActivity(), s.toUpperCase(), Toast.LENGTH_SHORT);
-        toast.show();
+    override fun errorToast(@StringRes res: Int, name: String) {
+        val s = resources.getString(res) + " " + name + " ✘"
+        val toast =
+            Toasty.error(requireActivity(), s.uppercase(Locale.getDefault()), Toast.LENGTH_SHORT)
+        toast.show()
     }
 
 
-    @Override
-    public void readAssetRequest(ResItem resource) {
-        presenter.readAssetRequest(getActivity(), resource);
+    override fun readAssetRequest(resource: ResItem) {
+        presenter!!.readAssetRequest(requireActivity(), resource)
     }
 
-    @Override
-    public void saveIconRequest(ResItem resource) {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            presenter.saveAsset(getActivity(), resource);
+    override fun saveIconRequest(resource: ResItem) {
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            presenter!!.saveAsset(requireActivity(), resource)
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.REQUEST_CODE_SAVE_ICON);
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                MainActivity.REQUEST_CODE_SAVE_ICON
+            )
         }
     }
 
-    @Override
-    public void exportIconRequest(ResItem resource) {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            presenter.exportIconRequest(getActivity(), resource);
+    override fun exportIconRequest(resource: ResItem) {
+        var x = requireActivity()
+        if (ActivityCompat.checkSelfPermission(
+                x,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            presenter!!.exportIconRequest(x, resource)
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, 766);
+            ActivityCompat.requestPermissions(
+                x,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 766
+            )
         }
     }
 
-    @Override
-    public void zipAllAssetsRequest(ResItem resource) {
-        presenter.zipAllAssetsRequest(getActivity(), resource);
+    override fun zipAllAssetsRequest(resource: ResItem) {
+        presenter!!.zipAllAssetsRequest(requireActivity(), resource)
     }
 
+    companion object {
+        private const val ARG_PARAM1 = "key_arg_0"
+
+        @JvmStatic
+        fun newInstance(meta: PackageMeta?): AssetsFragment {
+            val fragment = AssetsFragment()
+            val args = Bundle()
+            args.putParcelable(ARG_PARAM1, meta)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 }

@@ -5,7 +5,7 @@ import android.widget.TextView;
 
 import com.walhalla.appextractor.model.ViewModel;
 
-public class RecyclerViewSimpleTextViewHolder extends BaseVh {
+public class RecyclerViewSimpleTextViewHolder extends BaseVh<ViewModel> {
 
     private TextView text1;
 

@@ -2,18 +2,13 @@ package com.walhalla.appextractor.activity.string;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.walhalla.appextractor.BuildConfig;
 import com.walhalla.appextractor.R;
 import com.walhalla.appextractor.activity.BaseActivity;
 import com.walhalla.appextractor.activity.debug.DemoData;
-import com.walhalla.appextractor.activity.resources.ResourcesPagerFragment;
-import com.walhalla.appextractor.fragment.QCallback;
 import com.walhalla.appextractor.model.PackageMeta;
 
 public class StrActivity extends BaseActivity {

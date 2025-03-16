@@ -1,52 +1,40 @@
-package com.walhalla.appextractor.adapter2.service;
+package com.walhalla.appextractor.adapter2.service
 
-import android.graphics.Color;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.graphics.Color
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter
+import com.walhalla.appextractor.sdk.ServiceLine
+import pokercc.android.expandablerecyclerview.ExpandableAdapter
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter;
+class ServiceViewHolder(view: View, private val presenter: AppDetailInfoAdapter) :
+    ExpandableAdapter.ViewHolder(view) {
+    private val icon: ImageView = view.findViewById(R.id.icon)
+    val class_name: TextView = view.findViewById(R.id.className)
 
-import pokercc.android.expandablerecyclerview.ExpandableAdapter;
+    val label: TextView = view.findViewById(R.id.activityLabel)
 
-public class ServiceViewHolder extends ExpandableAdapter.ViewHolder {
+    private val layout: ViewGroup = view.findViewById(R.id.lLayout1)
+    private val launch: Button = view.findViewById(R.id.launchActivity)
 
-    private final ImageView icon;
-    public final TextView class_name;
-    public final TextView label;
-
-    private final ViewGroup layout;
-    private final Button launch;
-    private final AppDetailInfoAdapter presenter;
-
-    public void bind(ServiceLine object, int position) {
+    fun bind(`object`: ServiceLine, position: Int) {
         if (position % 2 > 0) {
-            this.layout.setBackgroundColor(Color.WHITE);
+            layout.setBackgroundColor(Color.WHITE)
         }
-        this.icon.setImageDrawable(object.icon);
-        this.label.setText(object.label);
-        this.class_name.setText(object.class_name);
+        icon.setImageDrawable(`object`.icon)
+        label.text = `object`.label
+        class_name.text = `object`.class_name
 
         //this.text2.setBackgroundColor(Color.YELLOW);
-       if (object.exported) {
-            launch.setVisibility(View.VISIBLE);
-            launch.setOnClickListener(v -> {
-                presenter.onLaunchService(object.class_name);
-            });
+        if (`object`.exported) {
+            launch.visibility = View.VISIBLE
+            launch.setOnClickListener { v: View? ->
+                presenter.onLaunchService(`object`.class_name)
+            }
         }
-
-    }
-
-    public ServiceViewHolder(View view, AppDetailInfoAdapter presenter) {
-        super(view);
-        this.icon = view.findViewById(R.id.icon);
-        this.label = view.findViewById(R.id.activityLabel);
-        this.class_name = view.findViewById(R.id.className);
-        this.layout = view.findViewById(R.id.lLayout1);
-        this.launch = view.findViewById(R.id.launchActivity);
-        this.presenter = presenter;
     }
 }

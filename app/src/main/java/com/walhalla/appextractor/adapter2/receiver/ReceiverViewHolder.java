@@ -1,12 +1,6 @@
 package com.walhalla.appextractor.adapter2.receiver;
 
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter;
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter;
 import com.walhalla.appextractor.databinding.ItemReceiverBinding;
 
 import pokercc.android.expandablerecyclerview.ExpandableAdapter;

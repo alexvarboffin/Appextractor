@@ -7,7 +7,9 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
-import com.walhalla.appextractor.activity.resources.ResType;
+import com.walhalla.appextractor.resources.ResType;
+import com.walhalla.appextractor.resources.StringItemViewModel;
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin;
 import com.walhalla.ui.DLog;
 
 import java.lang.reflect.Field;
@@ -47,7 +49,7 @@ public class StringsPresenter {
             am = initAM;
             mResources = initRes;
         }
-        List<StringItem> m = new ArrayList<>();
+        List<StringItemViewModel> m = new ArrayList<>();
         //loadApplicationResources(this, m, getPackageName());
         loadApplicationResources(context, m, packageName, resourceType);
         mView.showSuccess(m);
@@ -62,7 +64,7 @@ public class StringsPresenter {
     }
 
 
-    private void loadApplicationResources(Context context, List<StringItem> iconPackResources,
+    private void loadApplicationResources(Context context, List<StringItemViewModel> iconPackResources,
                                           String packageName, String resourceType) {/*from w w w.  j a  va 2s. co  m*/
 
         ResType draw = ResourcesToolForPlugin.getIconBySourceType(resourceType);
@@ -119,7 +121,7 @@ public class StringsPresenter {
                 continue;
             }
             //iconPackResources.add(new ResItem(iconPackage + "." + iconActivity + " " + icon, null));
-            iconPackResources.add(new StringItem(icon, stringValue, draw));
+            iconPackResources.add(new StringItemViewModel(icon, stringValue, draw));
         }
     }
 

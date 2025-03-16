@@ -6,7 +6,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.AppDetailInfoAdapter;
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter;
+import com.walhalla.appextractor.sdk.CertLine;
 
 import pokercc.android.expandablerecyclerview.ExpandableAdapter;
 

@@ -22,6 +22,7 @@ import com.walhalla.appextractor.R;
 
 import com.walhalla.appextractor.fragment.BaseFragment;
 import com.walhalla.appextractor.model.PackageMeta;
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin;
 
 import java.util.ArrayList;
 

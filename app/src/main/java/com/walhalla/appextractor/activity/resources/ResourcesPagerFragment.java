@@ -20,7 +20,6 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 import com.walhalla.appextractor.R;
 import com.walhalla.appextractor.activity.resources.p001.AssetsFragment;
-import com.walhalla.appextractor.activity.resources.p002.ResourcesFragment;
 import com.walhalla.appextractor.fragment.BaseFragment;
 import com.walhalla.appextractor.model.PackageMeta;
 

@@ -35,16 +35,20 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 rootProject.name = "Appextractor"
 
-include(":threader")
-project(":threader").projectDir = File("D:\\walhalla\\sdk\\android\\multithreader\\threader\\")
+//include(":threader")
+//project(":threader").projectDir = File("D:\\walhalla\\sdk\\android\\multithreader\\threader\\")
 
 //include(":wads")
 //project(":wads").projectDir = File("D:\\walhalla\\sdk\\android\\UI\\wads")
 
 include(":features:ui")
-project(":features:ui").projectDir = File("G:\\android\\WalhallaUI\\features\\ui")
+project(":features:ui").projectDir = File("../WalhallaUI\\features\\ui")
 
-include(":SdkLibrary")
-project(":SdkLibrary").projectDir = File("D:\\Nonesorted\\Neptune\\SdkLibrary")
+include(":shared")
+project(":shared").projectDir = File("../WalhallaUI\\shared")
+
+//include(":SdkLibrary")
+//project(":SdkLibrary").projectDir = File("D:\\Nonesorted\\Neptune\\SdkLibrary")
 
 include(":extractor")
+include(":compose")

@@ -1,0 +1,94 @@
+<resources>
+    <string name="action_settings">Configurações</string>
+    <string name="dlg_loading_title">Carregando</string>
+    <string name="dlg_loading_body">Carregando lista de aplicativos instalados…</string>
+    <string name="search_title">Buscar</string>
+    <string name="msg_search_help">Buscar por nomes de aplicativos ou pacotes</string>
+    <string name="toast_extracted">Arquivo APK foi extraído como %s</string>
+    <string name="toast_failed">Falha ao extrair o arquivo APK. Consulte o log adb para mais detalhes.</string>
+    <string name="alert_root_title">Tentar com root?</string>
+    <string name="alert_root_body">Parece que este aplicativo não pode ser extraído através do método regular. Está tudo bem para aplicativos pagos: o Android tenta protegê-los da cópia. No entanto, eles ainda podem ser extraídos em dispositivos com root. Se o seu dispositivo estiver com root, o %1$s pode tentar extrair usando root.</string>
+    <string name="alert_root_yes">Vamos tentar com root</string>
+    <string name="alert_root_no">Agora não</string>
+    <string name="alert_perm_title">Permissão necessária</string>
+    <string name="alert_perm_body">Para escrever o arquivo APK, o aplicativo deve ser concedido com permissão de "Armazenamento".\nPor favor, abra as configurações do aplicativo e conceda permissão de "Armazenamento" a ele.</string>
+    <string name="alert_perm_btn">Abrir configurações</string>
+    <string name="action_extract">Extrair APK</string>
+    <string name="search_hint">Buscar</string>
+    <string name="data_empty">(Sem itens)</string>
+    <string name="google_drive_success">Salvo na nuvem do Google Drive!\n%1$s</string>
+    <string name="file_created">Arquivo criado: %1$s.</string>
+    <string name="telegram_token_title">Token</string>
+    <string name="telegram_chat_id_title">ID do Chat</string>
+    <string name="open_on_google_play">Abrir no Google Play</string>
+    <string name="action_launch_app">Abrir aplicativo</string>
+    <string name="action_uninstall_app">Desinstalar aplicativo</string>
+    <string name="access_error">Erro de acesso</string>
+    <string name="alert_dialog_title">Aguarde!</string>
+    <string name="alert_dialog_text">Tentando extrair arquivos selecionados</string>
+    <string name="extract_marked_files">Extrair arquivos marcados para o disco?\nSelecionado: %1$d arquivos</string>
+    <string name="action_extract_btn">Extrair selecionados</string>
+    <string name="action_deselect">Desmarcar</string>
+    <string name="action_selected">Selecionado</string>
+    <string name="open_file_browser">Abrir Navegador de Arquivos</string>
+    <string name="install_application">Instalar Aplicativo</string>
+    <string name="action_open_file_parent_folder">Abrir</string>
+    <string name="action_copy_package_name">Copiar Nome do Pacote</string>
+    <string name="copied_to_clipboard">copiado para a área de transferência</string>
+    <string name="menu_popup_copy">Copiar para a área de transferência</string>
+    <string name="action_rate_app">Avaliar ApkChief</string>
+    <string name="action_share_text">Compartilhar Texto</string>
+    <string name="action_delete_file">Excluir Arquivo</string>
+    <string name="app_info_basic">Informações Básicas</string>
+    <string name="app_info_certificate">Certificado</string>
+    <string name="app_info_data">Dados</string>
+    <string name="app_info_drop_target_label">Informações do Aplicativo</string>
+    <string name="app_info_enable">Estado do Pacote</string>
+    <string name="app_info_features">Recursos Solicitados</string>
+    <string name="app_info_first_install_time">Primeira instalação</string>
+    <string name="app_info_installation">Instalação</string>
+    <string name="app_info_installation_source">Fonte de instalação</string>
+    <string name="app_info_last_update">Última atualização</string>
+    <string name="app_info_package_name" translatable="false">Nome do Pacote</string>
+    <string name="app_info_permissions">Permissões</string>
+    <string name="app_info_serial_number">Número de série</string>
+    <string name="app_info_system">Informações do Aplicativo do Sistema</string>
+    <string name="app_info_min_sdk">Versão mínima do SDK</string>
+    <string name="app_info_target_sdk">Versão de destino do SDK</string>
+    <string name="app_info_version">Versão</string>
+    <string name="app_info_version_code">Código da Versão</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">Cache</string>
+    <string name="key_value_pair" formatted="false">%s : %s</string>
+    <string name="unknown">Desconhecido</string>
+    <string name="action_app_info">Informações do Aplicativo</string>
+    <string name="app_referer_amazon">Loja de Aplicativos da Amazon</string>
+    <string name="app_referer_google_play">Loja de Aplicativos do Google Play</string>
+    <string name="action_save_icon" translatable="false">Salvar Ícone</string>
+    <string name="savedicon" translatable="false">Ícone salvo de</string>
+    <string name="err_unable_saved_icon" translatable="false">Não foi possível salvar o ícone de</string>
+    <string name="app_info_uid">UID</string>
+    <string name="app_info_activities" translatable="false">Atividades</string>
+    <string name="app_info_services">Serviços</string>
+    <string name="app_info_receivers">Receptores</string>
+    <string name="app_info_providers">Provedores</string>
+    <string name="action_export_icon">Exportar Ícone</string>
+    <string name="data_to_clipboard">Copiado para a área de transferência: %s.</string>
+    <string name="app_info_sharedlibraryfiles">Arquivos de Biblioteca Compartilhada</string>
+    <string name="backup_app_feature_split">APK Dividido</string>
+    <string name="backup_app_feature_system_app">Aplicativo do Sistema</string>
+    <string name="backup_app_feature_install_date">Instalado: %s</string>
+    <string name="backup_app_feature_update_date">Atualizado: %s</string>
+    <string name="action_accessibility">Acessibilidade</string>
+    <string name="action_app_manifest">Explorador de Manifesto</string>
+    <string name="watermark_label_prefix" translatable="false" />
+    <string name="title_strings">CADEIAS DE CARACTERES</string>
+    <string name="savedfile">Arquivo salvo como</string>
+    <string name="err_unable_saved_file">Não foi possível salvar de</string>
+    <string name="action_save_file">Salvar Arquivo</string>
+    <string name="action_share_file">Exportar Arquivo</string>
+    <string name="action_read_file">Ler Arquivo</string>
+    <string name="actionCopyName">Copiar Nome</string>
+    <string name="actionCopyValue">Copiar Valor</string>
+    <string name="action_xml_viewer">Visualizador XML</string>
+</resources>

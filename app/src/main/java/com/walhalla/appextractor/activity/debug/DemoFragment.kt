@@ -1,73 +1,84 @@
-package com.walhalla.appextractor.activity.debug;
+package com.walhalla.appextractor.activity.debug
 
-import android.annotation.SuppressLint;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.annotation.SuppressLint
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.fragment.app.Fragment
+import com.walhalla.appextractor.ApkUtils
+import com.walhalla.appextractor.model.PackageMeta
+import java.io.File
 
-import androidx.fragment.app.Fragment;
+open class DemoFragment : Fragment() {
 
-import com.walhalla.appextractor.ApkUtils;
-import com.walhalla.appextractor.model.PackageMeta;
+    protected var a: List<ApplicationInfo> = emptyList()
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+    protected var b: List<PackageMeta> = emptyList()
+    protected var infos: List<PackageInfo> = emptyList()
 
-public class DemoFragment extends Fragment {
-
-    protected List<ApplicationInfo> a;
-    protected List<PackageMeta> b;
-    protected List<PackageInfo> infos;
 
     @SuppressLint("QueryPermissionsNeeded")
-    protected void fullMeta(PackageManager pm) {
-        List<ApplicationInfo> aaa = new ArrayList<>();
-        List<PackageMeta> bbb = new ArrayList<>();
+    protected fun fullMeta(pm: PackageManager) {
+        val aaa: MutableList<ApplicationInfo> = ArrayList()
+        val bbb: MutableList<PackageMeta> = ArrayList()
 
         //infos = pm.getInstalledPackages(PackageManager.GET_META_DATA);
         infos = pm.getInstalledPackages(
-                PackageManager.GET_PERMISSIONS
-                | PackageManager.GET_SIGNATURES
-                | PackageManager.GET_META_DATA
-                | PackageManager.GET_ACTIVITIES
-                | PackageManager.GET_SERVICES
-                | PackageManager.GET_PROVIDERS
-                | PackageManager.GET_RECEIVERS);
+            (PackageManager.GET_PERMISSIONS
+                    or PackageManager.GET_SIGNATURES
+                    or PackageManager.GET_META_DATA
+                    or PackageManager.GET_ACTIVITIES
+                    or PackageManager.GET_SERVICES
+                    or PackageManager.GET_PROVIDERS
+                    or PackageManager.GET_RECEIVERS)
+        )
 
-        for (PackageInfo packageInfo : infos) {
-            ApplicationInfo applicationInfo = packageInfo.applicationInfo;
-            aaa.add(applicationInfo);
+        for (packageInfo in infos!!) {
+            val applicationInfo = packageInfo.applicationInfo
+            applicationInfo?.let { aaa.add(it) }
 
 
-            boolean hasSplits = false;
+            var hasSplits = false
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                hasSplits = applicationInfo.splitPublicSourceDirs != null && applicationInfo.splitPublicSourceDirs.length > 0;
+                hasSplits =
+                    applicationInfo!!.splitPublicSourceDirs != null && applicationInfo.splitPublicSourceDirs!!.size > 0
             }
-            PackageMeta meta = new PackageMeta.Builder(applicationInfo.packageName).setLabel(applicationInfo.loadLabel(pm).toString()).setHasSplits(hasSplits).setIsSystemApp((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0).setVersionCode(ApkUtils.apiIsAtLeast(Build.VERSION_CODES.P) ? packageInfo.getLongVersionCode() : packageInfo.versionCode).setVersionName(packageInfo.versionName).setIcon(applicationInfo.icon).setInstallTime(packageInfo.firstInstallTime).setUpdateTime(packageInfo.lastUpdateTime).build();
+            val meta = PackageMeta.Builder(
+                applicationInfo!!.packageName
+            ).setLabel(applicationInfo.loadLabel(pm).toString()).setHasSplits(hasSplits)
+                .setIsSystemApp((applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0)
+                .setVersionCode(
+                    if (ApkUtils.apiIsAtLeast(
+                            Build.VERSION_CODES.P
+                        )
+                    ) packageInfo.longVersionCode else packageInfo.versionCode.toLong()
+                ).setVersionName(packageInfo.versionName).setIcon(
+                    applicationInfo.icon
+                ).setInstallTime(packageInfo.firstInstallTime)
+                .setUpdateTime(packageInfo.lastUpdateTime)
+                .build()
 
-            File file = new File(applicationInfo.publicSourceDir);
-            long longsize = file.length();
-            String size;
-            if (longsize > 1024 && longsize <= 1024 * 1024) {
-                size = (longsize / 1024 + " KB");
+            val file = File(applicationInfo.publicSourceDir)
+            val longsize = file.length()
+            val size = if (longsize > 1024 && longsize <= 1024 * 1024) {
+                ((longsize / 1024).toString() + " KB")
             } else if (longsize > 1024 * 1024 && longsize <= 1024 * 1024 * 1024) {
-                size = (longsize / (1024 * 1024) + " MB");
+                ((longsize / (1024 * 1024)).toString() + " MB")
             } else {
-                size = (longsize / (1024 * 1024 * 1024) + " GB");
+                ((longsize / (1024 * 1024 * 1024)).toString() + " GB")
             }
-            meta.size = size;
-            meta.sourceDir = applicationInfo.sourceDir;
-            meta.packageName = packageInfo.packageName;
-            meta.firstInstallTime = packageInfo.firstInstallTime;
-            meta.lastUpdateTime = packageInfo.lastUpdateTime;
+            meta.size = size
+            meta.sourceDir = applicationInfo.sourceDir
+            meta.packageName = packageInfo.packageName
+            meta.firstInstallTime = packageInfo.firstInstallTime
+            meta.lastUpdateTime = packageInfo.lastUpdateTime
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                meta.category = applicationInfo.category;
+                meta.category = applicationInfo.category
             }
-            bbb.add(meta);
+            bbb.add(meta)
         }
-        a = aaa;
-        b = bbb;
+        a = aaa
+        b = bbb
     }
 }

@@ -1,0 +1,39 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+
+        <!--
+        toolbar title, subtitle
+        -->
+        <item name="colorOnPrimary">@android:color/white</item>
+
+        <!--
+       default text color, menu item text color
+       -->
+        <item name="android:textColorPrimary">#FFFFFF</item>
+
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
+<!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>-->
+<!--        <item name="android:windowBackground">@color/colorLight</item>-->
+
+        <item name="android:colorControlNormal" tools:targetApi="lollipop">?attr/colorControlNormal</item>
+        <item name="colorControlNormal" tools:targetApi="lollipop">?attr/colorControlNormal</item>
+<!--        <item name="fontFamily">@font/inter_regular</item>-->
+
+
+        <item name="logCardBackColor">#1C1C1C</item>
+        <item name="logFileDrawable">@drawable/ic_log_file_card</item>
+    </style>
+</resources>

@@ -6,17 +6,17 @@
       <GradleProjectSettings>
         <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="C:/android/gradle/gradle-7.2" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../android/gradle/gradle-7.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/../../Nonesorted/Neptune/SdkLibrary" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/compose" />
             <option value="$PROJECT_DIR$/extractor" />
             <option value="$PROJECT_DIR$/features" />
-            <option value="$PROJECT_DIR$/../sdk/android/multithreader/threader" />
-            <option value="G:/android/WalhallaUI/features/ui" />
+            <option value="$PROJECT_DIR$/../WalhallaUI/features/ui" />
+            <option value="$PROJECT_DIR$/../WalhallaUI/shared" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

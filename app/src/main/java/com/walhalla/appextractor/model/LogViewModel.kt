@@ -5,46 +5,33 @@ import kotlinx.parcelize.Parcelize
 import java.io.File
 
 @Parcelize
-sealed class LogType(var id: Int) : Parcelable {
+sealed class LogType(override var id: Int) : Parcelable, ViewModel {
 
     object Error : LogType(12)
 
     object Success : LogType(13)
 
     object File : LogType(14)
-    
+
     object Empty : LogType(15)
-
-
-//    override fun getID(): Long {
-//        return id.toLong()
-//    }
-
 }
-
-//val errorLog = LogViewModel(LogType.Error, 1, "Произошла ошибка")
-//val successLog = LogViewModel(LogType.Success, 2, "Успех!")
-//val f = LFileViewModel(File("."), 1, "")
 
 @Parcelize
 open class LogViewModel(val type: LogType, open var icon: Int, open val text: String) : ViewModel, Parcelable {
 
-    override fun getID(): Long {
-        return type.id.toLong()
-    }
+    override val id = type.id
 }
 
 
+
 @Parcelize
-data class LFileViewModel(
-    val file: File,
-    override var icon: Int,
-    override val text: String
-) : LogViewModel(
+data class LFileViewModel(val file: File, override var icon: Int, override val text: String) : LogViewModel(
     type = LogType.File,
     icon = icon,
     text = text
-)
+) {
+    override val id = type.id
+}
 
 //class LErrorViewModel(icon: Int, msg: String) : LogViewModel(icon, msg) {
 //    override fun getID(): Long {

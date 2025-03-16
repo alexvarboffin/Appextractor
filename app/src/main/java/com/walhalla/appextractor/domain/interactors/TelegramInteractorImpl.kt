@@ -4,12 +4,16 @@ import android.content.Context
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.Util
 import com.walhalla.appextractor.domain.interactors.TelegramClient.TClientCallback
-import com.walhalla.boilerplate.domain.executor.Executor
-import com.walhalla.boilerplate.domain.executor.MainThread
-import com.walhalla.boilerplate.domain.interactors.base.AbstractInteractor
+import com.walhalla.threader.AbstractInteractor
+
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.getAppVersion
 import com.walhalla.ui.DLog.handleException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -18,14 +22,19 @@ import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
 
 
-class TelegramInteractorImpl(
-    threadExecutor: Executor?,
-    mainThread: MainThread?,
+class TelegramInteractorImpl @OptIn(DelicateCoroutinesApi::class) constructor(
+//    mThreadExecutor: Executor?,
+//    mMainThread: mMainThread?,
+
+    var mThreadExecutor: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    var mMainThread: CoroutineScope = GlobalScope,
+
+
     private val telegramClient: TelegramClient
 ) :
-    AbstractInteractor(threadExecutor, mainThread) {
-    override fun run() {
-    }
+    AbstractInteractor(mThreadExecutor, mMainThread) {
+
+//    override fun run() {}
 
 
     interface Callback<T> {
@@ -53,7 +62,7 @@ class TelegramInteractorImpl(
 🚀$eName v${getAppVersion(context)}"""
 
         try {
-            mThreadExecutor.submit {
+            mThreadExecutor.launch {
                 try {
                     var total = 0 //total file count
                     val errorCount = AtomicInteger() //total error count
@@ -83,7 +92,7 @@ class TelegramInteractorImpl(
                                 caption,
                                 object : TClientCallback {
                                     override fun onRetrievalFailed(e: Exception) {
-                                        mMainThread.post {
+                                        mMainThread.launch {
                                             errorCount.incrementAndGet()
                                             d("@@@@@@$e")
                                             //callback.hideProgressDialog();
@@ -92,13 +101,13 @@ class TelegramInteractorImpl(
                                     }
 
                                     override fun onMessageRetrieved(m: String) {
-                                        mMainThread.post {
+                                        mMainThread.launch {
                                             d("@@@@@@$m")
                                         }
                                     }
 
                                     override fun onRetrievalFailed(s: String) {
-                                        mMainThread.post {
+                                        mMainThread.launch {
                                             errorCount.incrementAndGet()
                                             d("@@@@@@$s")
                                             //callback.hideProgressDialog();
@@ -108,7 +117,7 @@ class TelegramInteractorImpl(
                                 }
                             ) { bytesWritten: Long, contentLength: Long ->
                                 if (callback != null) {
-                                    mMainThread.post {
+                                    mMainThread.launch {
                                         val percentage = 100f * bytesWritten / contentLength
                                         callback.onProgress(file, percentage, fileSize)
                                     }
@@ -127,16 +136,20 @@ class TelegramInteractorImpl(
                 } catch (e: Exception) {
                     handleException(e)
                     if (callback != null) {
-                        mMainThread.post { callback.onRetrievalFailed(e) }
+                        mMainThread.launch { callback.onRetrievalFailed(e) }
                     }
                 }
             }
         } catch (e: Exception) {
             handleException(e)
             if (callback != null) {
-                mMainThread.post { callback.onRetrievalFailed(e) }
+                mMainThread.launch { callback.onRetrievalFailed(e) }
             }
         }
+    }
+
+    override fun cancel() {
+
     }
     //    public void sendDocument(final List<File> files, String caption, Callback<String> callback) {
     //

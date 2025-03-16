@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="drugsearch">#B248C7</color>
+    <color name="pillidentifier">#29AFD3</color>
+    <color name="bluecolorPrimary">#5C8FED</color>
+    <color name="bluecolorPrimaryDark">#5068E2</color>
+    <color name="bluecolorAccent">#333333</color>
+
+    <color name="yellowcolorPrimary">#F3BC3D</color>
+    <color name="yellowcolorPrimaryDark">#FF9800</color>
+    <color name="yellowcolorAccent">#333333</color>
+
+    <color name="cyancolorPrimary">#29AFD3</color>
+    <color name="cyancolorPrimaryDark">#2291AF</color>
+    <color name="cyancolorAccent">#333333</color>
+
+    <color name="pinkcolorPrimary">#B248C7</color>
+    <color name="pinkcolorPrimaryDark">#933BA5</color>
+    <color name="pinkcolorAccent">#333333</color>
+
+    <color name="orangecolorPrimary">#F96F26</color>
+    <color name="orangecolorPrimaryDark">#EE6215</color>
+    <color name="orangecolorAccent">#333333</color>
+
+    <color name="graycolorPrimary">#3D739F</color>
+    <color name="graycolorPrimaryDark">#32648F</color>
+    <color name="graycolorAccent">#333333</color>
+    <color name="colorAccent">#FF6D00</color>
+    <color name="fg_drawable_grey">#413F3F</color>
+
+</resources>

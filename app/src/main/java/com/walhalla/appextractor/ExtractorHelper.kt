@@ -11,15 +11,20 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.appcompat.app.AlertDialog
 import com.walhalla.appextractor.DownloadProgressExample.RBCWrapper
+import com.walhalla.appextractor.core.RBCWrapperDelegate
 import com.walhalla.appextractor.domain.interactors.SimpleMeta
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.model.ViewModel
-import com.walhalla.boilerplate.domain.executor.Executor
-import com.walhalla.boilerplate.domain.executor.MainThread
-import com.walhalla.boilerplate.domain.interactors.base.AbstractInteractor
+import com.walhalla.appextractor.utils.DLog
+
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.e
 import com.walhalla.ui.DLog.handleException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -28,11 +33,18 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.Collections
 
-class ExtractorHelper(threadExecutor: Executor,
-    mainThread: MainThread,
+class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
+//    threadExecutor: Executor,
+//    mainThread: MainThread,
+
+    var mThreadExecutor: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    var mMainThread: CoroutineScope = GlobalScope,
+
+
     private val mView: Callback
-) :
-    AbstractInteractor(threadExecutor, mainThread) {
+)
+//: AbstractInteractor(mThreadExecutor, mMainThread)
+{
     //Отстук в фрагмент
     interface Callback {
         //void successExtracted(File fileName);
@@ -228,20 +240,31 @@ class ExtractorHelper(threadExecutor: Executor,
         try {
             val rbc =
                 RBCWrapper(
-                    source, source.size()
-                ) { position, totalFileSize, rbc, progress ->
-                    d("position->$position")
-                    //DLog.d("@@@" + index + "/" + totalFileSize + "\t" + sourceFile.getAbsolutePath() + "\t" + fileSize + "\t" + progress);
-                    mMainThread.post {
-                        mView.rbcProgressCallback(
-                            index,
-                            totalFileSize,
-                            sourceApk,
-                            fileSize?:"",
-                            progress
-                        )
+                    source, source.size(),
+                    object : RBCWrapperDelegate {
+                        override fun rbcProgressCallback(
+                            position: Int,
+                            totalFileSize: Int,
+                            rbc: RBCWrapper?,
+                            progress: Double
+                        ) {
+                            d("position->$position")
+                            //DLog.d("@@@" + index + "/" + totalFileSize + "\t" + sourceFile.getAbsolutePath() + "\t" + fileSize + "\t" + progress);
+                            mMainThread.launch {
+                                mView.rbcProgressCallback(
+                                    index,
+                                    totalFileSize,
+                                    sourceApk,
+                                    fileSize ?: "",
+                                    progress
+                                )
+                            }
+                        }
                     }
-                }
+
+                )
+
+
             //CRASH __> long size = destination.transferFrom(rbc, 0, Long.MAX_VALUE);
             val size = destination.transferFrom(rbc, 0, source.size())
             d("@ size->$size")
@@ -326,7 +349,7 @@ class ExtractorHelper(threadExecutor: Executor,
             // Логируем прогресс копирования
             val progress = totalRead.toDouble() / totalBytes * 100
             d("Copy Progress: " + String.format("%.2f", progress) + "%")
-            mMainThread.post {
+            mMainThread.launch {
                 mView.rbcProgressCallback(
                     index,
                     totalFileSize,
@@ -340,14 +363,13 @@ class ExtractorHelper(threadExecutor: Executor,
     }
 
 
-    override fun run() {
-    }
+//    override fun run() {}
 
 
     fun executeInternal(metas: List<PackageMeta>, context: Context) {
         this.totalFileSize = metas.size
 
-        mThreadExecutor.submit {
+        mThreadExecutor.launch {
             try {
                 val total_extractedFiles: MutableMap<SimpleMeta, List<File>> =
                     HashMap()
@@ -361,17 +383,16 @@ class ExtractorHelper(threadExecutor: Executor,
                 for (i in 0 until totalFileSize) {
                     val meta = metas[i]
                     val name0 = meta.label
-                    var apkFiles =
-                        getAllApkFilesForPackage(context, meta.packageName)
+                    val apkFiles = getAllApkFilesForPackage(context, meta.packageName)
 
 
-                    this.index = i
+                    //@@@ this.index = i
 
                     try {
                         if (apkFiles.size == 1) {
                             val file = extractWithoutRoot(context, meta)
                             if (file != null) {
-                                mMainThread.post {
+                                mMainThread.launch {
                                     if (file.exists() && !file.isDirectory) {
                                         //File[] mm = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).listFiles();
                                         d("[***]" + file.absolutePath)
@@ -392,7 +413,7 @@ class ExtractorHelper(threadExecutor: Executor,
                                 executeBackupWithPacking(context, meta.packageName, apkFiles)
                             d("-->" + apkFiles.size)
                             if (files.size > 0) {
-                                mMainThread.post {
+                                mMainThread.launch {
                                     val file = files[0]
                                     if (file.exists() && !file.isDirectory) {
                                         //File[] mm = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).listFiles();
@@ -421,9 +442,9 @@ class ExtractorHelper(threadExecutor: Executor,
 //                    DLog.d("@@@" + entry.getKey() + ":::" + entry.getValue().toString());
 //                }
                 if (total_extractedFiles != null && !total_extractedFiles.isEmpty()) {
-                    mMainThread.post { mView.successExtracted(total_extractedFiles) }
+                    mMainThread.launch { mView.successExtracted(total_extractedFiles) }
                 }
-                mMainThread.post {
+                mMainThread.launch {
                     mView.hideProgressBar(metas.size)
                 }
 
@@ -433,7 +454,7 @@ class ExtractorHelper(threadExecutor: Executor,
                 }
             } catch (e: Exception) {
                 d(e.message)
-                mMainThread.post {
+                mMainThread.launch {
                     mView.hideProgressBar(metas.size)
                 }
             }
@@ -445,7 +466,7 @@ class ExtractorHelper(threadExecutor: Executor,
 
 
         if (context != null) {
-            mMainThread.post {
+            mMainThread.launch {
                 AlertDialog.Builder(context)
                     .setTitle(R.string.alert_root_title)
                     .setMessage(

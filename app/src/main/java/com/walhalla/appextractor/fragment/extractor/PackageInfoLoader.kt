@@ -18,7 +18,7 @@ class PackageInfoLoader(a: Context, private val callback: Callback) : AsyncTask<
         WeakReference(a)
 
     interface Callback {
-        fun onProgressUpdate(value: PackageMeta?)
+        fun onProgressUpdate(value: PackageMeta)
 
         fun onPostExecute()
     }

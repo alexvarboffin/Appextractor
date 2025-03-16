@@ -19,9 +19,10 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.walhalla.appextractor.MetaFragment;
 import com.walhalla.appextractor.R;
 import com.walhalla.appextractor.activity.resources.p001.AssetsFragment;
-import com.walhalla.appextractor.activity.string.ResourcesToolForPlugin;
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin;
 import com.walhalla.appextractor.activity.string.StrFragment;
 import com.walhalla.appextractor.model.PackageMeta;
 

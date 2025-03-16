@@ -1,0 +1,91 @@
+<resources>
+    <string name="action_settings">Cài đặt</string>
+    <string name="dlg_loading_title">Đang tải</string>
+    <string name="dlg_loading_body">Đang tải danh sách các ứng dụng đã cài đặt...</string>
+    <string name="search_title">Tìm kiếm</string>
+    <string name="msg_search_help">Tìm kiếm theo tên ứng dụng hoặc gói ứng dụng</string>
+    <string name="toast_extracted">Tệp APK đã được trích xuất thành %s</string>
+    <string name="toast_failed">Không thể trích xuất tệp APK. Xem nhật ký adb để biết chi tiết.</string>
+    <string name="alert_root_title">Thử với quyền root?</string>
+    <string name="alert_root_body">Dường như ứng dụng này không thể được trích xuất bằng cách thông thường. Điều này là bình thường đối với các ứng dụng có phí: Android cố gắng bảo vệ chúng khỏi việc sao chép. Tuy nhiên, chúng vẫn có thể được trích xuất trên các thiết bị đã root. Nếu thiết bị của bạn đã root, %1$s có thể thử trích xuất nó bằng cách sử dụng quyền root.</string>
+    <string name="alert_root_yes">Hãy thử với quyền root</string>
+    <string name="alert_root_no">Không phải lúc này</string>
+    <string name="alert_perm_title">Yêu cầu quyền</string>
+    <string name="alert_perm_body">Để ghi tệp APK, ứng dụng phải được cấp quyền "Lưu trữ".\nVui lòng mở cài đặt ứng dụng và cấp quyền "Lưu trữ" cho nó.</string>
+    <string name="alert_perm_btn">Mở cài đặt</string>
+    <string name="storage_selection_spinner_title">99999</string>
+    <string name="action_extract">Trích xuất APK</string>
+    <string name="search_hint">Tìm kiếm</string>
+    <string name="data_empty">(Không có mục)</string>
+    <string name="google_drive_success">Đã lưu trong đám mây Google Drive!\n%1$s</string>
+    <string name="file_created">Đã tạo tệp: %1$s.</string>
+    <string name="telegram_token_title">Token</string>
+    <string name="telegram_chat_id_title">Chat ID</string>
+    <string name="open_on_google_play">Mở trên Google Play</string>
+    <string name="action_launch_app">Mở ứng dụng</string>
+    <string name="action_uninstall_app">Gỡ cài đặt ứng dụng</string>
+    <string name="access_error">Lỗi truy cập</string>
+    <string name="alert_dialog_title">Chờ chút!</string>
+    <string name="alert_dialog_text">Đang cố gắng trích xuất các tệp đã chọn</string>
+    <string name="extract_marked_files">Trích xuất các tệp được đánh dấu vào đĩa?\nĐã chọn: %1$d tệp</string>
+    <string name="action_extract_btn">Trích xuất đã chọn</string>
+    <string name="action_deselect">Bỏ chọn</string>
+    <string name="action_selected">Đã chọn</string>
+    <string name="open_file_browser">Mở Trình duyệt Tệp</string>
+    <string name="install_application">Cài đặt Ứng dụng</string>
+    <string name="action_open_file_parent_folder">Mở</string>
+    <string name="action_copy_package_name">Sao chép tên Gói ứng dụng</string>
+    <string name="copied_to_clipboard">đã sao chép vào clipboard</string>
+    <string name="menu_popup_copy">Sao chép vào Clipboard</string>
+    <string name="action_rate_app">Đánh giá ApkChief</string>
+    <string name="action_share_text">Chia sẻ Văn bản</string>
+    <string name="action_delete_file">Xóa Tệp</string>
+    <string name="app_info_basic">Thông tin Cơ bản</string>
+    <string name="app_info_certificate">Chứng chỉ</string>
+    <string name="app_info_data">Dữ liệu</string>
+    <string name="app_info_drop_target_label">Thông tin ứng dụng</string>
+    <string name="app_info_enable">Trạng thái gói</string>
+    <string name="app_info_features">Tính năng được yêu cầu</string>
+    <string name="app_info_first_install_time">Lần cài đặt đầu tiên</string>
+    <string name="app_info_installation">Cài đặt</string>
+    <string name="app_info_installation_source">Nguồn cài đặt</string>
+    <string name="app_info_last_update">Cập nhật lần cuối</string>
+    <string name="app_info_package_name" translatable="false">Tên Gói</string>
+    <string name="app_info_permissions">Quyền</string>
+    <string name="app_info_serial_number">Số sê-ri</string>
+    <string name="app_info_system">Thông tin Ứng dụng Hệ thống</string>
+    <string name="app_info_min_sdk">Phiên bản SDK Tối thiểu</string>
+    <string name="app_info_target_sdk">Phiên bản SDK Đích</string>
+    <string name="app_info_version">Phiên bản</string>
+    <string name="app_info_version_code">Mã Phiên bản</string>
+    <string name="app_info_apk">APK</string>
+    <string name="app_info_cache">Bộ nhớ Cache</string>
+    <string name="key_value_pair" formatted="false">%s : %s</string>
+    <string name="unknown">Không xác định</string>
+    <string name="action_app_info">Thông tin Ứng dụng</string>
+    <string name="app_referer_amazon">Cửa hàng Ứng dụng Amazon</string>
+    <string name="app_referer_google_play">Cửa hàng Ứng dụng Google Play</string>
+    <string name="action_save_icon" translatable="false">Lưu biểu tượng</string>
+    <string name="savedicon" translatable="false">Đã lưu biểu tượng của</string>
+    <string name="err_unable_saved_icon" translatable="false">Không thể Lưu biểu tượng của</string>
+    <string name="app_info_uid">UID</string>
+    <string name="app_info_activities" translatable="false">Hoạt động</string>
+    <string name="app_info_services">Dịch vụ</string>
+    <string name="app_info_receivers">Bộ nhận</string>
+    <string name="app_info_providers">Cung cấp</string>
+    <string name="action_export_icon">Xuất biểu tượng</string>
+    <string name="data_to_clipboard">Đã sao chép vào clipboard: %s.</string>
+    <string name="app_info_sharedlibraryfiles">Tệp Thư viện Chia sẻ</string>
+    <string name="backup_app_feature_split">Chia APK</string>
+    <string name="backup_app_feature_system_app">Ứng dụng Hệ thống</string>
+    <string name="backup_app_feature_install_date">Đã cài đặt: %s</string>
+    <string name="backup_app_feature_update_date">Đã cập nhật: %s</string>
+    <string name="action_accessibility">Khả năng Tiếp cận</string>
+    <string name="action_app_manifest">Trình duyệt Biểu mẫu</string>
+
+    <string name="title_strings">CHUỖI</string>
+    <string name="action_save_file">Lưu Tệp</string>
+    <string name="action_share_file">Xuất Tệp</string>
+    <string name="action_read_file">Đọc Tệp</string>
+
+</resources>
