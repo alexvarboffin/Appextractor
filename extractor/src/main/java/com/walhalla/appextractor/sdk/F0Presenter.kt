@@ -1,5 +1,6 @@
 package com.walhalla.appextractor.sdk
 
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AppOpsManager
@@ -25,12 +26,11 @@ import android.text.format.Formatter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.walhalla.appextractor.activity.detail.DetailsF0
-
-
+import com.walhalla.appextractor.utils.IntentUtil
+import com.walhalla.appextractor.utils.PermissionUtils.protectionLevelToString
+import com.walhalla.extractor.R
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.handleException
-import com.walhalla.appextractor.utils.IntentUtil
-import com.walhalla.extractor.R
 import org.qiyi.pluginlibrary.utils.ManifestParser
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
     context: Context,
@@ -295,12 +296,12 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         //PackageInfo packageInfo0 = getPackageManager().getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
 
         //Optional name of a permission required to be able to access this application's components.
-//            if (packageInfo.permissions != null) {
+//            if (targetPackageInfo.permissions != null) {
 //                // For each defined permission
-//                for (PermissionInfo permission : packageInfo.permissions) {
-//                    int protectionLevelKey = permission.protectionLevel;
-//                    String protectionLevel = PermissionUtils.protectionLevelToString(protectionLevelKey);
-//                    DLog.d(permission.name + " " + protectionLevel);
+//                for (permission in packageInfo.permissions) {
+//                    val protectionLevelKey = permission.protectionLevel
+//                    val protectionLevel = protectionLevelToString(protectionLevelKey)
+//                    d(permission.name + " " + protectionLevel)
 //                }
 //            }
         //permissions

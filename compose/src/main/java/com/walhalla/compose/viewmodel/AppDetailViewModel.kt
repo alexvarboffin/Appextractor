@@ -8,6 +8,8 @@ import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.utils.PermissionUtils
+import com.walhalla.compose.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,13 +22,8 @@ data class AppComponent(
     val exported: Boolean
 )
 
-data class Permission(
-    val name: String,
-    val description: String?
-)
-
 data class AppDetails(
-    val permissions: List<Permission>,
+    val permissions: Map<PermissionCategory, List<PermissionInfo>>,
     val activities: List<AppComponent>,
     val services: List<AppComponent>,
     val receivers: List<AppComponent>,
@@ -53,14 +50,23 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                 val permissions = packageInfo.requestedPermissions?.mapNotNull { permissionName ->
                     try {
                         val permissionInfo = pm.getPermissionInfo(permissionName, 0)
-                        Permission(
+                        val isGranted = pm.checkPermission(permissionName, app.packageName) == PackageManager.PERMISSION_GRANTED
+                        val category = getPermissionCategory(permissionName)
+                        
+                        PermissionInfo(
                             name = permissionName,
-                            description = permissionInfo.loadDescription(pm)?.toString()
+                            simpleName = permissionName.substringAfterLast('.'),
+                            description = permissionInfo.loadDescription(pm)?.toString() 
+                                ?: getPermissionDescription(permissionName),
+                            category = category,
+                            protectionLevel = permissionInfo.protectionLevel,
+                            isGranted = isGranted,
+                            recommendation = getSecurityRecommendation(category, permissionInfo.protectionLevel)
                         )
                     } catch (e: PackageManager.NameNotFoundException) {
-                        Permission(name = permissionName, description = null)
+                        null
                     }
-                } ?: emptyList()
+                }?.groupBy { it.category } ?: emptyMap()
 
                 val activities = packageInfo.activities?.map { activityInfo ->
                     AppComponent(

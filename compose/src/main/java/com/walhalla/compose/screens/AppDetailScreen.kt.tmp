@@ -1,39 +1,3 @@
-package com.walhalla.compose.screens
-
-import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.utils.PermissionUtils
-import com.walhalla.compose.viewmodel.AppDetailViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.material.tabs.TabLayout
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Tab
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
-import android.content.pm.PermissionInfo
-
-import com.walhalla.compose.model.PermissionCategory
-import com.walhalla.compose.model.SecurityLevel
-import androidx.compose.ui.platform.LocalContext
-import android.widget.Toast
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDetailScreen(
@@ -190,8 +154,6 @@ fun AppDetailScreen(
                                                     ) {
                                                         Icon(
                                                             imageVector = when (category) {
-
-
                                                                 PermissionCategory.PERSONAL_DATA -> Icons.Default.Person
                                                                 PermissionCategory.LOCATION -> Icons.Default.LocationOn
                                                                 PermissionCategory.STORAGE -> Icons.Default.Storage
@@ -202,7 +164,6 @@ fun AppDetailScreen(
                                                                 PermissionCategory.NOTIFICATIONS -> Icons.Default.Notifications
                                                                 PermissionCategory.SYSTEM -> Icons.Default.Settings
                                                                 PermissionCategory.OTHER -> Icons.Default.Info
-
                                                             },
                                                             contentDescription = null,
                                                             tint = MaterialTheme.colorScheme.primary
@@ -229,33 +190,6 @@ fun AppDetailScreen(
                                                                     else
                                                                         MaterialTheme.colorScheme.error
                                                                 )
-                                                                
-                                                                val context = LocalContext.current
-                                                                Icon(
-                                                                    imageVector = if (permission.isGranted) 
-                                                                        Icons.Default.LockOpen
-                                                                    else 
-                                                                        Icons.Default.Lock,
-                                                                    contentDescription = "Protection Level",
-                                                                    modifier = Modifier
-                                                                        .size(16.dp)
-                                                                        .clickable {
-                                                                            Toast.makeText(
-                                                                                context,
-                                                                                """
-                                                                                Is Permission Granted? ${permission.isGranted}
-                                                                                Permission ProtectionLevel: ${permission.protectionLevel}
-                                                                                """.trimIndent(),
-                                                                                Toast.LENGTH_LONG
-                                                                            ).show()
-                                                                        },
-                                                                    tint = when (permission.protectionLevel) {
-                                                                        PermissionInfo.PROTECTION_DANGEROUS -> MaterialTheme.colorScheme.error
-                                                                        PermissionInfo.PROTECTION_SIGNATURE -> MaterialTheme.colorScheme.primary
-                                                                        else -> MaterialTheme.colorScheme.secondary
-                                                                    }
-                                                                )
-                                                                
                                                                 Text(
                                                                     text = PermissionUtils.protectionLevelToString(permission.protectionLevel),
                                                                     style = MaterialTheme.typography.labelSmall,
@@ -309,177 +243,7 @@ fun AppDetailScreen(
                         }
                     }
                 }
-
-                item {
-                    ExpandableCard(
-                        title = "Activities (${details.activities.size})",
-                        icon = Icons.Default.Apps,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.activities.forEach { activity ->
-                                DetailRow(
-                                    activity.name.substringAfterLast('.'),
-                                    if (activity.exported) "Exported" else "Not exported"
-                                )
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(
-                        title = "Services (${details.services.size})",
-                        icon = Icons.Default.Build,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.services.forEach { service ->
-                                DetailRow(
-                                    service.name.substringAfterLast('.'),
-                                    if (service.exported) "Exported" else "Not exported"
-                                )
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(
-                        title = "Receivers (${details.receivers.size})",
-                        icon = Icons.Default.BroadcastOnPersonal,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.receivers.forEach { receiver ->
-                                DetailRow(
-                                    receiver.name.substringAfterLast('.'),
-                                    if (receiver.exported) "Exported" else "Not exported"
-                                )
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(
-                        title = "Providers (${details.providers.size})",
-                        icon = Icons.Default.Storage,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.providers.forEach { provider ->
-                                DetailRow(
-                                    provider.name.substringAfterLast('.'),
-                                    if (provider.exported) "Exported" else "Not exported"
-                                )
-                            }
-                        }
-                    }
-                }
             }
         }
-    }
-}
-
-@Composable
-private fun ExpandableCard(
-    title: String,
-    icon: ImageVector,
-    initiallyExpanded: Boolean = false,
-    content: @Composable () -> Unit
-) {
-    var expanded by remember { mutableStateOf(initiallyExpanded) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = !expanded }
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (expanded) "Collapse" else "Expand"
-                )
-            }
-            
-            AnimatedVisibility(
-                visible = expanded,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                content()
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailRow(
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-private fun formatDate(timestamp: Long): String {
-    return SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-        .format(Date(timestamp))
-}
-
-@Composable
-private fun ManifestTab(app: PackageMeta) {
-    ManifestScreen(
-        app = app,
-        onBackClick = { /* Ignore */ }
-    )
-}
-
-@Composable
-private fun ResourcesTab(app: PackageMeta) {
-    // TODO: Implement Resources tab
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Resources coming soon...")
     }
 } 

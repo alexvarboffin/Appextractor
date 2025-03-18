@@ -3,7 +3,7 @@ package com.walhalla.appextractor.utils
 import android.content.pm.PermissionInfo
 
 object PermissionUtils {
-    @JvmStatic
+
     fun protectionLevelToString(protectionLevelKey: Int): String {
         val protectionLevel = when (protectionLevelKey) {
             PermissionInfo.PROTECTION_NORMAL -> "normal"
