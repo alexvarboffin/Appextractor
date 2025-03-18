@@ -71,24 +71,14 @@ android {
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("x")
-            buildConfigField(
-                "String",
-                "KEY_TELEGRAM_TOKEN",
-                "\"220535441:AAGSE2J0uJp0X87cxyup4kL9ytybvb78AGk\""
-            )
-            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"-1001857544330\"")
             versionNameSuffix = "-DEMO"
         }
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("x")
-            buildConfigField("String", "KEY_TELEGRAM_TOKEN", "\"\"")
-            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"\"")
             versionNameSuffix = ".release"
         }
     }

@@ -1,44 +1,37 @@
-package com.walhalla.appextractor.adapter2.cert;
+package com.walhalla.appextractor.adapter2.cert
 
-import android.graphics.Color;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.graphics.Color
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter
+import com.walhalla.appextractor.sdk.CertLine
+import pokercc.android.expandablerecyclerview.ExpandableAdapter
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter;
-import com.walhalla.appextractor.sdk.CertLine;
+class CertViewHolder(view: View, presenter: AppDetailInfoAdapter?) :
+    ExpandableAdapter.ViewHolder(view) {
+    private val text1: TextView =
+        view.findViewById(R.id.text1)
+    val text2: TextView = view.findViewById(R.id.text2)
 
-import pokercc.android.expandablerecyclerview.ExpandableAdapter;
+    private val layout: ViewGroup =
+        view.findViewById(R.id.lLayout1)
+    private val btn: View = view.findViewById(R.id.searchBtn)
 
-public class CertViewHolder extends ExpandableAdapter.ViewHolder {
-
-    private final TextView text1;
-    public final TextView text2;
-
-    private final ViewGroup layout;
-    private final View btn;
     //private final AppDetailInfoAdapter presenter;
-
-    public void bind(CertLine object, int position) {
+    fun bind(`object`: CertLine, position: Int) {
         if (position % 2 > 0) {
-            this.layout.setBackgroundColor(Color.WHITE);
+            layout.setBackgroundColor(Color.WHITE)
         }
-        this.text1.setText(object.res0);
-        this.text2.setText(object.value);
-        //this.text2.setBackgroundColor(Color.YELLOW);
+        text1.text = `object`.res0
+        text2.text = `object`.value
 
-        btn.setOnClickListener(v -> {
-            //presenter.onItemClicked(v, object);
-        });
+        //this.text2.setBackgroundColor(Color.YELLOW);
+        btn.setOnClickListener { v: View? -> }
     }
 
-    public CertViewHolder(View view, AppDetailInfoAdapter presenter) {
-        super(view);
-        text1 = view.findViewById(R.id.text1);
-        text2 = view.findViewById(R.id.text2);
-        layout = view.findViewById(R.id.lLayout1);
-        btn = view.findViewById(R.id.searchBtn);
+    init {
         //this.presenter = presenter;
     }
 }

@@ -33,14 +33,15 @@ import com.walhalla.appextractor.adapter2.headerCollapsed.HeaderCollapsedVH
 
 import com.walhalla.appextractor.adapter2.infoapk.InfoApkHolder
 
-import com.walhalla.appextractor.adapter2.perm.PermissionViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.PermissionViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.ActivityViewHolder
 
-import com.walhalla.appextractor.adapter2.receiver.ReceiverViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.ReceiverViewHolder
 
-import com.walhalla.appextractor.adapter2.service.ServiceViewHolder
-import com.walhalla.appextractor.adapter2.simple.SimpleViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.ServiceViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.SimpleViewHolder
 
-import com.walhalla.appextractor.adapter2.v2line.V2ViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.V2ViewHolder
 import com.walhalla.appextractor.databinding.ItemActionBinding
 import com.walhalla.appextractor.databinding.ItemActivityBinding
 import com.walhalla.appextractor.databinding.ItemDirBinding
@@ -51,8 +52,8 @@ import com.walhalla.appextractor.databinding.ItemLinePermissionBinding
 import com.walhalla.appextractor.databinding.ItemProviderBinding
 import com.walhalla.appextractor.databinding.ItemReceiverBinding
 import com.walhalla.appextractor.databinding.ItemV2LineBinding
-import com.walhalla.appextractor.model.backup.SimpleAppFeature
-import com.walhalla.appextractor.model.common.AppFeature
+import com.walhalla.appextractor.common.SimpleAppFeature
+import com.walhalla.appextractor.common.AppFeature
 import com.walhalla.appextractor.sdk.ActivityLine
 import com.walhalla.appextractor.sdk.BaseViewModel
 import com.walhalla.appextractor.sdk.CertLine

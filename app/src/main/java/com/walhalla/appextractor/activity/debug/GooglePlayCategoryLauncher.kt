@@ -8,7 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import com.walhalla.appextractor.MarketUtils.openGooglePlayCategory
+import com.walhalla.appextractor.utils.MarketUtils.openGooglePlayCategory
 
 class GooglePlayCategoryLauncher : AppCompatActivity() {
     private val items = arrayOf(

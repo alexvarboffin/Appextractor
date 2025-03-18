@@ -5,6 +5,7 @@ dropboxCoreSdk = "3.1.5"
 flexbox = "2.0.1"
 glide = "4.16.0"
 lifecycleViewmodel = "2.6.2"
+materialIconsExtendedAndroid = "1.7.8"
 minSdk = "24"
 targetSdk = "35"
 accompanistSwiperefresh = "0.32.0"
@@ -119,6 +120,7 @@ androidx-lifecycle-runtime-compose = { version.ref = "androidx-lifecycle", group
 androidx-lifecycle-runtime-ktx = { version.ref = "lifecycle-runtime-ktx", group = "androidx.lifecycle", name = "lifecycle-runtime-ktx"}
 androidx-lifecycle-viewmodel = { version.ref = "androidx-lifecycle", group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel"}
 androidx-lifecycle-viewmodel-ktx = { version.ref = "lifecycleViewmodelKtx", module = "androidx.lifecycle:lifecycle-viewmodel-ktx"}
+androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
 dropbox-core-sdk = { module = "com.dropbox.core:dropbox-core-sdk", version.ref = "dropboxCoreSdk" }
 flexbox = { module = "com.google.android:flexbox", version.ref = "flexbox" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }

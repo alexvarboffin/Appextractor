@@ -4,19 +4,36 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.walhalla.compose.ui.navigation.Screen
-import com.walhalla.compose.ui.screens.appdetail.AppDetailScreen
-import com.walhalla.compose.ui.screens.main.MainScreen
-import com.walhalla.compose.ui.screens.manifest.ManifestScreen
-import com.walhalla.compose.ui.screens.resources.ResourcesScreen
-import com.walhalla.compose.ui.theme.AppextractorTheme
 
+import androidx.navigation.navArgument
+import com.walhalla.compose.screens.ExtractorScreen
+import com.walhalla.compose.screens.LogScreen
+import com.walhalla.compose.screens.ManifestScreen
+import com.walhalla.compose.screens.SettingsScreen
+import com.walhalla.compose.screens.AppDetailScreen
+import com.walhalla.compose.ui.theme.AppextractorTheme
+import com.walhalla.compose.viewmodel.ExtractorViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,54 +44,94 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-
-                    NavHost(navController = navController, startDestination = Screen.Home.route) {
-                        composable(Screen.Home.route) {
-                            MainScreen(
-                                onAppClick = { packageName ->
-                                    navController.navigate(Screen.AppDetail.createRoute(packageName))
+                    val items = listOf(
+                        Screen.Extractor,
+                        Screen.Logs,
+                        Screen.Settings,
+                        Screen.Manifest
+                    )
+                    
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = navBackStackEntry?.destination?.route
+                    val showBottomBar = currentRoute != null && !currentRoute.startsWith("app_detail")
+                    
+                    Scaffold(
+                        bottomBar = {
+                            if (showBottomBar) {
+                                NavigationBar {
+                                    val currentDestination = navBackStackEntry?.destination
+                                    
+                                    items.forEach { screen ->
+                                        NavigationBarItem(
+                                            icon = { Icon(screen.icon, contentDescription = null) },
+                                            label = { Text(screen.label) },
+                                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                            onClick = {
+                                                navController.navigate(screen.route) {
+                                                    popUpTo(navController.graph.findStartDestination().id) {
+                                                        saveState = true
+                                                    }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
+                                            }
+                                        )
+                                    }
                                 }
-                            )
+                            }
                         }
-
-                        composable(Screen.AppDetail.route) { backStackEntry ->
-                            val packageName = backStackEntry.arguments?.getString("packageName") ?: return@composable
-                            AppDetailScreen(
-                                packageName = packageName,
-                                onManifestClick = {
-                                    navController.navigate(Screen.Manifest.createRoute(packageName))
-                                },
-                                onResourcesClick = {
-                                    navController.navigate(Screen.Resources.createRoute(packageName))
-                                },
-                                onBackClick = {
-                                    navController.popBackStack()
+                    ) { innerPadding ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = Screen.Extractor.route,
+                            modifier = Modifier.padding(innerPadding)
+                        ) {
+                            composable(Screen.Extractor.route) { 
+                                ExtractorScreen(
+                                    onNavigateToAppDetail = { packageName ->
+                                        navController.navigate("app_detail/$packageName")
+                                    }
+                                ) 
+                            }
+                            composable(Screen.Logs.route) { LogScreen() }
+                            composable(Screen.Settings.route) { SettingsScreen() }
+                            composable(Screen.Manifest.route) { ManifestScreen(
+                                app = TODO(),
+                                onBackClick = TODO(),
+                                viewModel = TODO()
+                            ) }
+                            composable(
+                                route = Screen.AppDetail.route,
+                                arguments = listOf(
+                                    navArgument("packageName") { type = NavType.StringType }
+                                )
+                            ) { backStackEntry ->
+                                val packageName = backStackEntry.arguments?.getString("packageName")
+                                val viewModel: ExtractorViewModel = viewModel()
+                                val app = viewModel.getAppByPackageName(packageName)
+                                if (app != null) {
+                                    AppDetailScreen(
+                                        app = app,
+                                        onBackClick = { navController.navigateUp() }
+                                    )
                                 }
-                            )
-                        }
-
-                        composable(Screen.Manifest.route) { backStackEntry ->
-                            val packageName = backStackEntry.arguments?.getString("packageName") ?: return@composable
-                            ManifestScreen(
-                                packageName = packageName,
-                                onBackClick = {
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-
-                        composable(Screen.Resources.route) { backStackEntry ->
-                            val packageName = backStackEntry.arguments?.getString("packageName") ?: return@composable
-                            ResourcesScreen(
-                                packageName = packageName,
-                                onBackClick = {
-                                    navController.popBackStack()
-                                }
-                            )
+                            }
                         }
                     }
                 }
             }
         }
     }
+}
+
+sealed class Screen(
+    val route: String,
+    val label: String,
+    val icon: ImageVector
+) {
+    object Extractor : Screen("extractor", "Extractor", Icons.Default.Storage)
+    object Logs : Screen("logs", "Logs", Icons.Default.List)
+    object Settings : Screen("settings", "Settings", Icons.Default.Settings)
+    object Manifest : Screen("manifest/{packageName}", "Manifest", Icons.Default.Description)
+    object AppDetail : Screen("app_detail/{packageName}", "App Detail", Icons.Default.Info)
 }

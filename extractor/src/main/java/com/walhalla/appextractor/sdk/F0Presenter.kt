@@ -222,10 +222,13 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         data.add(CertLine("DescriptionRes", "" + applicationInfo.descriptionRes))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            data.add(CertLine("AppComponentFactory", applicationInfo.appComponentFactory))
+            data.add(CertLine("AppComponentFactory", applicationInfo.appComponentFactory?:"None"))
         }
 
-        data.add(CertLine("BackupAgentName", applicationInfo.backupAgentName))
+        applicationInfo.backupAgentName?.let {
+            data.add(CertLine("BackupAgentName", it))
+        }
+
         data.add(CertLine("ManageSpaceActivityName", applicationInfo.manageSpaceActivityName?:"Unknown"))
         //
         data.add(CertLine("ProcessName", applicationInfo.processName))
@@ -246,13 +249,10 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
         val installerPackageName = packageManager.getInstallerPackageName(
             targetPackageInfo.packageName
-        )
+        )?: "Unknown"
         data.add(
             SimpleLine(
-                R.string.app_info_installation_source, "" + handleInstallSource(
-                    packageManager,
-                    installerPackageName!!
-                )
+                R.string.app_info_installation_source, "" + handleInstallSource(packageManager, installerPackageName)
             )
         )
 

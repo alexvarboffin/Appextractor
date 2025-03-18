@@ -7,4 +7,6 @@
     <string name="preference_telegram_title">Telegram Chat (10 Mb limit)</string>
     <string name="storage_off">Storage disabled</string>
     <string name="storage_on">Storage enabled</string>
+
+
 </resources>

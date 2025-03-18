@@ -51,9 +51,10 @@ import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.getAppVersion
 import com.walhalla.ui.DLog.handleException
 import com.walhalla.ui.observer.RateAppModule
+import com.walhalla.ui.plugins.DialogAbout.aboutDialog
 import com.walhalla.ui.plugins.Launcher.openBrowser
 import com.walhalla.ui.plugins.Launcher.rateUs
-import com.walhalla.ui.plugins.Module_U.aboutDialog
+
 import com.walhalla.ui.plugins.Module_U.feedback
 import com.walhalla.ui.plugins.Module_U.moreApp
 import com.walhalla.ui.plugins.Module_U.shareThisApp

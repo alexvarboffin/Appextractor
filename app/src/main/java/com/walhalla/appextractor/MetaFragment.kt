@@ -14,18 +14,20 @@ import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter.DetailAdapterCall
 import com.walhalla.appextractor.activity.debug.DemoData
 import com.walhalla.appextractor.activity.detail.DetailsF0
 
-import com.walhalla.appextractor.adapter2.perm.PermissionViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.PermissionViewHolder
 import com.walhalla.appextractor.sdk.BaseViewModel
 
 import com.walhalla.appextractor.databinding.IncludeAppDetailInfoBinding
 import com.walhalla.appextractor.fragment.BaseFragment
+import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.MetaPresenter
 import com.walhalla.appextractor.sdk.PermissionLine
 import com.walhalla.appextractor.sdk.ProviderLine
 import com.walhalla.appextractor.utils.LauncherUtils
-import com.walhalla.ui.plugins.Module_U.shareText
+import com.walhalla.ui.plugins.Module_U
+
 class MetaFragment : BaseFragment(), DetailsF0.View {
-    private var meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta? = null
+    private var meta: PackageMeta? = null
     private var mPresenter: MetaPresenter? = null
     private var binding: IncludeAppDetailInfoBinding? = null
 
@@ -86,7 +88,7 @@ class MetaFragment : BaseFragment(), DetailsF0.View {
 
                 override fun shareText(value: String) {
                     if (callback != null) {
-                        shareText(activity!!, value, "Meta Data")
+                        Module_U.shareText(requireActivity(), value, "Meta Data")
                     }
                 }
             })
@@ -96,7 +98,7 @@ class MetaFragment : BaseFragment(), DetailsF0.View {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = IncludeAppDetailInfoBinding.inflate(inflater, container, false)
         return binding!!.root
     }

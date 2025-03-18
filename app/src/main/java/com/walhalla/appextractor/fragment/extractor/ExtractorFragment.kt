@@ -42,9 +42,9 @@ import com.walhalla.appextractor.activity.main.MainActivity
 import com.walhalla.appextractor.activity.main.MainView
 import com.walhalla.appextractor.adapter.ApkListAdapter
 import com.walhalla.appextractor.databinding.FragmentMainBinding
-import com.walhalla.appextractor.domain.interactors.SimpleMeta
-import com.walhalla.appextractor.domain.interactors.TelegramClient
-import com.walhalla.appextractor.domain.interactors.TelegramInteractorImpl
+import com.walhalla.appextractor.interactors.SimpleMeta
+import com.walhalla.appextractor.interactors.TelegramClient
+import com.walhalla.appextractor.interactors.TelegramInteractorImpl
 import com.walhalla.appextractor.model.LogType
 
 import com.walhalla.appextractor.model.LogViewModel
@@ -54,6 +54,7 @@ import com.walhalla.appextractor.storage.LocalStorage
 import com.walhalla.appextractor.task.UploadFileTask
 import com.walhalla.appextractor.utils.BitmapUtils
 import com.walhalla.appextractor.utils.PackageMetaUtils
+import com.walhalla.appextractor.utils.Util
 
 import com.walhalla.db.DropboxClientFactory
 import com.walhalla.ui.DLog.d
@@ -62,12 +63,14 @@ import com.walhalla.ui.plugins.Launcher.openMarketApp
 import es.dmoral.toasty.Toasty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.net.UnknownHostException
 import java.text.DateFormat
 import java.util.Locale
 
-class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Callback, TelegramInteractorImpl.Callback<String> {
+class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Callback,
+    TelegramInteractorImpl.Callback<String> {
     private var adapter: ApkListAdapter? = null
 
     //private ProgressBar progressBar;
@@ -169,6 +172,42 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         }
     }
 
+
+    override fun extractOnePleaseDialog(data: List<PackageMeta>) {
+        d("**** NONE EXTRACTED: " + data.size)
+
+
+        context?.let { ctx ->
+            AlertDialog.Builder(ctx)
+                .setTitle(com.walhalla.extractor.R.string.alert_root_title)
+                .setMessage(
+                    ctx.getString(
+                        com.walhalla.extractor.R.string.alert_root_body,
+                        ctx.getString(R.string.app_name_full)
+                    )
+                )
+                .setPositiveButton(com.walhalla.extractor.R.string.alert_root_yes) { dialog: DialogInterface?, which: Int ->
+                    try {
+                        for (info in data) {
+                            val file = File(Util.extractWithRoot(info))
+                            makeSnackBar(file)
+                            //callback.printOutput(new LFileViewModel(file[0], "Success",R.drawable.ic_baseline_sd_card_24));
+                            //###
+                            // successExtracted(mFile, appName);//to cloud
+                        }
+                    } catch (e: Exception) {
+                        failureExtracted(com.walhalla.extractor.R.string.toast_failed)
+                    }
+                }
+                .setNegativeButton(com.walhalla.extractor.R.string.alert_root_no) { dialog: DialogInterface?, which: Int ->
+                    d(
+                        "cancel"
+                    )
+                }
+                .show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -196,7 +235,8 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         inflater.inflate(R.menu.menu_extractor_tab, menu)
 
         if (activity != null) {
-            val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+            val searchManager =
+                requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
             //            final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
             val searchView = menu.findItem(R.id.action_search).actionView as SearchView?
 
@@ -634,7 +674,13 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
                                 "%1\$s size %2\$s modified %3\$s", result.pathLower, result.size,
                                 DateFormat.getDateTimeInstance().format(result.clientModified)
                             )
-                            showMessage(LogViewModel(LogType.Success, R.drawable.ic_log_db, message))
+                            showMessage(
+                                LogViewModel(
+                                    LogType.Success,
+                                    R.drawable.ic_log_db,
+                                    message
+                                )
+                            )
                         }
                     } else {
                         showMessage(LogViewModel(LogType.Success, R.drawable.ic_log_db, "Success!"))
@@ -719,7 +765,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
      * Получена ссылка на файл для дальнейшей загрузки в облако
      */
     override fun successExtracted(listMap: Map<SimpleMeta, List<File>>) {
-        var mpm = LocalStorage.getInstance(requireContext())
+        val mpm = LocalStorage.getInstance(requireContext())
         if (mpm.enableGoogleDrive()) {
             //new Storage.GoogleDrive().push(getContext(), path);
             //123 this.driveAdapter.signIn(getContext(), files, appName);
@@ -747,8 +793,8 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         }
 
         if (mpm.enableTelegram()) {
-            val chatId = mpm.telegramChatId()
-            val token = mpm.telegramToken()
+            val chatId = mpm.telegramChatId() ?: ""
+            val token = mpm.telegramToken() ?: ""
 
             if (!validate(chatId) || !validate(token)) {
 //                mExtractorExtractorViewCallback.printOutput(
@@ -760,7 +806,8 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
 
             pd0 = DialogUtils.loadDialog(requireActivity(), R.drawable.ic_telegram)
             pd0?.setButton(
-                DialogInterface.BUTTON_NEGATIVE, requireActivity().getString(android.R.string.cancel),
+                DialogInterface.BUTTON_NEGATIVE,
+                requireActivity().getString(android.R.string.cancel),
                 DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
                     //progressDialogValueTextView.setText("You canceled the onProgress.");
                     interactor!!.cancel()
@@ -786,7 +833,7 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
         if (o == null) {
             return false
         }
-        if (o.trim { it <= ' ' }.length > 0) {
+        if (o.trim { it <= ' ' }.isNotEmpty()) {
             return true
         }
         return false
@@ -850,9 +897,6 @@ $appName""")
 
         requireActivity().startActivity(chooser)
     }
-
-
-
 
 
     /**

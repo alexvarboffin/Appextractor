@@ -19,7 +19,7 @@ import com.walhalla.appextractor.adapter2.AppDetailInfoAdapter.DetailAdapterCall
 import com.walhalla.appextractor.activity.detail.DetailsF0
 import com.walhalla.appextractor.activity.manifest.ManifestActivity
 
-import com.walhalla.appextractor.adapter2.perm.PermissionViewHolder
+import com.walhalla.appextractor.adapter2.viewholders.PermissionViewHolder
 
 import com.walhalla.appextractor.databinding.IncludeAppDetailInfoBinding
 import com.walhalla.appextractor.sdk.F0Presenter
@@ -28,7 +28,7 @@ import com.walhalla.appextractor.sdk.PermissionLine
 import com.walhalla.appextractor.sdk.ProviderLine
 import com.walhalla.appextractor.utils.LauncherUtils
 import com.walhalla.appextractor.utils.ShareUtils
-import com.walhalla.ui.plugins.Module_U.shareText
+import com.walhalla.ui.plugins.Module_U
 import java.util.Locale
 
 class FR0 : BaseFragment(), DetailsF0.View {
@@ -86,7 +86,7 @@ class FR0 : BaseFragment(), DetailsF0.View {
 
                 override fun shareText(value: String) {
                     if (callback != null) {
-                        shareText(activity!!, value, "Information")
+                        Module_U.shareText(activity!!, value, "Information")
                     }
                 }
             })

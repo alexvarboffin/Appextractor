@@ -9,9 +9,15 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.walhalla.appextractor.storage.LocalStorage
+import com.walhalla.appextractor.storage.PrefsConst.KEY_DROP_BOX_STORAGE
+import com.walhalla.appextractor.storage.PrefsConst.KEY_GOOGLE_DRIVE_STORAGE
+import com.walhalla.appextractor.storage.PrefsConst.KEY_TELEGRAM_CHAT_ID
+import com.walhalla.appextractor.storage.PrefsConst.KEY_TELEGRAM_STORAGE
+import com.walhalla.appextractor.storage.PrefsConst.KEY_TELEGRAM_TOKEN
 import com.walhalla.core.settings.FolderChooser
 import com.walhalla.ui.DLog.getAppVersion
-import com.walhalla.ui.plugins.Module_U.aboutDialog
+import com.walhalla.ui.plugins.DialogAbout.aboutDialog
+
 
 /**
  * android.preference.PreferenceFragment
@@ -65,8 +71,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(),
         if (pref != null) {
             pref.setSummary(R.string.app_name_full)
             pref.onPreferenceClickListener =
-                Preference.OnPreferenceClickListener { preference: Preference? ->
-                    aboutDialog(requireContext())
+                Preference.OnPreferenceClickListener { preference: Preference? -> aboutDialog(requireContext())
                     false
                 }
         }
@@ -166,14 +171,5 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(),
         }
     }
 
-    companion object {
-        //public static final String KEY_APP_LOCATION = "key_save_location";
-        const val KEY_GOOGLE_DRIVE_STORAGE: String = "key_google_drive_storage"
-        const val KEY_DROP_BOX_STORAGE: String = "key_drop_box_storage"
 
-        //Telegram
-        const val KEY_TELEGRAM_STORAGE: String = "key_telegram_storage"
-        const val KEY_TELEGRAM_TOKEN: String = "key_telegram_token"
-        const val KEY_TELEGRAM_CHAT_ID: String = "key_telegram_chat_id"
-    }
 }

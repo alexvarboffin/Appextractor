@@ -15,8 +15,8 @@ import com.walhalla.appextractor.adapter.ApkListAdapter
 import com.walhalla.appextractor.adapter.BackupAppFeatureAdapter
 import com.walhalla.appextractor.databinding.ItemAppBinding
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.model.backup.SimpleAppFeature
-import com.walhalla.appextractor.model.common.AppFeature
+import com.walhalla.appextractor.common.SimpleAppFeature
+import com.walhalla.appextractor.common.AppFeature
 import java.util.Locale
 
 class AppVh(

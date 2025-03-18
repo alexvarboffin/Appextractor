@@ -1,142 +1,108 @@
-package com.walhalla.appextractor.activity.resources;
+package com.walhalla.appextractor.activity.resources
 
-import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
+import com.walhalla.appextractor.fragment.BaseFragment
+import androidx.viewpager.widget.ViewPager
+import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.activity.resources.ResourcesPagerFragment
+import android.view.LayoutInflater
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.activity.resources.p001.AssetsFragment
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 
-import android.annotation.SuppressLint;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+class ResourcesPagerFragment : BaseFragment(), android.view.View.OnClickListener {
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+    private lateinit var tabLayout: com.google.android.material.tabs.TabLayout
+    private lateinit var viewPager: ViewPager
 
-import com.google.android.material.tabs.TabLayout;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.resources.p001.AssetsFragment;
-import com.walhalla.appextractor.fragment.BaseFragment;
-import com.walhalla.appextractor.model.PackageMeta;
+    private var meta: PackageMeta? = null
 
-import java.util.ArrayList;
+    private var p: BaseFragment? = null
 
-
-public class ResourcesPagerFragment extends BaseFragment
-        implements View.OnClickListener {
-
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-
-    private static final String ARG_PARAM1 = "param1";
-
-    private PackageMeta meta;
-
-    private BaseFragment p;
-
-    public ResourcesPagerFragment() {
-        // Required empty public constructor
-    }
-
-    public static ResourcesPagerFragment newInstance(PackageMeta meta) {
-        ResourcesPagerFragment fragment = new ResourcesPagerFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, meta);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            meta = getArguments().getParcelable(ARG_PARAM1);
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (arguments != null) {
+            meta = arguments?.getParcelable<PackageMeta>(ResourcesPagerFragment.Companion.ARG_PARAM1)
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_viwpager, container, false);
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: android.view.ViewGroup?,
+        savedInstanceState: android.os.Bundle?
+    ): android.view.View? {
+        return inflater.inflate(R.layout.fragment_viwpager, container, false)
     }
 
-    @Override
-    public void fab() {
-
+    override fun fab() {
     }
 
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    override fun onViewCreated(view: android.view.View, savedInstanceState: android.os.Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         //FloatingActionButton fab = getActivity().findViewById(R.id.fab);
         //fab.setOnClickListener(this);
-
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        val actionBar: androidx.appcompat.app.ActionBar? =
+            (getActivity() as androidx.appcompat.app.AppCompatActivity).getSupportActionBar()
         if (actionBar != null) {
             //actionBar.setSubtitle(R.string.app_description);
         }
 
-        viewPager = view.findViewById(R.id.view_pager);
-        ViewpagerAdapter adapter = new ViewpagerAdapter(getChildFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPager = view.findViewById<ViewPager>(R.id.view_pager)
+        val adapter: com.walhalla.appextractor.activity.resources.ResourcesPagerFragment.ViewpagerAdapter =
+            com.walhalla.appextractor.activity.resources.ResourcesPagerFragment.ViewpagerAdapter(
+                getChildFragmentManager(),
+                androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+            )
+
         //adapter.addFragment(new FirstFragment(), "auth");
         //adapter.addFragment(new DemoFragment(), "demo");
 
         //adapter.addFragment(ResourcesFragment.newInstance(meta), "Resources");
-        adapter.addFragment(AssetsFragment.newInstance(meta), "Assets");
-
+        adapter.addFragment(AssetsFragment.newInstance(meta), "Assets")
 
 
         //adapter.addFragment(new GalleryFragment(), getString(R.string.abc_tab_gallery));
         //adapter.addFragment(CollageFragment.newInstance("", ""), "Collage");
         //bb
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+        viewPager.setAdapter(adapter)
+        viewPager.addOnPageChangeListener(object : OnPageChangeListener {
+            override fun onPageScrolled(
+                position: kotlin.Int,
+                positionOffset: kotlin.Float,
+                positionOffsetPixels: kotlin.Int
+            ) {
             }
 
-            @Override
-            public void onPageSelected(int position) {
-                Fragment tmp = adapter.getItem(position);
+            override fun onPageSelected(position: kotlin.Int) {
+                val tmp: androidx.fragment.app.Fragment? = adapter.getItem(position)
                 //if (tmp instanceof BaseFragment && position > 0) {
-                p = (BaseFragment) tmp;
+                p = tmp as BaseFragment
                 //}
                 //DLog.d(fragment.getClass().getSimpleName());
             }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+            override fun onPageScrollStateChanged(state: kotlin.Int) {
             }
-        });
-        tabLayout = getActivity().findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(viewPager);
+        })
+        tabLayout =requireActivity().findViewById<com.google.android.material.tabs.TabLayout>(R.id.tabLayout)
+        tabLayout.setupWithViewPager(viewPager)
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    override fun onResume() {
+        super.onResume()
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public void onClick(View v) {
+    @android.annotation.SuppressLint("NonConstantResourceId")
+    override fun onClick(v: android.view.View) {
         if (v.getId() == R.id.fab) {
             if (p == null) {
-                p = (BaseFragment) getChildFragmentManager().getFragments().get(0);
+                p = getChildFragmentManager().getFragments().get(0) as BaseFragment
             }
 
-            p.fab();
+            p!!.fab()
 
-//                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+            //                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 //            TweetComposer.Builder builder = new TweetComposer.Builder(this)
 //                    .text("Just setting up my Fabric!");
@@ -155,23 +121,18 @@ public class ResourcesPagerFragment extends BaseFragment
     }
 
 
-    private final static class ViewpagerAdapter extends FragmentPagerAdapter {
-
-        private final FragmentManager fm;
-        private final ArrayList<BaseFragment> mFragmentList = new ArrayList<>();
-        private final ArrayList<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewpagerAdapter(@NonNull FragmentManager fm, int behavior) {
-            super(fm, behavior);
-            this.fm = fm;
-        }
+    private class ViewpagerAdapter(
+        private val fm: androidx.fragment.app.FragmentManager,
+        behavior: kotlin.Int
+    ) :
+        androidx.fragment.app.FragmentPagerAdapter(fm, behavior) {
+        private val mFragmentList: java.util.ArrayList<BaseFragment> = java.util.ArrayList()
+        private val mFragmentTitleList: java.util.ArrayList<kotlin.String> = java.util.ArrayList()
 
 
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-//            viewPager!!.currentItem;
+        override fun getItem(position: kotlin.Int): androidx.fragment.app.Fragment {
+            return mFragmentList.get(position)
+            //            viewPager!!.currentItem;
 //            return when(position){
 //
 //                0-> download();
@@ -180,27 +141,40 @@ public class ResourcesPagerFragment extends BaseFragment
 //            }
         }
 
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
+        override fun getCount(): kotlin.Int {
+            return mFragmentList.size
         }
 
-        public void addFragment(BaseFragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
+        fun addFragment(fragment: BaseFragment, title: kotlin.String) {
+            mFragmentList.add(fragment)
+            mFragmentTitleList.add(title)
         }
 
-        @Override
-        public String getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
+        override fun getPageTitle(position: kotlin.Int): kotlin.String {
+            return mFragmentTitleList.get(position)
         }
 
-        @Override
-        public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        override fun setPrimaryItem(
+            container: android.view.ViewGroup,
+            position: kotlin.Int,
+            `object`: kotlin.Any
+        ) {
 //        if (getItem(position) != object) {
 //            DLog.d("22222222222" + getItem(position).getClass().getSimpleName());
 //        }
-            super.setPrimaryItem(container, position, object);
+            super.setPrimaryItem(container, position, `object`)
+        }
+    }
+
+    companion object {
+        private const val ARG_PARAM1: kotlin.String = "param1"
+
+        fun newInstance(meta: PackageMeta?): ResourcesPagerFragment {
+            val fragment: ResourcesPagerFragment = ResourcesPagerFragment()
+            val args: android.os.Bundle = android.os.Bundle()
+            args.putParcelable(ResourcesPagerFragment.Companion.ARG_PARAM1, meta)
+            fragment.setArguments(args)
+            return fragment
         }
     }
 }

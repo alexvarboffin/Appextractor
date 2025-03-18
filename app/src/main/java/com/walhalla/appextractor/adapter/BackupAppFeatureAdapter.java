@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.walhalla.appextractor.databinding.ItemBackupAppFeatureBinding;
-import com.walhalla.appextractor.model.common.AppFeature;
+import com.walhalla.appextractor.common.AppFeature;
 
 import java.util.ArrayList;
 import java.util.List;

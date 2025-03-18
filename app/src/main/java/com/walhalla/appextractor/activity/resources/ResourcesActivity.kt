@@ -1,75 +1,61 @@
-package com.walhalla.appextractor.activity.resources;
+package com.walhalla.appextractor.activity.resources
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.fragment.QCallback
+import com.walhalla.appextractor.model.PackageMeta
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+class ResourcesActivity : AppCompatActivity(), QCallback {
+    private var meta: PackageMeta? = null
 
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.fragment.QCallback;
-import com.walhalla.appextractor.model.PackageMeta;
+    public override fun onCreate(bundle: Bundle?) {
+        super.onCreate(bundle)
+        setContentView(R.layout.activity_assets_resources)
 
-public class ResourcesActivity extends AppCompatActivity implements QCallback {
-    private static final String KEY_OBJ_NAME = "key_obj_name"; //"app_component"
-    private PackageMeta meta;
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-    @Override
-    public void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
-        setContentView(R.layout.activity_assets_resources);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        ActionBar aaa = getSupportActionBar();
+        val aaa = supportActionBar
         if (aaa != null) {
-            aaa.setDisplayShowCustomEnabled(true);
-            aaa.setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(null);
-            aaa.setDisplayShowTitleEnabled(false);
-            aaa.setDisplayShowHomeEnabled(true);
+            aaa.setDisplayShowCustomEnabled(true)
+            aaa.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setTitle(null)
+            aaa.setDisplayShowTitleEnabled(false)
+            aaa.setDisplayShowHomeEnabled(true)
         }
 
-        Intent intent = this.getIntent();
+        val intent = this.intent
         if (intent != null) {
-            meta = intent.getParcelableExtra(KEY_OBJ_NAME);
+            meta = intent.getParcelableExtra(KEY_OBJ_NAME)
         }
 
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, ResourcesPagerFragment.newInstance(meta))
-                .commit();
+        supportFragmentManager.beginTransaction()
+            .add(R.id.container, ResourcesPagerFragment.newInstance(meta))
+            .commit()
     }
 
 
-    @Override
-    public void showProgress() {
-
+    override fun showProgress() {
     }
 
-    @Override
-    public void hideProgress() {
-
+    override fun hideProgress() {
     }
 
-    @Override
-    public void handleException(Exception exception) {
-
+    override fun handleException(exception: Exception) {
     }
 
-    @Override
-    public void success(int text) {
-
+    override fun success(text: Int) {
     }
 
-    @Override
-    public void copyToBuffer(String value) {
-
+    override fun copyToBuffer(value: String) {
     }
 
-    @Override
-    public void shareText(String value) {
+    override fun shareText(value: String) {
+    }
 
+    companion object {
+        private const val KEY_OBJ_NAME = "key_obj_name" //"app_component"
     }
 }

@@ -27,9 +27,7 @@ class PackageInfoLoader(a: Context, private val callback: Callback) : AsyncTask<
         val a = weakReference.get()
         if (a != null) {
             val pm = a.packageManager
-            @SuppressLint("QueryPermissionsNeeded") val packageInfos = pm.getInstalledPackages(
-                PackageManager.GET_META_DATA
-            )
+            val packageInfos = pm.getInstalledPackages(PackageManager.GET_META_DATA)
             for (packageInfo in packageInfos) {
                 //publishProgress(packageInfo);
 
