@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.compose.R
@@ -44,10 +45,8 @@ fun AppListItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .selectable(
-                selected = isSelected,
-                onClick = onSelect
-            ),
-        colors = CardDefaults.cardColors(
+                selected = isSelected, onClick = onSelect
+            ), colors = CardDefaults.cardColors(
             containerColor = if (isSelected) {
                 MaterialTheme.colorScheme.primaryContainer
             } else {
@@ -62,11 +61,23 @@ fun AppListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // App Icon
-            Icon(
-                imageVector = Icons.Default.Android,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp)
-            )
+
+
+            if (app.icon == null) {//|| app.icon<=0
+                Icon(
+                    imageVector = Icons.Default.Android,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+
+            } else {
+                AsyncImage(
+                    model = app.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -106,8 +117,7 @@ fun AppListItem(
 
                 if (app.size != null) {
                     Text(
-                        text = "Size: ${app.size}",
-                        style = MaterialTheme.typography.bodySmall
+                        text = "Size: ${app.size}", style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -116,123 +126,111 @@ fun AppListItem(
             Box {
                 IconButton(onClick = { showMenu = true }) {
                     Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options"
+                        imageVector = Icons.Default.MoreVert, contentDescription = "More options"
                     )
                 }
 
                 DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
+                    expanded = showMenu, onDismissRequest = { showMenu = false }) {
                     // Extract APK
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_extract)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.SaveAlt, contentDescription = null)
                         },
                         onClick = {
                             println("DEBUG: Extract menu item clicked")
                             showMenu = false
                             onExtractClick()
-                        }
-                    )
+                        })
 
                     // Open in Play Store
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.open_on_google_play)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.Shop, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onOpenPlayStoreClick()
-                        }
-                    )
+                        })
 
                     // Launch App
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_launch_app)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.PlayArrow, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onLaunchClick()
-                        }
-                    )
+                        })
 
                     // Uninstall App
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_uninstall_app)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.Delete, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onUninstallClick()
-                        }
-                    )
+                        })
 
                     // Copy Package Name
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_copy_package_name)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.ContentCopy, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onCopyPackageNameClick()
-                        }
-                    )
+                        })
 
                     // App Info
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_app_info)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.Info, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onInfoClick()
-                        }
-                    )
+                        })
 
                     // View Manifest
                     DropdownMenuItem(
                         text = { Text(stringResource(com.walhalla.extractor.R.string.action_app_manifest)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.Description, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onManifestClick()
-                        }
-                    )
+                        })
 
                     // Save Icon
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_save_icon)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.Download, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onSaveIconClick()
-                        }
-                    )
+                        })
 
                     // Share Icon
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_export_icon)) },
-                        leadingIcon = { 
+                        leadingIcon = {
                             Icon(Icons.Default.Share, contentDescription = null)
                         },
                         onClick = {
                             showMenu = false
                             onShareIconClick()
-                        }
-                    )
+                        })
                 }
             }
         }

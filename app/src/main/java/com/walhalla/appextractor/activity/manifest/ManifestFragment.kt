@@ -50,7 +50,7 @@ class ManifestFragment : BaseFragment(), ManifestCallback {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         bind = ManifestExplorerBinding.inflate(inflater, container, false)
         return bind!!.root
     }

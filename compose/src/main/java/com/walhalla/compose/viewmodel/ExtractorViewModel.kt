@@ -76,6 +76,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
                     val pining = XmlUtils.isPinningEnabled(context, applicationInfo.packageName)
 
+
                     val meta = PackageMeta.Builder(applicationInfo.packageName)
                         .label(applicationInfo.loadLabel(pm).toString())
                         .setHasSplits(hasSplits)
@@ -251,14 +252,13 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
-
     fun saveIcon(app: PackageMeta) {
         viewModelScope.launch {
             try {
                 val context = getApplication<Application>()
                 val drawable = context.packageManager.getApplicationIcon(app.packageName)
                 val bitmap = drawable.toBitmap()
-                
+
                 val iconDir = File(
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                     "AppIcons"
@@ -283,7 +283,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                 val context = getApplication<Application>()
                 val drawable = context.packageManager.getApplicationIcon(app.packageName)
                 val bitmap = drawable.toBitmap()
-                
+
                 val iconFile = File(context.cacheDir, "temp_icon.png")
                 FileOutputStream(iconFile).use { out ->
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)

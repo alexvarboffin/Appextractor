@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.TreeSet
 import android.os.Build
+import kotlinx.coroutines.delay
 
 data class ManifestState(
     val name: String,
@@ -36,6 +37,22 @@ class ManifestViewModel(application: Application) : AndroidViewModel(application
 
     private var currentPresenter: ManifestPresenterXml? = null
     private var currentApkPath: String? = null
+    private var pendingState: ManifestState? = null
+
+    private fun formatTabName(apkPath: String): String {
+        val name = apkPath.split("/").last()
+        return when {
+            name.startsWith("split_config.") -> {
+                // Для split APK показываем полное имя файла
+                name
+            }
+            name == "base.apk" -> {
+                // Для базового APK показываем как есть
+                name
+            }
+            else -> name
+        }
+    }
 
     fun loadManifests(app: PackageMeta) {
         viewModelScope.launch {
@@ -51,9 +68,7 @@ class ManifestViewModel(application: Application) : AndroidViewModel(application
                         try {
                             println("DEBUG: Processing APK: $apkPath")
                             currentApkPath = apkPath
-                            val name = apkPath.split("/").last()
-                                .replace(".apk", "")
-                                .replace("split_config.", "")
+                            val name = formatTabName(apkPath)
 
                             val presenter = ManifestPresenterXml(getApplication(), this@ManifestViewModel)
                             currentPresenter = presenter
@@ -67,22 +82,41 @@ class ManifestViewModel(application: Application) : AndroidViewModel(application
                             val content = presenter.mOutgetText(ManifestPresenterXml.ANDROID_MANIFEST_FILENAME)
                             println("DEBUG: Content length: ${content.length}")
 
+                            // Создаем состояние и сохраняем его как ожидающее
+                            val state = ManifestState(
+                                name = name,
+                                content = content,
+                                apkPath = apkPath,
+                                formattedContent = null
+                            )
+                            pendingState = state
+
                             println("DEBUG: Rendering XML for $apkPath")
                             presenter.renderXML(ManifestPresenterXml.ANDROID_MANIFEST_FILENAME)
 
-                            ManifestState(
-                                name = name,
-                                content = content,
-                                apkPath = apkPath
-                            )
+                            // Ждем немного, чтобы получить отформатированный контент
+                            var attempts = 0
+                            while (pendingState?.formattedContent == null && attempts < 10) {
+                                delay(100)
+                                attempts++
+                            }
+
+                            pendingState?.also { 
+                                println("DEBUG: State for $apkPath has formatted content: ${it.formattedContent != null}")
+                            }
+                            
+                            pendingState
                         } catch (e: Exception) {
                             println("DEBUG: Error processing APK $apkPath: ${e.message}")
                             e.printStackTrace()
                             null
+                        } finally {
+                            pendingState = null
                         }
                     }
                 }
                 println("DEBUG: Final states count: ${states.size}")
+                println("DEBUG: States with formatted content: ${states.count { it.formattedContent != null }}")
                 _manifestStates.value = states
                 if (states.isEmpty()) {
                     _error.value = "No manifests found"
@@ -123,11 +157,12 @@ class ManifestViewModel(application: Application) : AndroidViewModel(application
     }
 
     override fun showError(text: String, t: Throwable?) {
+        println("DEBUG: Error callback: $text, ${t?.message}")
         _error.value = "$text: ${t?.message ?: ""}"
     }
 
     override fun showManifestContent(s: String) {
-        // Обновляем обычный текст манифеста
+        println("DEBUG: showManifestContent called with length: ${s.length}")
         val currentStates = _manifestStates.value.toMutableList()
         val currentPath = currentApkPath ?: return
         val index = currentStates.indexOfFirst { it.apkPath == currentPath }
@@ -138,13 +173,25 @@ class ManifestViewModel(application: Application) : AndroidViewModel(application
     }
 
     override fun loadDataWithPatternHTML(encoded: String) {
-        // Обновляем HTML форматированный манифест
+        println("DEBUG: loadDataWithPatternHTML called with length: ${encoded.length}")
+        
+        // Сначала пробуем обновить ожидающее состояние
+        pendingState?.let { state ->
+            pendingState = state.copy(formattedContent = encoded)
+            println("DEBUG: Updated pending state with formatted content")
+            return
+        }
+
+        // Если нет ожидающего состояния, обновляем в списке
         val currentStates = _manifestStates.value.toMutableList()
         val currentPath = currentApkPath ?: return
         val index = currentStates.indexOfFirst { it.apkPath == currentPath }
         if (index != -1) {
             currentStates[index] = currentStates[index].copy(formattedContent = encoded)
             _manifestStates.value = currentStates
+            println("DEBUG: Updated formatted content for $currentPath")
+        } else {
+            println("DEBUG: Failed to find state for $currentPath")
         }
     }
 } 

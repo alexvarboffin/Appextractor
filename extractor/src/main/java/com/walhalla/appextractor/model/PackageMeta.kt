@@ -17,7 +17,7 @@ class PackageMeta : Parcelable {
     var versionCode: Long = 0
     var versionName: String? = null
 
-    var iconUri: Uri? = null
+    var icon: Uri? = null
     var installTime: Long = 0
     var updateTime: Long = 0
 
@@ -73,11 +73,11 @@ class PackageMeta : Parcelable {
 
         fun setIcon(iconResId: Int): Builder {
             if (iconResId == 0) {
-                mPackageMeta.iconUri = null
+                mPackageMeta.icon = null
                 return this
             }
 
-            mPackageMeta.iconUri = Uri.Builder()
+            mPackageMeta.icon = Uri.Builder()
                 .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(mPackageMeta.packageName)
                 .path(iconResId.toString())
@@ -87,7 +87,7 @@ class PackageMeta : Parcelable {
         }
 
         fun setIconUri(iconUri: Uri?): Builder {
-            mPackageMeta.iconUri = iconUri
+            mPackageMeta.icon = iconUri
             return this
         }
 
@@ -143,7 +143,7 @@ class PackageMeta : Parcelable {
         isSystemApp = `in`.readByte().toInt() != 0
         versionCode = `in`.readLong()
         versionName = `in`.readString()
-        iconUri = `in`.readParcelable(Uri::class.java.classLoader)
+        icon = `in`.readParcelable(Uri::class.java.classLoader)
         installTime = `in`.readLong()
         updateTime = `in`.readLong()
         size = `in`.readString()
@@ -159,7 +159,7 @@ class PackageMeta : Parcelable {
         dest.writeByte((if (isSystemApp) 1 else 0).toByte())
         dest.writeLong(versionCode)
         dest.writeString(versionName)
-        dest.writeParcelable(iconUri, flags)
+        dest.writeParcelable(icon, flags)
         dest.writeLong(installTime)
         dest.writeLong(updateTime)
         dest.writeString(size)

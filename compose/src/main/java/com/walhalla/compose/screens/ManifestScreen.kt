@@ -24,10 +24,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.google.accompanist.pager.*
 import com.walhalla.compose.viewmodel.ManifestViewModel
 import com.walhalla.appextractor.model.PackageMeta
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
+import coil3.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class,
     ExperimentalAnimationApi::class
@@ -52,8 +55,46 @@ fun ManifestScreen(
 
     var showFormatted by remember { mutableStateOf(true) }
 
+    // Получаем текущий активный манифест
+    val currentManifest = manifestStates.getOrNull(pagerState.currentPage)
+
+    fun copyCurrentManifest() {
+        currentManifest?.let { state ->
+            val textToCopy = if (showFormatted) {
+                // Для форматированного вида копируем обычный текст
+                state.content
+            } else {
+                state.content
+            }
+            clipboardManager.setText(AnnotatedString(textToCopy))
+            scope.launch {
+                snackbarHostState.showSnackbar("Manifest content copied")
+            }
+        }
+    }
+
+    fun shareCurrentManifest() {
+        currentManifest?.let { state ->
+            val textToShare = if (showFormatted) {
+                state.content
+            } else {
+                state.content
+            }
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, textToShare)
+                putExtra(Intent.EXTRA_TITLE, "Manifest for ${app.label} (${state.name})")
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            context.startActivity(shareIntent)
+        }
+    }
+
     LaunchedEffect(app) {
-        println("DEBUG: LaunchedEffect triggered for ${app.packageName}")
+        println("DEBUG: ManifestScreen started with package: ${app.packageName}")
+        println("DEBUG: App icon: ${app.icon}")
+        println("DEBUG: App label: ${app.label}")
         viewModel.loadManifests(app)
     }
 
@@ -76,51 +117,100 @@ fun ManifestScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Column {
-                        Text(app.label ?: "Unknown")
-                        Text(
-                            text = app.packageName,
-                            style = MaterialTheme.typography.bodySmall,
-
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    // Переключатель форматированного вида
-                    IconButton(onClick = { showFormatted = !showFormatted }) {
-                        Icon(
-                            if (showFormatted) Icons.Default.Code else Icons.Default.Article,
-                            contentDescription = if (showFormatted) "Show plain text" else "Show formatted"
-                        )
-                    }
-                    
-                    // Копировать имя пакета
-                    IconButton(onClick = {
-                        clipboardManager.setText(AnnotatedString(app.packageName))
-                        showSnackbar("Package name copied")
-                    }) {
-                        Icon(Icons.Default.ContentCopy, "Copy package name")
-                    }
-                    
-                    // Открыть настройки приложения
-                    IconButton(onClick = {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:${app.packageName}")
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            Column {
+                TopAppBar(
+                    title = { Text("Manifest") },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
-                        context.startActivity(intent)
-                    }) {
-                        Icon(Icons.Default.Settings, "App settings")
+                    },
+                    actions = {
+                        // Переключатель форматированного вида
+                        IconButton(onClick = { showFormatted = !showFormatted }) {
+                            Icon(
+                                if (showFormatted) Icons.Default.Code else Icons.Default.Article,
+                                contentDescription = if (showFormatted) "Show plain text" else "Show formatted"
+                            )
+                        }
+
+                        // Копировать текущий манифест
+                        IconButton(
+                            onClick = { copyCurrentManifest() },
+                            enabled = currentManifest != null
+                        ) {
+                            Icon(Icons.Default.ContentCopy, "Copy manifest")
+                        }
+
+                        // Поделиться текущим манифестом
+                        IconButton(
+                            onClick = { shareCurrentManifest() },
+                            enabled = currentManifest != null
+                        ) {
+                            Icon(Icons.Default.Share, "Share manifest")
+                        }
+
+                        // Открыть настройки приложения
+                        IconButton(onClick = {
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = "package:${app.packageName}".toUri()
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(intent)
+                        }) {
+                            Icon(Icons.Default.Settings, "App settings")
+                        }
+                    }
+                )
+
+                // Блок с информацией о приложении
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    tonalElevation = 1.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Иконка приложения
+                        if (app.icon != null) {
+                            AsyncImage(
+                                model = app.icon,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        } else {
+                            // Показываем плейсхолдер если иконка отсутствует
+                            Icon(
+                                imageVector = Icons.Default.Android,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        // Информация о приложении
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = app.label ?: "Unknown",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(
+                                text = app.packageName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
-            )
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -174,34 +264,46 @@ fun ManifestScreen(
                     }
                     manifestStates.isNotEmpty() -> {
                         Column {
-                            if (manifestStates.size > 1) {
-                                TabRow(
-                                    selectedTabIndex = pagerState.currentPage,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    manifestStates.forEachIndexed { index, state ->
-                                        Tab(
-                                            selected = pagerState.currentPage == index,
-                                            onClick = { 
-                                                scope.launch {
-                                                    pagerState.animateScrollToPage(index)
-                                                }
-                                            },
-                                            text = { Text(state.name) }
-                                        )
-                                    }
+                            // Добавляем заголовок с информацией о текущем файле
+                            val currentState = manifestStates[pagerState.currentPage]
+                            Text(
+                                text = "Manifest from: ${currentState.name}",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                            
+                            TabRow(
+                                selectedTabIndex = pagerState.currentPage,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                manifestStates.forEachIndexed { index, state ->
+                                    Tab(
+                                        selected = pagerState.currentPage == index,
+                                        onClick = { 
+                                            scope.launch {
+                                                pagerState.animateScrollToPage(index)
+                                            }
+                                        },
+                                        text = { 
+                                            Text(
+                                                text = state.name,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                maxLines = 1
+                                            )
+                                        }
+                                    )
                                 }
                             }
-                            
+
                             HorizontalPager(
                                 count = manifestStates.size,
                                 state = pagerState,
                                 modifier = Modifier.fillMaxSize()
                             ) { page ->
                                 val state = manifestStates[page]
-                                if (showFormatted && state.formattedContent != null) {
+                                if (showFormatted) {
                                     var webView by remember { mutableStateOf<WebView?>(null) }
-                                    
+
                                     DisposableEffect(state.apkPath) {
                                         onDispose {
                                             webView?.apply {
@@ -214,7 +316,7 @@ fun ManifestScreen(
                                             }
                                         }
                                     }
-                                    
+
                                     AndroidView(
                                         factory = { context ->
                                             WebView(context).apply {
@@ -226,7 +328,12 @@ fun ManifestScreen(
                                                     loadWithOverviewMode = true
                                                     useWideViewPort = true
                                                 }
-                                                webViewClient = WebViewClient()
+                                                webViewClient = object : WebViewClient() {
+                                                    override fun onPageFinished(view: WebView?, url: String?) {
+                                                        super.onPageFinished(view, url)
+                                                        println("DEBUG: WebView page finished loading")
+                                                    }
+                                                }
                                                 layoutParams = ViewGroup.LayoutParams(
                                                     ViewGroup.LayoutParams.MATCH_PARENT,
                                                     ViewGroup.LayoutParams.MATCH_PARENT
@@ -235,23 +342,25 @@ fun ManifestScreen(
                                             }
                                         },
                                         update = { webView ->
-                                            webView.loadDataWithBaseURL(
-                                                null,
-                                                state.formattedContent?:"NONE",
-                                                "text/html",
-                                                "UTF-8",
-                                                null
-                                            )
+                                            println("DEBUG: Updating WebView content for ${state.name}")
+                                            if (state.formattedContent != null) {
+                                                webView.loadDataWithBaseURL(
+                                                    null,
+                                                    state.formattedContent!!,
+                                                    "text/html",
+                                                    "UTF-8",
+                                                    null
+                                                )
+                                            } else {
+                                                println("DEBUG: No formatted content available for ${state.name}")
+                                            }
                                         },
                                         modifier = Modifier.fillMaxSize()
                                     )
                                 } else {
                                     ManifestContent(
                                         content = state.content,
-                                        onCopyClick = {
-                                            clipboardManager.setText(AnnotatedString(state.content))
-                                            showSnackbar("Manifest content copied")
-                                        }
+                                        onCopyClick = { copyCurrentManifest() }
                                     )
                                 }
                             }

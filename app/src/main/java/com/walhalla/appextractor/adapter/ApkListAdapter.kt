@@ -107,7 +107,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
 
                     //final Drawable icon = package_info.applicationInfo.loadIcon(pm);
                     val icon: Any =
-                        (if (packageMeta.iconUri != null) packageMeta.iconUri else R.drawable.placeholder_app_icon)!!
+                        (if (packageMeta.icon != null) packageMeta.icon else R.drawable.placeholder_app_icon)!!
                     cache_appIcon[packageMeta.packageName] = icon
                     handler.post {
                         applicationViewHolder.setAppName(appName!!, search_pattern)

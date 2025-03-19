@@ -48,6 +48,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import com.walhalla.appextractor.model.PackageMeta
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -231,12 +232,12 @@ fun ExtractorScreen(
                                     }
                                 }
 
-                                Divider(
+                                HorizontalDivider(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 16.dp),
-                                    color = MaterialTheme.colorScheme.outlineVariant,
-                                    thickness = 1.dp
+                                    thickness = 1.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant
                                 )
                             }
                         }
