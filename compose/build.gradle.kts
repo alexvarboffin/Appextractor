@@ -65,7 +65,7 @@ dependencies {
 
     //implementation("androidx.compose.material:material:1.7.8")
     implementation(libs.androidx.material.icons.extended.android)
-
+    implementation("com.google.accompanist:accompanist-pager:0.30.1")
 
     val nav_version = "2.8.9"
     // Jetpack Compose integration

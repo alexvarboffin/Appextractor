@@ -31,6 +31,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import androidx.core.net.toUri
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     private val _apps = MutableStateFlow<List<PackageMeta>>(emptyList())
@@ -236,7 +237,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     fun uninstallApp(app: PackageMeta) {
         val context = getApplication<Application>()
         val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE).apply {
-            data = Uri.parse("package:${app.packageName}")
+            data = "package:${app.packageName}".toUri()
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
@@ -249,14 +250,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         clipboard.setPrimaryClip(clip)
     }
 
-    fun viewManifest(app: PackageMeta) {
-        val context = getApplication<Application>()
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            data = Uri.parse("app://manifest/${app.packageName}")
-        }
-        context.startActivity(intent)
-    }
+
 
     fun saveIcon(app: PackageMeta) {
         viewModelScope.launch {

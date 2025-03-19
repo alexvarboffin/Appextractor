@@ -13,9 +13,9 @@ abstract class BaseManifestPresenter(
     interface ManifestCallback {
         fun showError(readingXml: String, throwable: Throwable?)
 
-        fun showManifestContent(toString: String)
+        fun showManifestContent(content: String)
 
-        fun loadDataWithPatternHTML(encoded: String)
+        fun loadDataWithPatternHTML(formatted: String)
     }
 
 

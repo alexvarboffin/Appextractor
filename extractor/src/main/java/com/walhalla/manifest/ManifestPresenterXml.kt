@@ -1,5 +1,6 @@
 package com.walhalla.manifest
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
@@ -65,8 +66,7 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
             //assetManager = context.createPackageContext(packageName, 0).getAssets();
             //context.getPackageResourcePath()
 
-            val otherAppContext = context.applicationContext.createPackageContext(
-                packageName,
+            val otherAppContext = context.applicationContext.createPackageContext(packageName,
                 0 //Context.CONTEXT_IGNORE_SECURITY
                 //Context.CONTEXT_INCLUDE_CODE//Requesting code from com.google.android.youtube (with uid 10162) to be run in process com.walhalla.appextractor (with uid 10730)
             )
@@ -93,7 +93,7 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
             val otherAppResources = otherAppContext.resources
 
 
-            //            int resourceId = otherAppResources.getIdentifier("app_name", "string", packageName);
+//            int resourceId = otherAppResources.getIdentifier("app_name", "string", packageName);
 //            String text = otherAppResources.getString(resourceId);
 //            DLog.d("@@@" + text);
 
@@ -119,7 +119,7 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
             resources = initRes
             return false
         } catch (unexpected: RuntimeException) {
-            d("----------------------->" + packageName + " " + unexpected.message)
+            println("----------------------->" + packageName + " " + unexpected.message)
             assets = initAM
             resources = initRes
             return false
@@ -208,6 +208,8 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
     //            res.add(pi.packageName);
     //        return res.toArray(new String[res.size()]);
     //    }
+
+    @SuppressLint("PrivateApi")
     fun mOutgetText(binaryXmlFileName: String): String {
         val filePath = "/"
         var cookie = 0
@@ -216,13 +218,9 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
         try {
             if (!TextUtils.isEmpty(apkPath)) {
                 try {
-                    val addAssetPath =
-                        AssetManager::class.java.getDeclaredMethod(
-                            "addAssetPath",
-                            String::class.java
-                        )
+                    val addAssetPath = AssetManager::class.java.getDeclaredMethod("addAssetPath", String::class.java)
                     addAssetPath.isAccessible = true
-                    d((assets == null).toString() + " " + apkPath)
+                    println((assets == null).toString() + " " + apkPath)
 
                     cookie = addAssetPath.invoke(assets, apkPath) as Int
                     if (cookie == null || cookie == 0) {
@@ -259,6 +257,7 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
         return ""
     }
 
+    @SuppressLint("PrivateApi")
     fun renderSimpleText(xmlFile: String) {
         try {
             //int xmlResourceId = resources.getIdentifier("AndroidManifest", "xml", packageName);
@@ -270,11 +269,7 @@ class ManifestPresenterXml(m: Context, mView: ManifestCallback) : BaseManifestPr
                 try {
                     //java.lang.NullPointerException: null receiver
 
-                    val addAssetPath =
-                        AssetManager::class.java.getDeclaredMethod(
-                            "addAssetPath",
-                            String::class.java
-                        )
+                    val addAssetPath = AssetManager::class.java.getDeclaredMethod("addAssetPath", String::class.java)
                     addAssetPath.isAccessible = true
                     cookie = addAssetPath.invoke(assets, apkPath) as Int
 

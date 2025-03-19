@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayout
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.manifest.ManifestFragment.Companion.newInstance
 import com.walhalla.appextractor.fragment.BaseFragment
+import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.ui.DLog.d
 import java.util.Arrays
 import java.util.TreeSet
@@ -25,7 +26,7 @@ class ManifestPagerFragment : BaseFragment(), View.OnClickListener {
     private var tabLayout: TabLayout? = null
     private var viewPager: ViewPager? = null
 
-    private var meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta? = null
+    private var meta: PackageMeta? = null
     private var apkPath: Array<String> = emptyArray()
     private var xmlFileName: String? = null
 
@@ -105,7 +106,7 @@ class ManifestPagerFragment : BaseFragment(), View.OnClickListener {
 
 
     private fun makeUI(context: Context, meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta, adapter: ViewpagerAdapter) {
-        if (apkPath == null || apkPath!!.size == 0) {
+        if (apkPath == null || apkPath.isEmpty()) {
             try {
                 val applicationInfo = context.packageManager.getApplicationInfo(
                     meta.packageName,
@@ -124,7 +125,7 @@ class ManifestPagerFragment : BaseFragment(), View.OnClickListener {
             }
         }
 
-        for (s in apkPath!!) {
+        for (s in apkPath) {
             val q = s.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val name = q[q.size - 1].replace(".apk", "")
                 .replace("split_config.", "")
@@ -208,7 +209,7 @@ class ManifestPagerFragment : BaseFragment(), View.OnClickListener {
         private const val KEY_OBJ_APK_PATH = "param2"
         private val KEY_OBJ_XML_FILENAME = ManifestPagerFragment::class.java.simpleName + "var3"
 
-        fun newInstance(
+        fun instanceXmlViewer(
             meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta?,
             apkPath: Array<String>?,
             xmlFileName: String?

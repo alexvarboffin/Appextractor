@@ -48,12 +48,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Divider
+import com.walhalla.appextractor.model.PackageMeta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExtractorScreen(
     viewModel: ExtractorViewModel = viewModel(),
-    onNavigateToAppDetail: (String) -> Unit
+    onNavigateToAppDetail: (String) -> Unit,
+    viewManifest: (app: PackageMeta) -> Unit
 ) {
     val context = LocalContext.current
     val apps by viewModel.apps.collectAsState()
@@ -191,20 +193,20 @@ fun ExtractorScreen(
                                 AppListItem(
                                     app = app,
                                     isSelected = app in selectedApps,
-                                    onSelect = { 
+                                    onSelect = {
                                         println("DEBUG: Selection clicked for ${app.label}")
-                                        viewModel.toggleAppSelection(app) 
+                                        viewModel.toggleAppSelection(app)
                                     },
                                     onExtractClick = {
                                         println("DEBUG: Extract clicked for ${app.label}")
                                         permissionLauncher.launch(permissions)
                                         viewModel.extractApk(app)
                                     },
-                                    onShareClick = { 
+                                    onShareClick = {
                                         println("DEBUG: Share clicked for ${app.label}")
-                                        viewModel.shareApk(app) 
+                                        viewModel.shareApk(app)
                                     },
-                                    onInfoClick = { 
+                                    onInfoClick = {
                                         println("DEBUG: Info clicked for ${app.label}")
                                         onNavigateToAppDetail(app.packageName)
                                     },
@@ -212,7 +214,7 @@ fun ExtractorScreen(
                                     onLaunchClick = { viewModel.launchApp(app) },
                                     onUninstallClick = { viewModel.uninstallApp(app) },
                                     onCopyPackageNameClick = { viewModel.copyPackageName(app) },
-                                    onManifestClick = { viewModel.viewManifest(app) },
+                                    onManifestClick = { viewManifest(app) },
                                     onSaveIconClick = { viewModel.saveIcon(app) },
                                     onShareIconClick = { viewModel.shareIcon(app) }
                                 )
@@ -228,7 +230,7 @@ fun ExtractorScreen(
                                         )
                                     }
                                 }
-                                
+
                                 Divider(
                                     modifier = Modifier
                                         .fillMaxWidth()

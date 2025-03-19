@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
@@ -25,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 import androidx.navigation.navArgument
+import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.compose.screens.ExtractorScreen
 import com.walhalla.compose.screens.LogScreen
 import com.walhalla.compose.screens.ManifestScreen
@@ -47,20 +49,20 @@ class MainActivity : ComponentActivity() {
                     val items = listOf(
                         Screen.Extractor,
                         Screen.Logs,
-                        Screen.Settings,
-                        Screen.Manifest
+                        Screen.Settings
                     )
-                    
+
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
-                    val showBottomBar = currentRoute != null && !currentRoute.startsWith("app_detail")
-                    
+                    val showBottomBar =
+                        currentRoute != null && !currentRoute.startsWith("app_detail")
+
                     Scaffold(
                         bottomBar = {
                             if (showBottomBar) {
                                 NavigationBar {
                                     val currentDestination = navBackStackEntry?.destination
-                                    
+
                                     items.forEach { screen ->
                                         NavigationBarItem(
                                             icon = { Icon(screen.icon, contentDescription = null) },
@@ -86,20 +88,36 @@ class MainActivity : ComponentActivity() {
                             startDestination = Screen.Extractor.route,
                             modifier = Modifier.padding(innerPadding)
                         ) {
-                            composable(Screen.Extractor.route) { 
+                            composable(Screen.Extractor.route) {
                                 ExtractorScreen(
                                     onNavigateToAppDetail = { packageName ->
                                         navController.navigate("app_detail/$packageName")
+                                    },
+                                    viewManifest = {
+                                        println("{}{}{}" + it)
+                                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                                            "app",
+                                            it
+                                        )
+                                        navController.navigate("manifest")
                                     }
-                                ) 
+                                )
                             }
                             composable(Screen.Logs.route) { LogScreen() }
                             composable(Screen.Settings.route) { SettingsScreen() }
-                            composable(Screen.Manifest.route) { ManifestScreen(
-                                app = TODO(),
-                                onBackClick = TODO(),
-                                viewModel = TODO()
-                            ) }
+                            composable(Screen.Manifest.route) { backStackEntry ->
+                                val app = navController.previousBackStackEntry?.savedStateHandle?.get<PackageMeta>("app")
+                                println("DEBUG: Manifest screen app: $app")
+                                if (app != null) {
+                                    ManifestScreen(
+                                        app = app,
+                                        onBackClick = { navController.navigateUp() }
+                                    )
+                                } else {
+                                    println("DEBUG: App is null in Manifest screen")
+                                    navController.navigateUp()
+                                }
+                            }
                             composable(
                                 route = Screen.AppDetail.route,
                                 arguments = listOf(
@@ -130,8 +148,11 @@ sealed class Screen(
     val icon: ImageVector
 ) {
     object Extractor : Screen("extractor", "Extractor", Icons.Default.Storage)
-    object Logs : Screen("logs", "Logs", Icons.Default.List)
+    object Logs : Screen("logs", "Logs", Icons.AutoMirrored.Filled.List)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
-    object Manifest : Screen("manifest/{packageName}", "Manifest", Icons.Default.Description)
+
+    //object Manifest : Screen("manifest/{packageName}", "Manifest", Icons.Default.Description)
+    object Manifest : Screen("manifest", "Manifest", Icons.Default.Description)
+
     object AppDetail : Screen("app_detail/{packageName}", "App Detail", Icons.Default.Info)
 }

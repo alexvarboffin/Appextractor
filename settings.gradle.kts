@@ -13,7 +13,6 @@ pluginManagement {
         maven { url = uri("https://www.jitpack.io") }
         gradlePluginPortal()
 
-        jcenter()
     }
 }
 dependencyResolutionManagement {
@@ -26,7 +25,7 @@ dependencyResolutionManagement {
         maven { url = uri("https://www.jitpack.io") }
         gradlePluginPortal()
 //        maven("https://jitpack.io")
-        jcenter()
+
     }
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

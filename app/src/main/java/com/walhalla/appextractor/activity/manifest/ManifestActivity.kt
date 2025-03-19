@@ -20,6 +20,7 @@ import com.walhalla.appextractor.fragment.QCallback
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.manifest.MainManifestPresenter
 import com.walhalla.manifest.ManifestContract
+import androidx.core.net.toUri
 
 class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
     private var meta: PackageMeta? = null
@@ -73,7 +74,7 @@ class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
 
         presenter = MainManifestPresenter(this, meta!!, this)
         supportFragmentManager.beginTransaction()
-            .add(R.id.container, ManifestPagerFragment.newInstance(meta, apkPath, xmlFileName))
+            .add(R.id.container, ManifestPagerFragment.instanceXmlViewer(meta, apkPath, xmlFileName))
             .commit()
     }
 
@@ -90,7 +91,7 @@ class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
             }
             //LauncherAppsCompat.getInstance(this).showAppDetailsForProfile(this.componentName, UserHandleCompat.myUserHandle());
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.setData(Uri.parse("package:" + meta!!.packageName))
+            intent.setData(("package:" + meta!!.packageName).toUri())
             startActivity(intent)
             return true
         }
@@ -173,7 +174,7 @@ class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
         fun newIntent(
             context: Context,
             packageInfo: PackageMeta?,
-            apkPath: Array<String?>?,
+            apkPath: Array<String>?,
             xmlFileName: String?
         ) {
             val intent = Intent(context, ManifestActivity::class.java)
