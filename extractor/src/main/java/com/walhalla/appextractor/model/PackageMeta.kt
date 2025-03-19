@@ -24,7 +24,7 @@ class PackageMeta : Parcelable {
 
     var size: String? = null
 
-    var sourceDir: String? = null
+    var sourceDir: String=""
 
 
     var firstInstallTime: Long = 0
@@ -147,7 +147,7 @@ class PackageMeta : Parcelable {
         installTime = `in`.readLong()
         updateTime = `in`.readLong()
         size = `in`.readString()
-        sourceDir = `in`.readString()
+        sourceDir = `in`.readString()?:""
         firstInstallTime = `in`.readLong()
         lastUpdateTime = `in`.readLong()
     }

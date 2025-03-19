@@ -48,8 +48,8 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
     private val unselectedItemColor: Int
 
     //private final IntentReaper reaper;
-    private val items: MutableList<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta> = ArrayList()
-    private val list_original: MutableList<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta> = ArrayList()
+    private val items: MutableList<PackageMeta> = ArrayList()
+    private val list_original: MutableList<PackageMeta> = ArrayList()
     private val executorServiceNames: ExecutorService = Executors.newFixedThreadPool(3, tFactory)
     private val executorServiceIcons: ExecutorService = Executors.newFixedThreadPool(3, tFactory)
     private val handler = Handler()
@@ -78,7 +78,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
     }
 
 
-    private inner class AppNameLoader(private val package_info: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta) : Runnable {
+    private inner class AppNameLoader(private val package_info: PackageMeta) : Runnable {
         override fun run() {
             cache_appName[package_info.packageName] =
                 package_info.label /*package_info.applicationInfo.loadLabel(pm)*/
@@ -94,7 +94,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
 
     internal inner class GuiLoader(
         private val applicationViewHolder: AppVh,
-        private val packageMeta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta
+        private val packageMeta: PackageMeta
     ) : Runnable {
         override fun run() {
             var first = true
@@ -224,7 +224,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
         holder.mBinding.rl2.setBackgroundColor(unselectedItemColor)
     }
 
-    private fun getItem(pos: Int): _root_ide_package_.com.walhalla.appextractor.model.PackageMeta {
+    private fun getItem(pos: Int): PackageMeta {
         return items[pos]
     }
 
@@ -267,11 +267,11 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
 
     //Button pressed or permission Granted
     fun doExtractClick() {
-        appNames = emptyArray()//Companion.selected.size
-        for (i in Companion.selected.indices) {
-            appNames[i] = GENERATE_APP_NAME(Companion.selected[i])?:""
+        appNames = Array(selected.size) { "" }
+        for (i in selected.indices) {
+            appNames[i] = GENERATE_APP_NAME(selected[i])?:""
         }
-        mView.nowExtractOneSelected(Companion.selected, appNames)
+        mView.nowExtractOneSelected(selected, appNames)
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -282,7 +282,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
 
         val menu = popup.menu
 
-        //        MenuPopupHelper menuHelper = new MenuPopupHelper(
+//        MenuPopupHelper menuHelper = new MenuPopupHelper(
 //                mView.getActivity(), (MenuBuilder) menu, v);
 //        menuHelper.setForceShowIcon(true);
 //        menuHelper.show();
@@ -330,8 +330,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
                     context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 if (clipboard != null) {
                     val clip = ClipData.newPlainText(
-                        "packageName",
-                        "" + packageInfo.packageName
+                        "packageName", "" + packageInfo.packageName
                     )
                     clipboard.setPrimaryClip(clip)
                     if (mView != null) {
@@ -356,7 +355,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
                 if (mView != null) {
                     mView.exportIconRequest(packageInfo)
                 }
-                //                case R.id.action_share_link:
+//                case R.id.action_share_link:
 ////                    ---akeText(mContext, "Play next", Toast.LENGTH_SHORT).show();
 //                    //getPresenter().onItemClicked(menuItem.getItemId(), category);
 //                    return true;
@@ -417,7 +416,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
     //        popup.show();
     //    }
     //Other function
-    fun addAll0(items: List<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta>) {
+    fun addAll0(items: List<PackageMeta>) {
         this.items.clear()
         list_original.clear()
         Companion.selected.clear()
@@ -427,12 +426,12 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
         notifyDataSetChanged()
     }
 
-    private fun selectOne(info: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta) {
+    private fun selectOne(info: PackageMeta) {
         Companion.selected.add(info)
         mView.count(Companion.selected.size)
     }
 
-    fun addItem(item: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta) {
+    fun addItem(item: PackageMeta) {
         names_to_load++
         executorServiceNames.submit(AppNameLoader(item))
         list_original.add(item)
@@ -460,10 +459,10 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
         mView.count(Companion.selected.size)
     }
 
-    val selected: List<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta>
+    val selected: List<PackageMeta>
         get() = Companion.selected
 
     companion object {
-        private val selected: MutableList<_root_ide_package_.com.walhalla.appextractor.model.PackageMeta> = ArrayList()
+        private val selected: MutableList<PackageMeta> = ArrayList()
     }
 }

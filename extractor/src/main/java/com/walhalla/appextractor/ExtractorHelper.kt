@@ -3,7 +3,6 @@ package com.walhalla.appextractor
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -15,12 +14,12 @@ import com.walhalla.appextractor.core.RBCWrapperDelegate
 import com.walhalla.appextractor.interactors.SimpleMeta
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.model.ViewModel
+import com.walhalla.appextractor.utils.ExtractorUtils
 
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.e
 import com.walhalla.ui.DLog.handleException
 import com.walhalla.appextractor.utils.Util
-import com.walhalla.extractor.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -73,23 +72,7 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
     private var totalFileSize = 0
     private var index = 0
 
-    @Throws(Exception::class)
-    protected fun getAllApkFilesForPackage(context: Context, pkg: String): List<File> {
-        val applicationInfo = context.packageManager.getApplicationInfo(pkg, 0)
 
-        val apkFiles: MutableList<File> = ArrayList()
-        apkFiles.add(File(applicationInfo.publicSourceDir))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (applicationInfo.splitPublicSourceDirs != null) {
-                for (splitPath in applicationInfo.splitPublicSourceDirs!!) apkFiles.add(
-                    File(
-                        splitPath
-                    )
-                )
-            }
-        }
-        return apkFiles
-    }
 
     /**
      * adb shell pm path com.google.android.googlequicksearchbox
@@ -104,7 +87,7 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
      * -rw-r--r-- 1 system system    3275913 2022-11-19 14:05 split_config.xxhdpi.apk
      */
     @Throws(Exception::class)
-    private fun extractWithoutRoot(context: Context, meta: PackageMeta): File {
+    private fun extractBaseApkWithoutRoot(context: Context, meta: PackageMeta): File {
         val newApi = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
         //DLog.d("@@@" + meta.packageName+" "+meta.sourceDir);
@@ -129,16 +112,16 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
 
 
             if (!newApi && out.exists() && out.isFile && out.length() == src.length()) {
-                d("skip file...")
+                println("skip file...")
             } else {
                 copyFileRequest(context, src, out, out.name)
             }
         } catch (ex: Exception) {
-            d("@@@@@@@@@@@@@@" + ex.message + " " + ex.javaClass.simpleName)
+            println("@@@@@@@@@@@@@@" + ex.message + " " + ex.javaClass.simpleName)
             throw Exception(ex.message)
         }
         if (!newApi && !out.exists()) {
-            d("cannot extract file [no root]")
+            println("cannot extract file [no root]")
             throw Exception("cannot extract file [no root]")
         }
         return out
@@ -147,11 +130,7 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
 
     //Return success {and not success} extracted files...
     @Throws(Exception::class)
-    private fun executeBackupWithPacking(
-        context: Context,
-        packageName: String,
-        apkFiles: List<File>
-    ): List<File> {
+    private fun executeBackupWithPacking(context: Context, packageName: String, apkFiles: List<File>): List<File> {
         var apkFiles1 = apkFiles
         val newApi = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
@@ -235,7 +214,7 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
         fileSize = Util.getFileSizeMegaBytes(sourceApk)
 
 
-        //        long size = source.transferTo(0, source.size(), destination);
+//        long size = source.transferTo(0, source.size(), destination);
 //        DLog.d("@ size->" + size);
 
 //        long size = destination.transferFrom(source, 0, Long.MAX_VALUE);
@@ -377,8 +356,7 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
                 val total_extractedFiles: MutableMap<SimpleMeta, List<File>> =
                     HashMap()
 
-                val none_extracted: MutableList<PackageMeta> =
-                    ArrayList()
+                val none_extracted: MutableList<PackageMeta> = ArrayList()
 
                 //        for (PackageInfo info : metas) {
                 //            DLog.d("--> " + info.packageName);
@@ -386,19 +364,23 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
                 for (i in 0 until totalFileSize) {
                     val meta = metas[i]
                     val name0 = meta.label
-                    val apkFiles = getAllApkFilesForPackage(context, meta.packageName)
+                    val apkFiles = ExtractorUtils.getAllApkFilesForCurrentPackage(context, meta.packageName)
 
 
-                    //@@@ this.index = i
+                        //this.index = i
+
+
+                    println("Extracting package: $name0")
+                    println("Extracting $name0 with ${apkFiles.size} files")
 
                     try {
                         if (apkFiles.size == 1) {
-                            val file = extractWithoutRoot(context, meta)
+                            val file = extractBaseApkWithoutRoot(context, meta)
                             if (file != null) {
                                 mMainThread.launch {
                                     if (file.exists() && !file.isDirectory) {
                                         //File[] mm = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).listFiles();
-                                        d("[***]" + file.absolutePath)
+                                        println("[***]" + file.absolutePath)
                                         MediaScannerConnection.scanFile(
                                             context,
                                             arrayOf(file.toString()),

@@ -32,6 +32,8 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import androidx.core.net.toUri
+import com.walhalla.appextractor.utils.ExtractorUtils
+import com.walhalla.appextractor.utils.FileUtil
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     private val _apps = MutableStateFlow<List<PackageMeta>>(emptyList())
@@ -45,6 +47,12 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _extractionProgress = MutableStateFlow<Pair<String, Int>?>(null)
     val extractionProgress: StateFlow<Pair<String, Int>?> = _extractionProgress.asStateFlow()
+
+    private val _extractionFileCount = MutableStateFlow<Pair<String, Int>?>(null)
+    val extractionFileCount: StateFlow<Pair<String, Int>?> = _extractionFileCount.asStateFlow()
+
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
     private val _selectedApps = MutableStateFlow<Set<PackageMeta>>(emptySet())
     val selectedApps: StateFlow<Set<PackageMeta>> = _selectedApps.asStateFlow()
@@ -141,46 +149,78 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun extractApk(app: PackageMeta): File? {
-        println("DEBUG: Extracting APK for ${app.label}")
+        println("DEBUG: Starting APK extraction for ${app.label}")
         try {
-            val sourceFile = File(app.sourceDir ?: return null)
-            if (!sourceFile.exists()) return null
+            val context = getApplication<Application>()
+            
+            // Get all APK files including splits
+            val uniqueApkFiles = ExtractorUtils.getAllApkFilesForCurrentPackage(context, app.packageName)
+            println("DEBUG: Found ${uniqueApkFiles.size} APK files to extract")
 
-            val apkDir = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            // Show total file count
+            _extractionFileCount.value = app.packageName to uniqueApkFiles.size
+            println("DEBUG: Set extraction file count to ${uniqueApkFiles.size}")
+
+            val apkDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 "ExtractedApks"
             )
             if (!apkDir.exists()) {
                 apkDir.mkdirs()
             }
 
-            val destFile = File(
-                apkDir,
-                "${app.label.replace(" ", "_")}_${app.versionName}.apk"
-            )
-
-            FileInputStream(sourceFile).use { input ->
-                FileOutputStream(destFile).use { output ->
-                    val buffer = ByteArray(1024)
-                    var length: Int
-                    var totalBytes: Long = 0
-                    val fileSize = sourceFile.length()
-
-                    while (input.read(buffer).also { length = it } > 0) {
-                        output.write(buffer, 0, length)
-                        totalBytes += length
-                        val progress = ((totalBytes.toDouble() / fileSize.toDouble()) * 100).toInt()
-                        _extractionProgress.value = app.packageName to progress
-                    }
-                }
+            // Create package directory
+            val packageDir = File(apkDir, app.packageName.replace(".", "_"))
+            if (!packageDir.exists()) {
+                packageDir.mkdirs()
             }
 
+            val extractedFiles = mutableListOf<File>()
+            var currentFileIndex = 0
+
+            // Copy each APK file
+            for (sourceFile in uniqueApkFiles) {
+                if (!sourceFile.exists()) continue
+
+                currentFileIndex++
+                println("DEBUG: Extracting file ${currentFileIndex}/${uniqueApkFiles.size}: ${sourceFile.name}")
+                val destFile = File(packageDir, sourceFile.name)
+                FileInputStream(sourceFile).use { input ->
+                    FileOutputStream(destFile).use { output ->
+                        val buffer = ByteArray(1024)
+                        var length: Int
+                        var totalBytes: Long = 0
+                        val fileSize = sourceFile.length()
+
+                        while (input.read(buffer).also { length = it } > 0) {
+                            output.write(buffer, 0, length)
+                            totalBytes += length
+                            val progress = ((totalBytes.toDouble() / fileSize.toDouble()) * 100).toInt()
+                            _extractionProgress.value = app.packageName to progress
+                            println("DEBUG: Progress for ${sourceFile.name}: $progress%")
+                        }
+                    }
+                }
+                extractedFiles.add(destFile)
+            }
+
+            println("DEBUG: Extraction completed")
             _extractionProgress.value = null
-            return destFile
+            _extractionFileCount.value = null
+
+            if (extractedFiles.isNotEmpty()) {
+                val file = extractedFiles[0]
+                val fileSize = FileUtil.getFileSizeMegaBytes(file)
+                val message = "APK extracted to:\n${file.path}\n$fileSize"
+                _successMessage.value = message
+                return file
+            }
+            return null
         } catch (e: IOException) {
             println("DEBUG: Error extracting APK: ${e.message}")
             e.printStackTrace()
             _extractionProgress.value = null
+            _extractionFileCount.value = null
+            _successMessage.value = null
             return null
         }
     }
@@ -212,14 +252,14 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         val context = getApplication<Application>()
         try {
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("market://details?id=${app.packageName}")
+                data = "market://details?id=${app.packageName}".toUri()
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             // Если Play Store не установлен, открываем в браузере
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("https://play.google.com/store/apps/details?id=${app.packageName}")
+                data = "https://play.google.com/store/apps/details?id=${app.packageName}".toUri()
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)

@@ -1,6 +1,7 @@
 package com.walhalla.compose.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,7 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.SortByAlpha
+import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +58,21 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import com.walhalla.appextractor.model.PackageMeta
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+
+
+// Sort options
+enum class SortOption {
+    NAME_ASC, NAME_DESC,
+    PACKAGE_ASC, PACKAGE_DESC,
+    SIZE_ASC, SIZE_DESC,
+    UPDATE_DATE_ASC, UPDATE_DATE_DESC,
+    SYSTEM_FIRST, USER_FIRST
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,8 +87,80 @@ fun ExtractorScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedApps by viewModel.selectedApps.collectAsState()
     val extractionProgress by viewModel.extractionProgress.collectAsState()
+    val extractionFileCount by viewModel.extractionFileCount.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var isSearchActive by remember { mutableStateOf(false) }
+    var showSortMenu by remember { mutableStateOf(false) }
+    val successMessage by viewModel.successMessage.collectAsState()
+
+
+    var currentSort by remember { mutableStateOf(SortOption.NAME_ASC) }
+
+    // Sort apps based on current option
+    val sortedApps = remember(apps, currentSort) {
+        when (currentSort) {
+            SortOption.NAME_ASC -> apps.sortedBy { it.label }
+            SortOption.NAME_DESC -> apps.sortedByDescending { it.label }
+            SortOption.PACKAGE_ASC -> apps.sortedBy { it.packageName }
+            SortOption.PACKAGE_DESC -> apps.sortedByDescending { it.packageName }
+                ...         SortOption.SIZE_ASC -> apps.sortedBy { it.size?.let { size -> size.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0 } ?: 0.0 }
+            SortOption.SIZE_DESC -> apps.sortedByDescending { it.size?.let { size -> size.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0 } ?: 0.0 }
+            SortOption.UPDATE_DATE_ASC -> apps.sortedBy { it.updateTime }
+            SortOption.UPDATE_DATE_DESC -> apps.sortedByDescending { it.updateTime }
+            SortOption.SYSTEM_FIRST -> apps.sortedWith(compareByDescending<PackageMeta> { it.isSystemApp }.thenBy { it.label })
+            SortOption.USER_FIRST -> apps.sortedWith(compareBy<PackageMeta> { it.isSystemApp }.thenBy { it.label })
+        }
+    }
+
+    // Debug logging for extraction state
+    LaunchedEffect(extractionProgress, extractionFileCount) {
+        println("DEBUG: Extraction progress: $extractionProgress")
+        println("DEBUG: Extraction file count: $extractionFileCount")
+    }
+
+    // Show success message
+    LaunchedEffect(successMessage) {
+        successMessage?.let { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
+    // Show extraction progress dialog
+    if (extractionProgress != null || extractionFileCount != null) {
+        println("DEBUG: Showing extraction dialog")
+        AlertDialog(
+            onDismissRequest = { /* Can't dismiss during extraction */ },
+            title = { Text("Extracting APK") },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (extractionFileCount != null) {
+                        Text(
+                            text = "Extracting ${extractionFileCount!!.second} file(s)...",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    if (extractionProgress != null) {
+                        LinearProgressIndicator(
+                            progress = extractionProgress!!.second / 100f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text(
+                            text = "${extractionProgress!!.second}%",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {}
+        )
+    }
 
     val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
@@ -94,38 +189,181 @@ fun ExtractorScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    if (!isSearchActive) {
-                        Text(stringResource(com.walhalla.extractor.R.string.app_name))
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        if (!isSearchActive) {
+                            Text(stringResource(com.walhalla.extractor.R.string.app_name))
+                        }
+                    },
+                    actions = {
+                        // Sort menu
+                        Box {
+                            IconButton(onClick = { showSortMenu = true }) {
+                                Icon(
+                                    Icons.Default.Sort,
+                                    contentDescription = "Sort apps"
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = showSortMenu,
+                                onDismissRequest = { showSortMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Name (A-Z)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.SortByAlpha,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.NAME_ASC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Name (Z-A)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.SortByAlpha,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.NAME_DESC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Package (A-Z)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Code,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.PACKAGE_ASC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Package (Z-A)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Code,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.PACKAGE_DESC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Size (Small-Large)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Storage,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.SIZE_ASC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Size (Large-Small)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Storage,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.SIZE_DESC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Update Date (Old-New)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Update,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.UPDATE_DATE_ASC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Update Date (New-Old)") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Update,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.UPDATE_DATE_DESC
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("System Apps First") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Android,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.SYSTEM_FIRST
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("User Apps First") },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Person,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        currentSort = SortOption.USER_FIRST
+                                        showSortMenu = false
+                                    }
+                                )
+                            }
+                        }
+
+                        SearchBar(
+                            query = searchQuery,
+                            onQueryChange = { viewModel.setSearchQuery(it) },
+                            onSearch = { isSearchActive = false },
+                            active = isSearchActive,
+                            onActiveChange = { isSearchActive = it },
+                            placeholder = { Text(stringResource(com.walhalla.extractor.R.string.search_hint)) },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            modifier = Modifier.animateContentSize()
+                        ) {
+                            // Search suggestions will go here
+                        }
                     }
-                },
-                actions = {
-                    SearchBar(
-                        query = searchQuery,
-                        onQueryChange = { viewModel.setSearchQuery(it) },
-                        onSearch = { isSearchActive = false },
-                        active = isSearchActive,
-                        onActiveChange = { isSearchActive = it },
-                        placeholder = { Text(stringResource(com.walhalla.extractor.R.string.search_hint)) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        modifier = Modifier.animateContentSize()
-                    ) {
-                        // Search suggestions will go here
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+                )
+            }
         ) {
+            paddingValues ->
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().padding(paddingValues)
             ) {
                 // Selection header
                 val currentSelectedSize = selectedApps.size
@@ -190,7 +428,7 @@ fun ExtractorScreen(
                         LazyColumn(
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(apps) { app ->
+                            items(sortedApps) { app ->
                                 AppListItem(
                                     app = app,
                                     isSelected = app in selectedApps,
@@ -199,6 +437,7 @@ fun ExtractorScreen(
                                         viewModel.toggleAppSelection(app)
                                     },
                                     onExtractClick = {
+                                        //@@@@@
                                         println("DEBUG: Extract clicked for ${app.label}")
                                         permissionLauncher.launch(permissions)
                                         viewModel.extractApk(app)
@@ -242,13 +481,13 @@ fun ExtractorScreen(
                             }
                         }
                     }
-
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        modifier = Modifier.align(Alignment.BottomCenter)
-                    )
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 } 

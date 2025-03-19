@@ -480,10 +480,8 @@ class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
         init {
             map["applovin."] = com.walhalla.extractor.R.drawable.ic_applovin
             map["com.google.firebase."] = com.walhalla.extractor.R.drawable.ic_firebase
-            map["com.unity3d."] =
-                com.walhalla.extractor.R.drawable.ic_unity3d
-            map["com.facebook."] =
-                com.walhalla.extractor.R.drawable.ic_facebook
+            map["com.unity3d."] = com.walhalla.extractor.R.drawable.ic_unity3d
+            map["com.facebook."] = com.walhalla.extractor.R.drawable.ic_facebook
         }
     }
 }
