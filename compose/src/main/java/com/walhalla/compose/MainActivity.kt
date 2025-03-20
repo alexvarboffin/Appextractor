@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Description
@@ -27,11 +26,12 @@ import androidx.navigation.compose.rememberNavController
 
 import androidx.navigation.navArgument
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.compose.screens.ExtractorScreen
 import com.walhalla.compose.screens.LogScreen
 import com.walhalla.compose.screens.ManifestScreen
 import com.walhalla.compose.screens.SettingsScreen
 import com.walhalla.compose.screens.AppDetailScreen
+import com.walhalla.compose.screens.ExtractorScreen
+import com.walhalla.compose.screens.SearchScreen
 import com.walhalla.compose.ui.theme.AppextractorTheme
 import com.walhalla.compose.viewmodel.ExtractorViewModel
 
@@ -102,6 +102,8 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate("manifest")
                                     }
                                 )
+
+
                             }
                             composable(Screen.Logs.route) { LogScreen() }
                             composable(Screen.Settings.route) { SettingsScreen() }

@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -58,6 +62,8 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.ImeAction
 
 
 // Sort options
@@ -85,7 +91,7 @@ fun ExtractorScreen(
     val extractionFileCount by viewModel.extractionFileCount.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var isSearchActive by remember { mutableStateOf(false) }
-    var showSortMenu by remember { mutableStateOf(false) }
+
     val successMessage by viewModel.successMessage.collectAsState()
 
 
@@ -98,8 +104,8 @@ fun ExtractorScreen(
             SortOption.NAME_DESC -> apps.sortedByDescending { it.label }
             SortOption.PACKAGE_ASC -> apps.sortedBy { it.packageName }
             SortOption.PACKAGE_DESC -> apps.sortedByDescending { it.packageName }
-            SortOption.SIZE_ASC -> apps.sortedBy { it.fileSize}
-            SortOption.SIZE_DESC -> apps.sortedByDescending { it.fileSize}
+            SortOption.SIZE_ASC -> apps.sortedBy { it.fileSize }
+            SortOption.SIZE_DESC -> apps.sortedByDescending { it.fileSize }
             SortOption.UPDATE_DATE_ASC -> apps.sortedBy { it.updateTime }
             SortOption.UPDATE_DATE_DESC -> apps.sortedByDescending { it.updateTime }
             SortOption.SYSTEM_FIRST -> apps.sortedWith(compareByDescending<PackageMeta> { it.isSystemApp }.thenBy { it.label })
@@ -187,179 +193,65 @@ fun ExtractorScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
+
+
                 TopAppBar(
                     title = {
-                        if (!isSearchActive) {
-                            Text(stringResource(com.walhalla.extractor.R.string.app_name))
-                        }
+                        //if (!isSearchActive) {
+                        Text(stringResource(com.walhalla.extractor.R.string.app_name))
+                        //}
                     },
                     actions = {
-                        // Sort menu
-                        Box {
-                            IconButton(onClick = { showSortMenu = true }) {
-                                Icon(
-                                    Icons.Default.Sort,
-                                    contentDescription = "Sort apps"
-                                )
-                            }
-
-                            DropdownMenu(
-                                expanded = showSortMenu,
-                                onDismissRequest = { showSortMenu = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Name (A-Z)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.SortByAlpha,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.NAME_ASC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Name (Z-A)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.SortByAlpha,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.NAME_DESC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Package (A-Z)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Code,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.PACKAGE_ASC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Package (Z-A)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Code,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.PACKAGE_DESC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Size (Small-Large)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Storage,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.SIZE_ASC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Size (Large-Small)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Storage,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.SIZE_DESC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Update Date (Old-New)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Update,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.UPDATE_DATE_ASC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Update Date (New-Old)") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Update,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.UPDATE_DATE_DESC
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("System Apps First") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Android,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.SYSTEM_FIRST
-                                        showSortMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("User Apps First") },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Person,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    onClick = {
-                                        currentSort = SortOption.USER_FIRST
-                                        showSortMenu = false
-                                    }
-                                )
-                            }
-                        }
-
-                        SearchBar(
-                            query = searchQuery,
-                            onQueryChange = { viewModel.setSearchQuery(it) },
-                            onSearch = { isSearchActive = false },
-                            active = isSearchActive,
-                            onActiveChange = { isSearchActive = it },
-                            placeholder = { Text(stringResource(com.walhalla.extractor.R.string.search_hint)) },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                            modifier = Modifier.animateContentSize()
-                        ) {
-                            // Search suggestions will go here
-                        }
+                        SortMenu(currentSort = {
+                            currentSort = it
+                        })
                     }
                 )
             }
-        ) {
-            paddingValues ->
-            Column(
-                modifier = Modifier.fillMaxSize().padding(paddingValues)
+        ) { paddingValues ->
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)
             ) {
+
+//                SearchBar(
+//                    query = searchQuery,
+//                    onQueryChange = { viewModel.setSearchQuery(it) },
+//                    onSearch = { isSearchActive = false },
+//                    active = isSearchActive,
+//                    onActiveChange = { isSearchActive = it },
+//                    placeholder = { Text(stringResource(com.walhalla.extractor.R.string.search_hint)) },
+//                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+//                    modifier = Modifier.animateContentSize()
+//                ) {
+//                    // Search suggestions will go here
+//                }
+                // Поисковая строка
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { viewModel.setSearchQuery(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    placeholder = { Text(stringResource(com.walhalla.extractor.R.string.search_hint)) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    singleLine = true,
+                    shape = MaterialTheme.shapes.medium,
+
+
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear"
+                                )
+                            }
+                        }
+                    },
+
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { /* Действие при нажатии на Done */ }),
+
+                    )
                 // Selection header
                 val currentSelectedSize = selectedApps.size
                 println("DEBUG: Current selected size: $currentSelectedSize")
@@ -485,4 +377,153 @@ fun ExtractorScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
-} 
+}
+
+@Composable
+fun SortMenu(currentSort: (sort: SortOption) -> Unit) {
+    var showSortMenu by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { showSortMenu = true }) {
+            Icon(
+                Icons.Default.Sort,
+                contentDescription = "Sort apps"
+            )
+        }
+
+        DropdownMenu(
+            expanded = showSortMenu,
+            onDismissRequest = { showSortMenu = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Name (A-Z)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.SortByAlpha,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.NAME_ASC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Name (Z-A)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.SortByAlpha,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.NAME_DESC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Package (A-Z)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Code,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.PACKAGE_ASC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Package (Z-A)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Code,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.PACKAGE_DESC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Size (Small-Large)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Storage,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.SIZE_ASC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Size (Large-Small)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Storage,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.SIZE_DESC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Update Date (Old-New)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Update,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.UPDATE_DATE_ASC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Update Date (New-Old)") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Update,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.UPDATE_DATE_DESC)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("System Apps First") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Android,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.SYSTEM_FIRST)
+                    showSortMenu = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("User Apps First") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    currentSort(SortOption.USER_FIRST)
+                    showSortMenu = false
+                }
+            )
+        }
+    }
+}
