@@ -2,14 +2,22 @@ package com.walhalla.compose.viewmodel
 
 import android.app.Application
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.sdk.F0Presenter.Companion.DEVIDER_END
+import com.walhalla.appextractor.sdk.F0Presenter.Companion.DEVIDER_START
+import com.walhalla.appextractor.sdk.HeaderCollapsedObject
+import com.walhalla.appextractor.sdk.HeaderObject
+import com.walhalla.appextractor.sdk.ServiceLine
 import com.walhalla.appextractor.utils.PermissionUtils
 import com.walhalla.compose.model.*
+import com.walhalla.extractor.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -75,13 +83,7 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                     )
                 } ?: emptyList()
 
-                val services = packageInfo.services?.map { serviceInfo ->
-                    AppComponent(
-                        name = serviceInfo.name,
-                        exported = serviceInfo.exported
-                    )
-                } ?: emptyList()
-
+                val services = getServices(getApplication<Application>(), packageInfo)
                 val receivers = packageInfo.receivers?.map { receiverInfo ->
                     AppComponent(
                         name = receiverInfo.name,
@@ -107,6 +109,45 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                 e.printStackTrace()
             }
         }
+    }
+
+    private fun getServices(application: Application, targetPackageInfo: PackageInfo): List<AppComponent> {
+        //SERVICES
+        val i1 =
+            if ((targetPackageInfo.services == null)) 0 else targetPackageInfo.services!!.size
+        val app_info_services = application.getString(R.string.app_info_services)
+
+        if (i1 > 0) {
+            val collapse = HeaderCollapsedObject(app_info_services + DEVIDER_START + i1 + DEVIDER_END,
+                R.drawable.ic_category_services
+            )
+            for (i in targetPackageInfo.services!!.indices) {
+                val service = targetPackageInfo.services!![i]
+
+                //CertLine sl = new CertLine(, service.enabled + "}");
+                val label = service.loadLabel(packageManager)
+                var drawable: Drawable?
+                //if (ai.icon > 0) {
+                drawable = icons[service.icon]
+                if (drawable == null) {
+                    drawable = service.loadIcon(packageManager)
+                    icons[service.icon] = drawable
+                }
+                //}
+                val sl = ServiceLine(drawable, label.toString(), "" + service.name, service.exported
+                )
+                collapse.list.add(sl)
+            }
+            data.add(collapse)
+        } else {
+            data.add(
+                HeaderObject(
+                    (app_info_services
+                            + DEVIDER_START + i1 + DEVIDER_END), R.drawable.ic_category_services
+                )
+            )
+        }
+        //END_SERVICES
     }
 
     fun openInSettings(app: PackageMeta) {

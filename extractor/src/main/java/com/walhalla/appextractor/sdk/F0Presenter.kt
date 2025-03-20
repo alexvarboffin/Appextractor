@@ -27,7 +27,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.walhalla.appextractor.activity.detail.DetailsF0
 import com.walhalla.appextractor.utils.IntentUtil
-import com.walhalla.appextractor.utils.PermissionUtils.protectionLevelToString
 import com.walhalla.extractor.R
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.handleException
@@ -146,7 +145,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
 
         //END_BROWSABLE ACTIVITY
-        services(data, targetPackageInfo)
+        getServices(data, targetPackageInfo)
         receivers(targetPackageInfo, packageManager, data)
         providers(targetPackageInfo.providers, packageManager, data)
 
@@ -457,10 +456,9 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         //END_RECEIVERS
     }
 
-    private fun services(data: MutableList<BaseViewModel>, targetPackageInfo: PackageInfo) {
+    private fun getServices(data: MutableList<BaseViewModel>, targetPackageInfo: PackageInfo) {
         //SERVICES
-        val i1 =
-            if ((targetPackageInfo!!.services == null)) 0 else targetPackageInfo.services!!.size
+        val i1 = if ((targetPackageInfo.services == null)) 0 else targetPackageInfo.services!!.size
         val app_info_services = myActivityContext.getString(R.string.app_info_services)
 
         if (i1 > 0) {
@@ -1066,8 +1064,8 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
     //    }
 
     companion object {
-        private const val DEVIDER_START = " ("
-        private const val DEVIDER_END = ")"
+        const val DEVIDER_START = " ("
+        const val DEVIDER_END = ")"
 
         // Вот шестнадцатеричное преобразование полученного кода
         private fun byte2HexFormatted(arr: ByteArray): String {
