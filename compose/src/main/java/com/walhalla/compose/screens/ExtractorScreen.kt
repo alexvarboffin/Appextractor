@@ -134,16 +134,16 @@ fun ExtractorScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (extractionFileCount != null) {
+                    extractionFileCount?.let {
                         Text(
-                            text = "Extracting ${extractionFileCount!!.second} file(s)...",
+                            text = "Extracting ${it.second} file(s)...",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                     if (extractionProgress != null) {
                         LinearProgressIndicator(
-                            progress = extractionProgress!!.second / 100f,
-                            modifier = Modifier.fillMaxWidth()
+                            progress = { extractionProgress!!.second / 100f },
+                            modifier = Modifier.fillMaxWidth(),
                         )
                         Text(
                             text = "${extractionProgress!!.second}%",
@@ -435,7 +435,7 @@ fun ExtractorScreen(
                                         //@@@@@
                                         println("DEBUG: Extract clicked for ${app.label}")
                                         permissionLauncher.launch(permissions)
-                                        viewModel.extractApk(app)
+                                        viewModel.extractApkRequest(app)
                                     },
                                     onShareClick = {
                                         println("DEBUG: Share clicked for ${app.label}")

@@ -1,5 +1,6 @@
 package com.walhalla.compose.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,7 +58,7 @@ fun AppListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // App Icon
@@ -78,7 +80,7 @@ fun AppListItem(
             }
 
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             // App Info
             Column(
@@ -160,17 +162,18 @@ fun AppListItem(
                 }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().background(Color.Red),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
+                        modifier = Modifier.weight(1f).background(Color.Yellow),
                         text = "v${app.versionName} (${app.versionCode})",
                         style = MaterialTheme.typography.bodySmall
                     )
 
                     Text(
-                        text = DateFormat.getDateInstance(DateFormat.SHORT)
-                            .format(Date(app.updateTime)),
+
+                        text = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(app.updateTime)),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }

@@ -1,15 +1,15 @@
 package com.walhalla.appextractor.utils
 
-fun prettyFileSize(longsize: Long): String {
+fun prettyFileSize(longSize: Long): String {
     val size = when {
-        longsize > 1024 && longsize <= 1024 * 1024 ->
-            "${longsize / 1024} KB"
+        longSize > 1024 && longSize <= 1024 * 1024 ->
+            "${longSize / 1024} KB"
 
-        longsize > 1024 * 1024 && longsize <= 1024 * 1024 * 1024 ->
-            "${longsize / (1024 * 1024)} MB"
+        longSize > 1024 * 1024 && longSize <= 1024 * 1024 * 1024 ->
+            "${longSize / (1024 * 1024)} MB"
 
         else ->
-            "${longsize / (1024 * 1024 * 1024)} GB"
+            "${longSize / (1024 * 1024 * 1024)} GB"
     }
     return size
 }

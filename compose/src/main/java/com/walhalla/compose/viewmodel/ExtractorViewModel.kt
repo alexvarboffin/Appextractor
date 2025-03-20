@@ -27,8 +27,12 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.walhalla.appextractor.utils.ExtractorUtils
 import com.walhalla.appextractor.utils.FileUtil
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     private val _apps = MutableStateFlow<List<PackageMeta>>(emptyList())
@@ -131,20 +135,28 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun extractApk(app: PackageMeta): File? {
+    fun extractApkRequest(app: PackageMeta) {
+        viewModelScope.launch(Dispatchers.Default) {
+            extractApk(app)
+        }
+    }
+
+    private fun extractApk(app: PackageMeta): File? {
         println("DEBUG: Starting APK extraction for ${app.label}")
         try {
             val context = getApplication<Application>()
-            
+
             // Get all APK files including splits
-            val uniqueApkFiles = ExtractorUtils.getAllApkFilesForCurrentPackage(context, app.packageName)
+            val uniqueApkFiles =
+                ExtractorUtils.getAllApkFilesForCurrentPackage(context, app.packageName)
             println("DEBUG: Found ${uniqueApkFiles.size} APK files to extract")
 
             // Show total file count
             _extractionFileCount.value = app.packageName to uniqueApkFiles.size
             println("DEBUG: Set extraction file count to ${uniqueApkFiles.size}")
 
-            val apkDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            val apkDir = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 "ExtractedApks"
             )
             if (!apkDir.exists()) {
@@ -177,7 +189,8 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                         while (input.read(buffer).also { length = it } > 0) {
                             output.write(buffer, 0, length)
                             totalBytes += length
-                            val progress = ((totalBytes.toDouble() / fileSize.toDouble()) * 100).toInt()
+                            val progress =
+                                ((totalBytes.toDouble() / fileSize.toDouble()) * 100).toInt()
                             _extractionProgress.value = app.packageName to progress
                             println("DEBUG: Progress for ${sourceFile.name}: $progress%")
                         }
@@ -348,6 +361,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         _selectedApps.value = emptySet()
     }
 
+
     fun selectExtractedApps() {
         viewModelScope.launch {
             val extractedDir = File(
@@ -371,4 +385,6 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     fun getAppByPackageName(packageName: String?): PackageMeta? {
         return _apps.value.find { it.packageName == packageName }
     }
+
+
 } 
