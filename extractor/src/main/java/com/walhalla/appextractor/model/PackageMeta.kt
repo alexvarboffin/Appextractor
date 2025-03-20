@@ -22,9 +22,9 @@ class PackageMeta : Parcelable {
     var updateTime: Long = 0
 
 
-    var size: String? = null
+    var fileSize: Long = -1L
 
-    var sourceDir: String=""
+    var sourceDir: String = ""
 
 
     var firstInstallTime: Long = 0
@@ -146,8 +146,8 @@ class PackageMeta : Parcelable {
         icon = `in`.readParcelable(Uri::class.java.classLoader)
         installTime = `in`.readLong()
         updateTime = `in`.readLong()
-        size = `in`.readString()
-        sourceDir = `in`.readString()?:""
+        fileSize = `in`.readLong()
+        sourceDir = `in`.readString() ?: ""
         firstInstallTime = `in`.readLong()
         lastUpdateTime = `in`.readLong()
     }
@@ -162,7 +162,7 @@ class PackageMeta : Parcelable {
         dest.writeParcelable(icon, flags)
         dest.writeLong(installTime)
         dest.writeLong(updateTime)
-        dest.writeString(size)
+        dest.writeLong(fileSize)
         dest.writeString(sourceDir)
         dest.writeLong(firstInstallTime)
         dest.writeLong(lastUpdateTime)

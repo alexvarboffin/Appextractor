@@ -1,11 +1,9 @@
 package com.walhalla.compose.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.utils.prettyFileSize
 import com.walhalla.compose.R
 import java.text.DateFormat
 import java.util.*
@@ -176,9 +175,10 @@ fun AppListItem(
                     )
                 }
 
-                if (app.size != null) {
+                if (app.fileSize > 0) {
+                    val x : String = prettyFileSize(app.fileSize)
                     Text(
-                        text = "Size: ${app.size}", style = MaterialTheme.typography.bodySmall
+                        text = "Size: $x", style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -296,4 +296,4 @@ fun AppListItem(
             }
         }
     }
-} 
+}

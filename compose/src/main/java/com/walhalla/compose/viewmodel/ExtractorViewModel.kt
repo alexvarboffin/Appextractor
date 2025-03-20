@@ -7,22 +7,17 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.provider.Settings
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.findNavController
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.utils.XmlUtils
-import com.walhalla.compose.MainActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -101,19 +96,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                         .build()
 
                     val file = File(applicationInfo.publicSourceDir)
-                    val longsize = file.length()
-                    val size = when {
-                        longsize > 1024 && longsize <= 1024 * 1024 ->
-                            "${longsize / 1024} KB"
-
-                        longsize > 1024 * 1024 && longsize <= 1024 * 1024 * 1024 ->
-                            "${longsize / (1024 * 1024)} MB"
-
-                        else ->
-                            "${longsize / (1024 * 1024 * 1024)} GB"
-                    }
-
-                    meta.size = size
+                    meta.fileSize = file.length()
                     meta.sourceDir = applicationInfo.sourceDir
                     meta.firstInstallTime = packageInfo.firstInstallTime
                     meta.lastUpdateTime = packageInfo.lastUpdateTime

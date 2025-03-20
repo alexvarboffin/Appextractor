@@ -60,15 +60,7 @@ open class DemoFragment : Fragment() {
                 .build()
 
             val file = File(applicationInfo.publicSourceDir)
-            val longsize = file.length()
-            val size = if (longsize > 1024 && longsize <= 1024 * 1024) {
-                ((longsize / 1024).toString() + " KB")
-            } else if (longsize > 1024 * 1024 && longsize <= 1024 * 1024 * 1024) {
-                ((longsize / (1024 * 1024)).toString() + " MB")
-            } else {
-                ((longsize / (1024 * 1024 * 1024)).toString() + " GB")
-            }
-            meta.size = size
+            meta.fileSize = file.length()
             meta.sourceDir = applicationInfo.sourceDir
             meta.packageName = packageInfo.packageName
             meta.firstInstallTime = packageInfo.firstInstallTime

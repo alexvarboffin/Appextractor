@@ -160,7 +160,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
 
 
         //String uid = String.valueOf(item.applicationInfo.uid);
-        holder.mBinding.size.text = item.size
+        holder.mBinding.size.text = item.fileSize
 
         if (cache_appIcon.containsKey(item.packageName) && cache_appName.containsKey(item.packageName)) {
             holder.setAppName(cache_appName[item.packageName]!!, search_pattern)

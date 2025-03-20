@@ -1,7 +1,6 @@
 package com.walhalla.compose.screens
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,13 +23,11 @@ import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Update
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -50,12 +47,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.walhalla.compose.components.AppListItem
-import com.walhalla.compose.model.AppModel
 import com.walhalla.compose.viewmodel.ExtractorViewModel
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import com.walhalla.appextractor.model.PackageMeta
 import androidx.compose.material3.AlertDialog
@@ -103,8 +98,8 @@ fun ExtractorScreen(
             SortOption.NAME_DESC -> apps.sortedByDescending { it.label }
             SortOption.PACKAGE_ASC -> apps.sortedBy { it.packageName }
             SortOption.PACKAGE_DESC -> apps.sortedByDescending { it.packageName }
-                ...         SortOption.SIZE_ASC -> apps.sortedBy { it.size?.let { size -> size.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0 } ?: 0.0 }
-            SortOption.SIZE_DESC -> apps.sortedByDescending { it.size?.let { size -> size.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0 } ?: 0.0 }
+            SortOption.SIZE_ASC -> apps.sortedBy { it.fileSize}
+            SortOption.SIZE_DESC -> apps.sortedByDescending { it.fileSize}
             SortOption.UPDATE_DATE_ASC -> apps.sortedBy { it.updateTime }
             SortOption.UPDATE_DATE_DESC -> apps.sortedByDescending { it.updateTime }
             SortOption.SYSTEM_FIRST -> apps.sortedWith(compareByDescending<PackageMeta> { it.isSystemApp }.thenBy { it.label })

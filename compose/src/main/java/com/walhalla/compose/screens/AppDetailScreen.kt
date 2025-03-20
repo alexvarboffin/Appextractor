@@ -11,19 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.PermissionUtils
 import com.walhalla.compose.viewmodel.AppDetailViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.material.tabs.TabLayout
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Tab
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import android.content.pm.PermissionInfo
@@ -32,6 +24,7 @@ import com.walhalla.compose.model.PermissionCategory
 import com.walhalla.compose.model.SecurityLevel
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
+import com.walhalla.appextractor.utils.prettyFileSize
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,10 +79,11 @@ fun AppDetailScreen(
                     icon = Icons.Default.Info,
                     initiallyExpanded = true
                 ) {
+                    val x = prettyFileSize(app.fileSize)
                     Column(modifier = Modifier.padding(16.dp)) {
                         DetailRow("Package Name", app.packageName)
                         DetailRow("Version", "${app.versionName} (${app.versionCode})")
-                        DetailRow("Size", app.size ?: "Unknown")
+                        DetailRow("Size", x)
                         DetailRow("Install Date", formatDate(app.firstInstallTime))
                         DetailRow("Last Update", formatDate(app.lastUpdateTime))
                         DetailRow("System App", if (app.isSystemApp) "Yes" else "No")
@@ -99,10 +93,7 @@ fun AppDetailScreen(
 
             appDetails?.let { details ->
                 item {
-                    ExpandableCard(
-                        title = "Разрешения",
-                        icon = Icons.Default.Security,
-                        initiallyExpanded = false
+                    ExpandableCard(title = "Разрешения", icon = Icons.Default.Security, initiallyExpanded = false
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             details.permissions.forEach { (category, permissions) ->

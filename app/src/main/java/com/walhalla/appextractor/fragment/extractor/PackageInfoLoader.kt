@@ -1,6 +1,5 @@
 package com.walhalla.appextractor.fragment.extractor
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -61,7 +60,7 @@ class PackageInfoLoader(a: Context, private val callback: Callback) : AsyncTask<
                 } else {
                     ((longsize / (1024 * 1024 * 1024)).toString() + " GB")
                 }
-                meta.size = size
+                meta.fileSize = size
                 meta.sourceDir = applicationInfo.sourceDir
                 meta.packageName = packageInfo.packageName
                 meta.firstInstallTime = packageInfo.firstInstallTime
