@@ -1,6 +1,7 @@
 package com.walhalla.compose.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -10,8 +11,10 @@ import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.sdk.BaseViewModel
 import com.walhalla.appextractor.sdk.F0Presenter.Companion.DEVIDER_END
 import com.walhalla.appextractor.sdk.F0Presenter.Companion.DEVIDER_START
+import com.walhalla.appextractor.sdk.GetServicesUseCase
 import com.walhalla.appextractor.sdk.HeaderCollapsedObject
 import com.walhalla.appextractor.sdk.HeaderObject
 import com.walhalla.appextractor.sdk.ServiceLine
@@ -33,7 +36,7 @@ data class AppComponent(
 data class AppDetails(
     val permissions: Map<PermissionCategory, List<PermissionInfo>>,
     val activities: List<AppComponent>,
-    val services: List<AppComponent>,
+    val services: List<BaseViewModel>,
     val receivers: List<AppComponent>,
     val providers: List<AppComponent>
 )
@@ -41,6 +44,8 @@ data class AppDetails(
 class AppDetailViewModel(application: Application) : AndroidViewModel(application) {
     private val _appDetails = MutableStateFlow<AppDetails?>(null)
     val appDetails: StateFlow<AppDetails?> = _appDetails.asStateFlow()
+    var icons: MutableMap<Int, Drawable?> = HashMap()
+
 
     fun loadAppDetails(app: PackageMeta) {
         viewModelScope.launch {
@@ -58,18 +63,24 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                 val permissions = packageInfo.requestedPermissions?.mapNotNull { permissionName ->
                     try {
                         val permissionInfo = pm.getPermissionInfo(permissionName, 0)
-                        val isGranted = pm.checkPermission(permissionName, app.packageName) == PackageManager.PERMISSION_GRANTED
+                        val isGranted = pm.checkPermission(
+                            permissionName,
+                            app.packageName
+                        ) == PackageManager.PERMISSION_GRANTED
                         val category = getPermissionCategory(permissionName)
-                        
+
                         PermissionInfo(
                             name = permissionName,
                             simpleName = permissionName.substringAfterLast('.'),
-                            description = permissionInfo.loadDescription(pm)?.toString() 
+                            description = permissionInfo.loadDescription(pm)?.toString()
                                 ?: getPermissionDescription(permissionName),
                             category = category,
                             protectionLevel = permissionInfo.protectionLevel,
                             isGranted = isGranted,
-                            recommendation = getSecurityRecommendation(category, permissionInfo.protectionLevel)
+                            recommendation = getSecurityRecommendation(
+                                category,
+                                permissionInfo.protectionLevel
+                            )
                         )
                     } catch (e: PackageManager.NameNotFoundException) {
                         null
@@ -83,7 +94,11 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                     )
                 } ?: emptyList()
 
-                val services = getServices(getApplication<Application>(), packageInfo)
+
+                val getServicesUseCase = GetServicesUseCase(getApplication<Application>().packageManager, getApplication<Application>())
+                val services = getServicesUseCase.execute(packageInfo, icons)
+
+
                 val receivers = packageInfo.receivers?.map { receiverInfo ->
                     AppComponent(
                         name = receiverInfo.name,
@@ -111,44 +126,7 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    private fun getServices(application: Application, targetPackageInfo: PackageInfo): List<AppComponent> {
-        //SERVICES
-        val i1 =
-            if ((targetPackageInfo.services == null)) 0 else targetPackageInfo.services!!.size
-        val app_info_services = application.getString(R.string.app_info_services)
 
-        if (i1 > 0) {
-            val collapse = HeaderCollapsedObject(app_info_services + DEVIDER_START + i1 + DEVIDER_END,
-                R.drawable.ic_category_services
-            )
-            for (i in targetPackageInfo.services!!.indices) {
-                val service = targetPackageInfo.services!![i]
-
-                //CertLine sl = new CertLine(, service.enabled + "}");
-                val label = service.loadLabel(packageManager)
-                var drawable: Drawable?
-                //if (ai.icon > 0) {
-                drawable = icons[service.icon]
-                if (drawable == null) {
-                    drawable = service.loadIcon(packageManager)
-                    icons[service.icon] = drawable
-                }
-                //}
-                val sl = ServiceLine(drawable, label.toString(), "" + service.name, service.exported
-                )
-                collapse.list.add(sl)
-            }
-            data.add(collapse)
-        } else {
-            data.add(
-                HeaderObject(
-                    (app_info_services
-                            + DEVIDER_START + i1 + DEVIDER_END), R.drawable.ic_category_services
-                )
-            )
-        }
-        //END_SERVICES
-    }
 
     fun openInSettings(app: PackageMeta) {
         val context = getApplication<Application>()

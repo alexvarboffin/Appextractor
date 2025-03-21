@@ -22,6 +22,7 @@ import com.walhalla.appextractor.activity.manifest.ManifestActivity
 import com.walhalla.appextractor.adapter.appInfo.AppVh
 import com.walhalla.appextractor.databinding.ItemAppBinding
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.utils.prettyFileSize
 import com.walhalla.ui.DLog.d
 import java.util.Collections
 import java.util.Locale
@@ -155,12 +156,12 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
 
     override fun onBindViewHolder(holder: AppVh, position: Int) {
         val item = items[position]
-        holder.setPackageName(item.packageName!!, search_pattern, position)
+        holder.setPackageName(item.packageName, search_pattern, position)
         holder.mBinding.version.text = getDate(item)
 
 
         //String uid = String.valueOf(item.applicationInfo.uid);
-        holder.mBinding.size.text = item.fileSize
+        holder.mBinding.size.text = prettyFileSize(item.fileSize)
 
         if (cache_appIcon.containsKey(item.packageName) && cache_appName.containsKey(item.packageName)) {
             holder.setAppName(cache_appName[item.packageName]!!, search_pattern)
@@ -170,7 +171,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
                 .placeholder(R.drawable.placeholder_app_icon)
                 .into(holder.mBinding.imgIcon)
         } else {
-            holder.setAppName(item.packageName!!, search_pattern)
+            holder.setAppName(item.packageName, search_pattern)
             holder.mBinding.imgIcon.setImageDrawable(null)
             executorServiceIcons.submit(GuiLoader(holder, item))
         }
@@ -247,7 +248,7 @@ class ApkListAdapter(private val mView: AppListAdapterCallback, private val cont
                 if (search_pattern == null || search_pattern!!.isEmpty()) {
                     break // empty search pattern: add everything
                 }
-                if (meta.packageName!!.lowercase(Locale.getDefault()).contains(
+                if (meta.packageName.lowercase(Locale.getDefault()).contains(
                         search_pattern!!
                     )
                 ) {

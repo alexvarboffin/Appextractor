@@ -39,7 +39,7 @@ class StrFragment : BaseFragment(), MvpContract.View, ResourceAdapter.OnItemClic
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = TabStringsBinding.inflate(inflater, container, false)
         return binding!!.root
     }

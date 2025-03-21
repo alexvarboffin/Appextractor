@@ -52,15 +52,7 @@ class PackageInfoLoader(a: Context, private val callback: Callback) : AsyncTask<
                     .build()
 
                 val file = File(applicationInfo.publicSourceDir)
-                val longsize = file.length()
-                var size = if (longsize > 1024 && longsize <= 1024 * 1024) {
-                    ((longsize / 1024).toString() + " KB")
-                } else if (longsize > 1024 * 1024 && longsize <= 1024 * 1024 * 1024) {
-                    ((longsize / (1024 * 1024)).toString() + " MB")
-                } else {
-                    ((longsize / (1024 * 1024 * 1024)).toString() + " GB")
-                }
-                meta.fileSize = size
+                meta.fileSize = file.length()
                 meta.sourceDir = applicationInfo.sourceDir
                 meta.packageName = packageInfo.packageName
                 meta.firstInstallTime = packageInfo.firstInstallTime
@@ -77,11 +69,11 @@ class PackageInfoLoader(a: Context, private val callback: Callback) : AsyncTask<
 
     override fun onProgressUpdate(vararg values: PackageMeta) {
         super.onProgressUpdate(*values)
-        callback?.onProgressUpdate(values[0])
+        callback.onProgressUpdate(values[0])
     }
 
     override fun onPostExecute(aVoid: Void?) {
         super.onPostExecute(aVoid)
-        callback?.onPostExecute()
+        callback.onPostExecute()
     }
 }

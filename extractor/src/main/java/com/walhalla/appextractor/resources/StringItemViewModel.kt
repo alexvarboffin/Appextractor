@@ -2,8 +2,7 @@ package com.walhalla.appextractor.resources
 
 import com.walhalla.appextractor.model.ViewModel
 
-class StringItemViewModel(val name: String, val text: String, val icon: Int?
-, val type: ResType = ResType.StringRes) :
+class StringItemViewModel(val name: String, val text: String, val icon: Int?, val type: ResType = ResType.StringRes) :
     ViewModel {
     constructor(name: String, value: String, type: ResType) : this(
         name,

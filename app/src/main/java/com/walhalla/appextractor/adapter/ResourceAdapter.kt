@@ -49,6 +49,11 @@ class ResourceAdapter(private val items: MutableList<StringItemViewModel>) :
                 return StringsViewHolder(binding)
             }
 
+            ResType.Xml.id -> {
+                val binding = ItemStringBinding.inflate(inflater, parent, false)
+                return StringsViewHolder(binding)
+            }
+
             ResType.Empty.id -> {
                 val binding0 = ItemLoggerEmptyBinding.inflate(inflater, parent, false)
                 return LogEmptyViewHolder(binding0, null)
@@ -78,10 +83,15 @@ class ResourceAdapter(private val items: MutableList<StringItemViewModel>) :
                 val resource = it as StringItemViewModel
                 binderReceiverView(holder.binding, resource)
                 holder.binding.overflowMenu.setOnClickListener { view: View ->
-                    showPopupMenu(
-                        view,
-                        resource
-                    )
+                    showPopupMenu(view, resource)
+                }
+            }
+            ResType.Xml.id -> {
+                val holder = (viewHolder as StringsViewHolder)
+                val resource = it as StringItemViewModel
+                binderReceiverView(holder.binding, resource)
+                holder.binding.overflowMenu.setOnClickListener { view: View ->
+                    showPopupMenu(view, resource)
                 }
             }
 
@@ -216,6 +226,5 @@ class ResourceAdapter(private val items: MutableList<StringItemViewModel>) :
         }
     }
 
-    class StringsViewHolder internal constructor(val binding: ItemStringBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    class StringsViewHolder internal constructor(val binding: ItemStringBinding) : RecyclerView.ViewHolder(binding.root)
 }

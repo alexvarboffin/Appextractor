@@ -1,21 +1,26 @@
-package com.walhalla.appextractor.adapter.viewholder;
+package com.walhalla.appextractor.adapter.viewholder
 
-import android.view.View;
-import android.widget.TextView;
+import android.R
+import android.view.View
+import android.widget.TextView
+import com.walhalla.appextractor.model.ViewModel
+import com.walhalla.appextractor.resources.StringItemViewModel
 
-import com.walhalla.appextractor.model.ViewModel;
 
-public class RecyclerViewSimpleTextViewHolder extends BaseVh<ViewModel> {
+//class RecyclerViewSimpleTextViewHolder(view: View) : BaseVh<StringItemViewModel>(view) {
+//    private val text1: TextView = view.findViewById(R.id.text1)
+//
+//    override fun bind(viewModel: StringItemViewModel, position: Int) {
+//        text1.text = viewModel.text
+//    }
+//}
 
-    private TextView text1;
 
-    public RecyclerViewSimpleTextViewHolder(View view) {
-        super(view);
-        text1 = view.findViewById(android.R.id.text1);
-    }
+class RecyclerViewSimpleTextViewHolder(view: View) : BaseVh<ViewModel>(view) {
+    private val text1: TextView =
+        view.findViewById(R.id.text1)
 
-    @Override
-    public void bind(ViewModel viewModel, int position) {
-        text1.setText(viewModel.toString());
+    override fun bind(viewModel: ViewModel, position: Int) {
+        text1.text = viewModel.toString()
     }
 }

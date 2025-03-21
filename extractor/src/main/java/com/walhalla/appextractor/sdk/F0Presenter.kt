@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.net.toUri
 
 
 class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
@@ -124,7 +125,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
 
         //BROWSABLE ACTIVITY
-        val ia0 = Intent(Intent.ACTION_VIEW, Uri.parse("file:///sdcard"))
+        val ia0 = Intent(Intent.ACTION_VIEW, "file:///sdcard".toUri())
         ia0.addCategory(Intent.CATEGORY_BROWSABLE)
         ia0.setPackage(targetPackageInfo.packageName)
 
@@ -145,7 +146,9 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
 
         //END_BROWSABLE ACTIVITY
-        getServices(data, targetPackageInfo)
+        val getServicesUseCase = GetServicesUseCase(packageManager, context)
+        data.addAll(getServicesUseCase.execute(targetPackageInfo, icons))
+
         receivers(targetPackageInfo, packageManager, data)
         providers(targetPackageInfo.providers, packageManager, data)
 
@@ -454,45 +457,6 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
             )
         }
         //END_RECEIVERS
-    }
-
-    private fun getServices(data: MutableList<BaseViewModel>, targetPackageInfo: PackageInfo) {
-        //SERVICES
-        val i1 = if ((targetPackageInfo.services == null)) 0 else targetPackageInfo.services!!.size
-        val app_info_services = myActivityContext.getString(R.string.app_info_services)
-
-        if (i1 > 0) {
-            val collapse = HeaderCollapsedObject(
-                app_info_services + DEVIDER_START + i1 + DEVIDER_END,
-                R.drawable.ic_category_services
-            )
-            for (i in targetPackageInfo.services!!.indices) {
-                val service = targetPackageInfo.services!![i]
-
-                //CertLine sl = new CertLine(, service.enabled + "}");
-                val label = service.loadLabel(packageManager)
-                var drawable: Drawable?
-                //if (ai.icon > 0) {
-                drawable = icons[service.icon]
-                if (drawable == null) {
-                    drawable = service.loadIcon(packageManager)
-                    icons[service.icon] = drawable
-                }
-                //}
-                val sl = ServiceLine(drawable, label.toString(), "" + service.name, service.exported
-                )
-                collapse.list.add(sl)
-            }
-            data.add(collapse)
-        } else {
-            data.add(
-                HeaderObject(
-                    (app_info_services
-                            + DEVIDER_START + i1 + DEVIDER_END), R.drawable.ic_category_services
-                )
-            )
-        }
-        //END_SERVICES
     }
 
 

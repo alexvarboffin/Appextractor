@@ -24,6 +24,10 @@ import com.walhalla.compose.model.PermissionCategory
 import com.walhalla.compose.model.SecurityLevel
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.ui.res.painterResource
+import com.walhalla.appextractor.sdk.HeaderObject
+import com.walhalla.appextractor.sdk.ServiceLine
 import com.walhalla.appextractor.utils.prettyFileSize
 
 
@@ -326,10 +330,35 @@ fun AppDetailScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             details.services.forEach { service ->
-                                DetailRow(
-                                    service.name.substringAfterLast('.'),
-                                    if (service.exported) "Exported" else "Not exported"
-                                )
+                                if(service is ServiceLine){
+                                    DetailRow(
+                                        service.label.substringAfterLast('.'),
+                                        if (service.exported) "Exported" else "Not exported"
+                                    )
+                                }else
+                                if(service is HeaderObject){
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = service.icon),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(
+                                            text = service.title,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                    }
+                                }
+
                             }
                         }
                     }
