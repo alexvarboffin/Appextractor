@@ -4,7 +4,7 @@ import android.content.IntentFilter
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 
-interface BaseViewModel
+sealed interface BaseViewModel
 
 
 class DirLine(val name: String, val value: String, @param:DrawableRes val icon: Int) : BaseViewModel
