@@ -25,7 +25,7 @@
 ///**
 // * Adapter for file list
 // */
-//public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.MetadataViewHolder> {
+//111 public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.MetadataViewHolder> {
 //
 //    private List<Metadata> mFiles;
 //    private final Picasso mPicasso;
@@ -70,7 +70,7 @@
 //        return mFiles == null ? 0 : mFiles.size();
 //    }
 //
-//    public class MetadataViewHolder extends RecyclerView.ViewHolder0 implements View.OnClickListener {
+//    111 public class MetadataViewHolder extends RecyclerView.ViewHolder0 implements View.OnClickListener {
 //        private final TextView mTextView;
 //        private final ImageView mImageView;
 //        private Metadata mItem;

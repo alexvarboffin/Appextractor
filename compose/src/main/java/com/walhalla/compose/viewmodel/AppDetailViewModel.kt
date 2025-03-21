@@ -1,9 +1,7 @@
 package com.walhalla.compose.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -12,21 +10,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.BaseViewModel
-import com.walhalla.appextractor.sdk.F0Presenter.Companion.DEVIDER_END
-import com.walhalla.appextractor.sdk.F0Presenter.Companion.DEVIDER_START
 import com.walhalla.appextractor.sdk.GetServicesUseCase
-import com.walhalla.appextractor.sdk.HeaderCollapsedObject
-import com.walhalla.appextractor.sdk.HeaderObject
-import com.walhalla.appextractor.sdk.ServiceLine
-import com.walhalla.appextractor.utils.PermissionUtils
+
 import com.walhalla.compose.model.*
-import com.walhalla.extractor.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.net.toUri
 
 data class AppComponent(
     val name: String,
@@ -131,7 +124,7 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
     fun openInSettings(app: PackageMeta) {
         val context = getApplication<Application>()
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.parse("package:${app.packageName}")
+            data = "package:${app.packageName}".toUri()
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)

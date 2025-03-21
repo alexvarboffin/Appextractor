@@ -118,11 +118,11 @@ fun ManifestScreen(
     Scaffold(
         topBar = {
             Column {
-                TopAppBar(
+            TopAppBar(
                     title = { Text("Manifest") },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
                     actions = {

@@ -1,97 +1,66 @@
-package com.walhalla.appextractor.adapter;
+package com.walhalla.appextractor.adapter
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import com.walhalla.appextractor.adapter.BackupAppFeatureAdapter.ViewHolder0
+import com.walhalla.appextractor.common.AppFeature
+import com.walhalla.appextractor.databinding.ItemBackupAppFeatureBinding
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
+class BackupAppFeatureAdapter : RecyclerView.Adapter<ViewHolder0>() {
+    private var mFeatures: List<AppFeature> = ArrayList()
 
-import com.walhalla.appextractor.databinding.ItemBackupAppFeatureBinding;
-import com.walhalla.appextractor.common.AppFeature;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class BackupAppFeatureAdapter extends
-        RecyclerView.Adapter<BackupAppFeatureAdapter.ViewHolder0> {
-
-    private List<AppFeature> mFeatures = new ArrayList<>();
-
-    public BackupAppFeatureAdapter() {
-        // Конструктор пустой, потому что мы не используем контекст в адаптере
-    }
-
-    public void setFeatures(List<AppFeature> newFeatures) {
+    fun setFeatures(newFeatures: List<AppFeature>) {
         // Используем DiffUtil для обновления списка с минимальными изменениями
-        AppFeatureDiffCallback diffCallback = new AppFeatureDiffCallback(mFeatures, newFeatures);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
-        mFeatures = newFeatures;
-        diffResult.dispatchUpdatesTo(this);
+        val diffCallback = AppFeatureDiffCallback(mFeatures, newFeatures)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        mFeatures = newFeatures
+        diffResult.dispatchUpdatesTo(this)
     }
 
-    @NonNull
-    @Override
-    public ViewHolder0 onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemBackupAppFeatureBinding binding = ItemBackupAppFeatureBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new ViewHolder0(binding);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder0 {
+        val binding =
+            ItemBackupAppFeatureBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder0(binding)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder0 holder, int position) {
-        holder.bind(mFeatures.get(position));
+    override fun onBindViewHolder(holder: ViewHolder0, position: Int) {
+        holder.bind(mFeatures[position])
     }
 
-    @Override
-    public int getItemCount() {
-        return mFeatures == null ? 0 : mFeatures.size();
+    override fun getItemCount(): Int {
+        return if (mFeatures == null) 0 else mFeatures.size
     }
 
-    static class ViewHolder0 extends RecyclerView.ViewHolder {
-
-        private final ItemBackupAppFeatureBinding binding;
-
-        ViewHolder0(@NonNull ItemBackupAppFeatureBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-
-        void bind(AppFeature feature) {
-            binding.getRoot().setText(feature.toText());
+    class ViewHolder0(private val binding: ItemBackupAppFeatureBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(feature: AppFeature) {
+            binding.root.text = feature.toText()
         }
     }
 
-    static class AppFeatureDiffCallback extends DiffUtil.Callback {
-
-        private final List<AppFeature> oldFeatures;
-        private final List<AppFeature> newFeatures;
-
-        public AppFeatureDiffCallback(List<AppFeature> oldFeatures, List<AppFeature> newFeatures) {
-            this.oldFeatures = oldFeatures;
-            this.newFeatures = newFeatures;
+    internal class AppFeatureDiffCallback(
+        private val oldFeatures: List<AppFeature>?,
+        private val newFeatures: List<AppFeature>
+    ) :
+        DiffUtil.Callback() {
+        override fun getOldListSize(): Int {
+            return oldFeatures!!.size
         }
 
-        @Override
-        public int getOldListSize() {
-            return oldFeatures.size();
+        override fun getNewListSize(): Int {
+            return newFeatures.size
         }
 
-        @Override
-        public int getNewListSize() {
-            return newFeatures.size();
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldFeatures!![oldItemPosition].toText() === newFeatures[newItemPosition].toText()
         }
 
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldFeatures.get(oldItemPosition).toText() == newFeatures.get(newItemPosition).toText();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            AppFeature oldFeature = oldFeatures.get(oldItemPosition);
-            AppFeature newFeature = newFeatures.get(newItemPosition);
-            return oldFeature.equals(newFeature);
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldFeature = oldFeatures!![oldItemPosition]
+            val newFeature = newFeatures[newItemPosition]
+            return oldFeature == newFeature
         }
     }
-
 }

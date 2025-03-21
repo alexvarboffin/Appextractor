@@ -191,24 +191,24 @@ fun ExtractorScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            topBar = {
+    Scaffold(
+        topBar = {
 
 
-                TopAppBar(
-                    title = {
+            TopAppBar(
+                title = {
                         //if (!isSearchActive) {
                         Text(stringResource(com.walhalla.extractor.R.string.app_name))
                         //}
-                    },
-                    actions = {
+                },
+                actions = {
                         SortMenu(currentSort = {
                             currentSort = it
                         })
-                    }
-                )
-            }
-        ) { paddingValues ->
+                }
+            )
+        }
+    ) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues)
             ) {
 
@@ -368,16 +368,16 @@ fun ExtractorScreen(
                             }
                         }
                     }
+                            }
+                        }
+                    }
+
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    )
                 }
             }
-        }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
-    }
-}
 
 @Composable
 fun SortMenu(currentSort: (sort: SortOption) -> Unit) {

@@ -1,128 +1,115 @@
-package com.walhalla.appextractor.activity.string;
+package com.walhalla.appextractor.activity.string
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.text.TextUtils;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.AssetManager
+import android.content.res.Resources
+import android.text.TextUtils
+import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin.getIconBySourceType
+import com.walhalla.ui.DLog.d
+import java.lang.reflect.Field
+import java.util.Locale
 
-import com.walhalla.appextractor.resources.ResType;
-import com.walhalla.appextractor.resources.StringItemViewModel;
-import com.walhalla.appextractor.sdk.ResourcesToolForPlugin;
-import com.walhalla.ui.DLog;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-public class StringsPresenter {
-
-    private final Context context;
-    private final MvpContract.View mView;
-
-    String mPackageName = null;
-    private AssetManager am = null;
-    private Resources mResources = null;
-
-    public StringsPresenter(Context m, MvpContract.View mView) {
-        this.context = m;
-        this.mView = mView;
-    }
+class StringsPresenter(private val context: Context, private val mView: MvpContract.View) {
+    var mPackageName: String? = null
+    private var am: AssetManager? = null
+    private var mResources: Resources? = null
 
 
-    public void loadManifestContent(String packageName, String resourceType) {
-        this.mPackageName = packageName;
+    fun loadResourceContent(packageName: String, resourceType: String) {
+        this.mPackageName = packageName
 
-        AssetManager initAM = am;
-        Resources initRes = mResources;
+        val initAM = am
+        val initRes = mResources
         try {
-            am = context.createPackageContext(packageName, 0).getAssets();
-            mResources = new Resources(am, context.getResources().getDisplayMetrics(), null);
+            am = context.createPackageContext(packageName, 0).assets
+            mResources = Resources(am, context.resources.displayMetrics, null)
             //resources = new Resources(am, null, null);
-        } catch (PackageManager.NameNotFoundException name) {
+        } catch (name: PackageManager.NameNotFoundException) {
             //Toast.makeText(this, "Error, couldn't create package context: " + name.getLocalizedMessage(), Toast.LENGTH_LONG);
-            am = initAM;
-            mResources = initRes;
-        } catch (RuntimeException unexpected) {
-            DLog.d("@@@ error configuring for package: " + packageName + " " + unexpected.getMessage());
-            am = initAM;
-            mResources = initRes;
+            am = initAM
+            mResources = initRes
+        } catch (unexpected: RuntimeException) {
+            d("@@@ error configuring for package: " + packageName + " " + unexpected.message)
+            am = initAM
+            mResources = initRes
         }
-        List<StringItemViewModel> m = new ArrayList<>();
+        val m: MutableList<StringItemViewModel> = ArrayList()
         //loadApplicationResources(this, m, getPackageName());
-        loadApplicationResources(context, m, packageName, resourceType);
-        mView.showSuccess(m);
+        loadApplicationResources(context, m, packageName, resourceType)
+        mView.showSuccess(m)
     }
 
     @SuppressLint("DiscouragedApi")
-    private int getResourceId(String sourceName, String sourceType) {
+    private fun getResourceId(sourceName: String, sourceType: String): Int {
         if (mResources == null || TextUtils.isEmpty(mPackageName) || TextUtils.isEmpty(sourceName)) {
-            return -1;
+            return -1
         }
-        return mResources.getIdentifier(sourceName, sourceType, mPackageName);
+        return mResources!!.getIdentifier(sourceName, sourceType, mPackageName)
     }
 
 
-    private void loadApplicationResources(Context context, List<StringItemViewModel> iconPackResources,
-                                          String packageName, String resourceType) {/*from w w w.  j a  va 2s. co  m*/
+    private fun loadApplicationResources(
+        context: Context, iconPackResources: MutableList<StringItemViewModel>,
+        packageName: String, resourceType: String
+    ) { /*from w w w.  j a  va 2s. co  m*/
 
-        ResType draw = ResourcesToolForPlugin.getIconBySourceType(resourceType);
-        Field[] drawableItems;
+        val draw = getIconBySourceType(resourceType)
+        val drawableItems: Array<Field>
         try {
-
             //Всегда ClassNotFoundException
             // Context appContext = context.createPackageContext(packageName,0);
 
-            Context appContext = context.createPackageContext(packageName,
-                    Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY
-            );
+            val appContext = context.createPackageContext(
+                packageName,
+                Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
+            )
             //drawableItems = Class.forName(packageName + ".R$drawable", true, appContext.getClassLoader()).getFields();
-            drawableItems = Class.forName(packageName + ".R$" + resourceType, true, appContext.getClassLoader()).getFields();
-
-        } catch (ClassNotFoundException e) {
-            mView.showError("@ww@" + e.toString());
-            return;
-        } catch (Exception e) {
-            DLog.d("@ww@" + e.toString());
-            return;
+            drawableItems =
+                Class.forName("$packageName.R$$resourceType", true, appContext.classLoader).fields
+        } catch (e: ClassNotFoundException) {
+            mView.showError("@ww@$e")
+            return
+        } catch (e: Exception) {
+            d("@ww@$e")
+            return
         }
-        for (Field f : drawableItems) {
-            String name = f.getName();
-            String icon = name.toLowerCase();
-            name = name.replaceAll("_", ".");
-            String stringValue = "";
-            int stringId = getResourceId(icon, resourceType);
+        for (f in drawableItems) {
+            var name = f.name
+            val icon = name.lowercase(Locale.getDefault())
+            name = name.replace("_".toRegex(), ".")
+            var stringValue = ""
+            val stringId = getResourceId(icon, resourceType)
             if (stringId > 0) {
-                try {
-                    stringValue = mResources.getString(stringId);
-                } catch (Resources.NotFoundException e) {
-                    stringValue = "Resources.NotFoundException " + stringId;
+                stringValue = try {
+                    mResources!!.getString(stringId)
+                } catch (e: Resources.NotFoundException) {
+                    "Resources.NotFoundException $stringId"
                 }
             }
 
             //iconPackResources.add(new ResItem(name + " " + icon + " " + stringValue, null));
             //@@iconPackResources.add(new StringItem(icon, stringValue, null));
-
-            int activityIndex = name.lastIndexOf(".");
-            if (activityIndex <= 0 || activityIndex == name.length() - 1) {
-                continue;
+            val activityIndex = name.lastIndexOf(".")
+            if (activityIndex <= 0 || activityIndex == name.length - 1) {
+                continue
             }
 
-            String iconPackage = name.substring(0, activityIndex);
+            val iconPackage = name.substring(0, activityIndex)
             if (TextUtils.isEmpty(iconPackage)) {
-                continue;
+                continue
             }
+
             //iconPackResources.add(new ResItem(iconPackage + " " + icon, null));
             //@@iconPackResources.add(new StringItem(icon, stringValue, null));
-
-            String iconActivity = name.substring(activityIndex + 1);
+            val iconActivity = name.substring(activityIndex + 1)
             if (TextUtils.isEmpty(iconActivity)) {
-                continue;
+                continue
             }
             //iconPackResources.add(new ResItem(iconPackage + "." + iconActivity + " " + icon, null));
-            iconPackResources.add(new StringItemViewModel(icon, stringValue, draw));
+            iconPackResources.add(StringItemViewModel(icon, stringValue, draw!!))
         }
     }
-
 }

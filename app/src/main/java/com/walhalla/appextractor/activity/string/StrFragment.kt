@@ -62,7 +62,7 @@ class StrFragment : BaseFragment(), MvpContract.View, ResourceAdapter.OnItemClic
         //TextView textView = findViewById(R.id.manifest_content);
         adapter!!.setOnItemClickListener(this)
         if (meta != null && savedInstanceState == null) {
-            presenter!!.loadManifestContent(meta!!.packageName, resourceType!!)
+            presenter!!.loadResourceContent(meta!!.packageName, resourceType!!)
         }
     }
 

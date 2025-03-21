@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import com.walhalla.appextractor.sdk.HeaderObject
 import com.walhalla.appextractor.sdk.ServiceLine
 import com.walhalla.appextractor.utils.prettyFileSize
+import com.walhalla.compose.viewmodel.AppDetails
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +39,7 @@ fun AppDetailScreen(
     onBackClick: () -> Unit,
     viewModel: AppDetailViewModel = viewModel()
 ) {
-    val appDetails by viewModel.appDetails.collectAsState()
+    val appDetails : AppDetails? by viewModel.appDetails.collectAsState()
 
     LaunchedEffect(app) {
         viewModel.loadAppDetails(app)
@@ -72,228 +73,234 @@ fun AppDetailScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            item {
-                ExpandableCard(
-                    title = "Basic Information",
-                    icon = Icons.Default.Info,
-                    initiallyExpanded = true
-                ) {
-                    val x = prettyFileSize(app.fileSize)
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        DetailRow("Package Name", app.packageName)
-                        DetailRow("Version", "${app.versionName} (${app.versionCode})")
-                        DetailRow("Size", x)
-                        DetailRow("Install Date", formatDate(app.firstInstallTime))
-                        DetailRow("Last Update", formatDate(app.lastUpdateTime))
-                        DetailRow("System App", if (app.isSystemApp) "Yes" else "No")
-                    }
+//!!! androidx.compose.foundation.pager.HorizontalPager !!!!
+//!!!         InformationScreen(paddingValues, app, appDetails)
+    }
+}
+
+@Composable
+fun InformationScreen(paddingValues: PaddingValues, app: PackageMeta, appDetails: AppDetails?) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        item {
+            ExpandableCard(
+                title = "Basic Information",
+                icon = Icons.Default.Info,
+                initiallyExpanded = true
+            ) {
+                val x = prettyFileSize(app.fileSize)
+                Column(modifier = Modifier.padding(16.dp)) {
+                    DetailRow("Package Name", app.packageName)
+                    DetailRow("Version", "${app.versionName} (${app.versionCode})")
+                    DetailRow("Size", x)
+                    DetailRow("Install Date", formatDate(app.firstInstallTime))
+                    DetailRow("Last Update", formatDate(app.lastUpdateTime))
+                    DetailRow("System App", if (app.isSystemApp) "Yes" else "No")
                 }
             }
+        }
 
-            appDetails?.let { details ->
-                item {
-                    ExpandableCard(title = "Разрешения", icon = Icons.Default.Security, initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.permissions.forEach { (category, permissions) ->
-                                Card(
+        appDetails?.let { details ->
+            item {
+                ExpandableCard(title = "Разрешения", icon = Icons.Default.Security, initiallyExpanded = false
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        details.permissions.forEach { (category, permissions) ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = when (category.securityLevel) {
+                                        SecurityLevel.HIGH -> MaterialTheme.colorScheme.errorContainer
+                                        SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.secondaryContainer
+                                        SecurityLevel.LOW -> MaterialTheme.colorScheme.tertiaryContainer
+                                    }
+                                )
+                            ) {
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = when (category.securityLevel) {
-                                            SecurityLevel.HIGH -> MaterialTheme.colorScheme.errorContainer
-                                            SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.secondaryContainer
-                                            SecurityLevel.LOW -> MaterialTheme.colorScheme.tertiaryContainer
+                                        .padding(16.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = category.title,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = when (category.securityLevel) {
+                                                SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
+                                                SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
+                                                SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
+                                            }
+                                        )
+                                        Text(
+                                            text = "${permissions.size}",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = when (category.securityLevel) {
+                                                SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
+                                                SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
+                                                SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
+                                            }
+                                        )
+                                    }
+
+                                    Text(
+                                        text = category.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(vertical = 4.dp),
+                                        color = when (category.securityLevel) {
+                                            SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
+                                            SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
+                                            SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
                                         }
                                     )
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                text = category.title,
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = when (category.securityLevel) {
-                                                    SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
-                                                    SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
-                                                    SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
-                                                }
-                                            )
-                                            Text(
-                                                text = "${permissions.size}",
-                                                style = MaterialTheme.typography.labelMedium,
-                                                color = when (category.securityLevel) {
-                                                    SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
-                                                    SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
-                                                    SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
-                                                }
-                                            )
+
+                                    Text(
+                                        text = "Уровень безопасности: ${category.securityLevel.title}",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        modifier = Modifier.padding(bottom = 8.dp),
+                                        color = when (category.securityLevel) {
+                                            SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
+                                            SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
+                                            SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
                                         }
+                                    )
 
-                                        Text(
-                                            text = category.description,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.padding(vertical = 4.dp),
-                                            color = when (category.securityLevel) {
-                                                SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
-                                                SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
-                                                SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
-                                            }
-                                        )
-
-                                        Text(
-                                            text = "Уровень безопасности: ${category.securityLevel.title}",
-                                            style = MaterialTheme.typography.labelMedium,
-                                            modifier = Modifier.padding(bottom = 8.dp),
-                                            color = when (category.securityLevel) {
-                                                SecurityLevel.HIGH -> MaterialTheme.colorScheme.onErrorContainer
-                                                SecurityLevel.MEDIUM -> MaterialTheme.colorScheme.onSecondaryContainer
-                                                SecurityLevel.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
-                                            }
-                                        )
-
-                                        permissions.forEach { permission ->
-                                            Card(
+                                    permissions.forEach { permission ->
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.surface
+                                            )
+                                        ) {
+                                            Column(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(vertical = 4.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surface
-                                                )
+                                                    .padding(12.dp)
                                             ) {
-                                                Column(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .padding(12.dp)
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                                 ) {
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = when (category) {
+                                                    Icon(
+                                                        imageVector = when (category) {
 
 
-                                                                PermissionCategory.PERSONAL_DATA -> Icons.Default.Person
-                                                                PermissionCategory.LOCATION -> Icons.Default.LocationOn
-                                                                PermissionCategory.STORAGE -> Icons.Default.Storage
-                                                                PermissionCategory.CAMERA_MIC -> Icons.Default.PhotoCamera
-                                                                PermissionCategory.PHONE -> Icons.Default.Phone
-                                                                PermissionCategory.NETWORK -> Icons.Default.Wifi
-                                                                PermissionCategory.BLUETOOTH -> Icons.Default.Bluetooth
-                                                                PermissionCategory.NOTIFICATIONS -> Icons.Default.Notifications
-                                                                PermissionCategory.SYSTEM -> Icons.Default.Settings
-                                                                PermissionCategory.OTHER -> Icons.Default.Info
+                                                            PermissionCategory.PERSONAL_DATA -> Icons.Default.Person
+                                                            PermissionCategory.LOCATION -> Icons.Default.LocationOn
+                                                            PermissionCategory.STORAGE -> Icons.Default.Storage
+                                                            PermissionCategory.CAMERA_MIC -> Icons.Default.PhotoCamera
+                                                            PermissionCategory.PHONE -> Icons.Default.Phone
+                                                            PermissionCategory.NETWORK -> Icons.Default.Wifi
+                                                            PermissionCategory.BLUETOOTH -> Icons.Default.Bluetooth
+                                                            PermissionCategory.NOTIFICATIONS -> Icons.Default.Notifications
+                                                            PermissionCategory.SYSTEM -> Icons.Default.Settings
+                                                            PermissionCategory.OTHER -> Icons.Default.Info
 
-                                                            },
-                                                            contentDescription = null,
-                                                            tint = MaterialTheme.colorScheme.primary
+                                                        },
+                                                        contentDescription = null,
+                                                        tint = MaterialTheme.colorScheme.primary
+                                                    )
+
+                                                    Column {
+                                                        Text(
+                                                            text = permission.simpleName,
+                                                            style = MaterialTheme.typography.titleSmall
                                                         )
-                                                        
-                                                        Column {
-                                                            Text(
-                                                                text = permission.simpleName,
-                                                                style = MaterialTheme.typography.titleSmall
+                                                        Row(
+                                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = if (permission.isGranted)
+                                                                    Icons.Default.CheckCircle
+                                                                else
+                                                                    Icons.Default.Cancel,
+                                                                contentDescription = null,
+                                                                modifier = Modifier.size(16.dp),
+                                                                tint = if (permission.isGranted)
+                                                                    MaterialTheme.colorScheme.primary
+                                                                else
+                                                                    MaterialTheme.colorScheme.error
                                                             )
-                                                            Row(
-                                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                                verticalAlignment = Alignment.CenterVertically
-                                                            ) {
-                                                                Icon(
-                                                                    imageVector = if (permission.isGranted) 
-                                                                        Icons.Default.CheckCircle 
-                                                                    else 
-                                                                        Icons.Default.Cancel,
-                                                                    contentDescription = null,
-                                                                    modifier = Modifier.size(16.dp),
-                                                                    tint = if (permission.isGranted)
-                                                                        MaterialTheme.colorScheme.primary
-                                                                    else
-                                                                        MaterialTheme.colorScheme.error
-                                                                )
-                                                                
-                                                                val context = LocalContext.current
-                                                                Icon(
-                                                                    imageVector = if (permission.isGranted) 
-                                                                        Icons.Default.LockOpen
-                                                                    else 
-                                                                        Icons.Default.Lock,
-                                                                    contentDescription = "Protection Level",
-                                                                    modifier = Modifier
-                                                                        .size(16.dp)
-                                                                        .clickable {
-                                                                            Toast.makeText(
-                                                                                context,
-                                                                                """
+
+                                                            val context = LocalContext.current
+                                                            Icon(
+                                                                imageVector = if (permission.isGranted)
+                                                                    Icons.Default.LockOpen
+                                                                else
+                                                                    Icons.Default.Lock,
+                                                                contentDescription = "Protection Level",
+                                                                modifier = Modifier
+                                                                    .size(16.dp)
+                                                                    .clickable {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            """
                                                                                 Is Permission Granted? ${permission.isGranted}
                                                                                 Permission ProtectionLevel: ${permission.protectionLevel}
                                                                                 """.trimIndent(),
-                                                                                Toast.LENGTH_LONG
-                                                                            ).show()
-                                                                        },
-                                                                    tint = when (permission.protectionLevel) {
-                                                                        PermissionInfo.PROTECTION_DANGEROUS -> MaterialTheme.colorScheme.error
-                                                                        PermissionInfo.PROTECTION_SIGNATURE -> MaterialTheme.colorScheme.primary
-                                                                        else -> MaterialTheme.colorScheme.secondary
-                                                                    }
-                                                                )
-                                                                
-                                                                Text(
-                                                                    text = PermissionUtils.protectionLevelToString(permission.protectionLevel),
-                                                                    style = MaterialTheme.typography.labelSmall,
-                                                                    color = MaterialTheme.colorScheme.primary
-                                                                )
-                                                            }
+                                                                            Toast.LENGTH_LONG
+                                                                        ).show()
+                                                                    },
+                                                                tint = when (permission.protectionLevel) {
+                                                                    PermissionInfo.PROTECTION_DANGEROUS -> MaterialTheme.colorScheme.error
+                                                                    PermissionInfo.PROTECTION_SIGNATURE -> MaterialTheme.colorScheme.primary
+                                                                    else -> MaterialTheme.colorScheme.secondary
+                                                                }
+                                                            )
+
+                                                            Text(
+                                                                text = PermissionUtils.protectionLevelToString(permission.protectionLevel),
+                                                                style = MaterialTheme.typography.labelSmall,
+                                                                color = MaterialTheme.colorScheme.primary
+                                                            )
                                                         }
                                                     }
+                                                }
 
-                                                    if (permission.description.isNotBlank()) {
-                                                        Text(
-                                                            text = permission.description,
-                                                            style = MaterialTheme.typography.bodySmall,
-                                                            modifier = Modifier.padding(start = 32.dp, top = 4.dp)
-                                                        )
-                                                    }
+                                                if (permission.description.isNotBlank()) {
+                                                    Text(
+                                                        text = permission.description,
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        modifier = Modifier.padding(start = 32.dp, top = 4.dp)
+                                                    )
+                                                }
 
-                                                    Card(
+                                                Card(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(start = 32.dp, top = 8.dp),
+                                                    colors = CardDefaults.cardColors(
+                                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                                    )
+                                                ) {
+                                                    Row(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
-                                                            .padding(start = 32.dp, top = 8.dp),
-                                                        colors = CardDefaults.cardColors(
-                                                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                                        )
+                                                            .padding(8.dp),
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                                                     ) {
-                                                        Row(
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .padding(8.dp),
-                                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                                        ) {
-                                                            Icon(
-                                                                imageVector = Icons.Default.Info,
-                                                                contentDescription = null,
-                                                                tint = MaterialTheme.colorScheme.primary,
-                                                                modifier = Modifier.size(16.dp)
-                                                            )
-                                                            Text(
-                                                                text = permission.recommendation,
-                                                                style = MaterialTheme.typography.bodySmall,
-                                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                            )
-                                                        }
+                                                        Icon(
+                                                            imageVector = Icons.Default.Info,
+                                                            contentDescription = null,
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                            modifier = Modifier.size(16.dp)
+                                                        )
+                                                        Text(
+                                                            text = permission.recommendation,
+                                                            style = MaterialTheme.typography.bodySmall,
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
                                                     }
                                                 }
                                             }
@@ -304,38 +311,39 @@ fun AppDetailScreen(
                         }
                     }
                 }
+            }
 
-                item {
-                    ExpandableCard(
-                        title = "Activities (${details.activities.size})",
-                        icon = Icons.Default.Apps,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.activities.forEach { activity ->
-                                DetailRow(
-                                    activity.name.substringAfterLast('.'),
-                                    if (activity.exported) "Exported" else "Not exported"
-                                )
-                            }
+            item {
+                ExpandableCard(
+                    title = "Activities (${details.activities.size})",
+                    icon = Icons.Default.Apps,
+                    initiallyExpanded = false
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        details.activities.forEach { activity ->
+                            DetailRow(
+                                activity.name.substringAfterLast('.'),
+                                if (activity.exported) "Exported" else "Not exported"
+                            )
                         }
                     }
                 }
+            }
 
-                item {
-                    ExpandableCard(
-                        title = "Services (${details.services.size})",
-                        icon = Icons.Default.Build,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.services.forEach { service ->
-                                if(service is ServiceLine){
-                                    DetailRow(
-                                        service.label.substringAfterLast('.'),
-                                        if (service.exported) "Exported" else "Not exported"
-                                    )
-                                }else
+            item {
+                ExpandableCard(
+                    title = "Services (${details.services.size})",
+                    icon = Icons.Default.Build,
+                    initiallyExpanded = false
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        details.services.forEach { service ->
+                            if(service is ServiceLine){
+                                DetailRow(
+                                    service.label.substringAfterLast('.'),
+                                    if (service.exported) "Exported" else "Not exported"
+                                )
+                            }else
                                 if(service is HeaderObject){
                                     Row(
                                         modifier = Modifier
@@ -359,41 +367,40 @@ fun AppDetailScreen(
                                     }
                                 }
 
-                            }
                         }
                     }
                 }
+            }
 
-                item {
-                    ExpandableCard(
-                        title = "Receivers (${details.receivers.size})",
-                        icon = Icons.Default.BroadcastOnPersonal,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.receivers.forEach { receiver ->
-                                DetailRow(
-                                    receiver.name.substringAfterLast('.'),
-                                    if (receiver.exported) "Exported" else "Not exported"
-                                )
-                            }
+            item {
+                ExpandableCard(
+                    title = "Receivers (${details.receivers.size})",
+                    icon = Icons.Default.BroadcastOnPersonal,
+                    initiallyExpanded = false
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        details.receivers.forEach { receiver ->
+                            DetailRow(
+                                receiver.name.substringAfterLast('.'),
+                                if (receiver.exported) "Exported" else "Not exported"
+                            )
                         }
                     }
                 }
+            }
 
-                item {
-                    ExpandableCard(
-                        title = "Providers (${details.providers.size})",
-                        icon = Icons.Default.Storage,
-                        initiallyExpanded = false
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            details.providers.forEach { provider ->
-                                DetailRow(
-                                    provider.name.substringAfterLast('.'),
-                                    if (provider.exported) "Exported" else "Not exported"
-                                )
-                            }
+            item {
+                ExpandableCard(
+                    title = "Providers (${details.providers.size})",
+                    icon = Icons.Default.Storage,
+                    initiallyExpanded = false
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        details.providers.forEach { provider ->
+                            DetailRow(
+                                provider.name.substringAfterLast('.'),
+                                if (provider.exported) "Exported" else "Not exported"
+                            )
                         }
                     }
                 }

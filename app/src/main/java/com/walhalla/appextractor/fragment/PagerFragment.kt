@@ -1,99 +1,69 @@
-package com.walhalla.appextractor.fragment;
+package com.walhalla.appextractor.fragment
 
-import static androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener
+import com.google.android.material.tabs.TabLayout
+import com.walhalla.appextractor.MetaFragment
+import com.walhalla.appextractor.R
+import com.walhalla.appextractor.activity.resources.p001.AssetsFragment
+import com.walhalla.appextractor.activity.string.StrFragment.Companion.newInstance
+import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 
-import android.annotation.SuppressLint;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+class PagerFragment : BaseFragment(), View.OnClickListener {
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+    private var meta: PackageMeta? = null
 
-import com.google.android.material.tabs.TabLayout;
-import com.walhalla.appextractor.MetaFragment;
-import com.walhalla.appextractor.R;
-import com.walhalla.appextractor.activity.resources.p001.AssetsFragment;
-import com.walhalla.appextractor.sdk.ResourcesToolForPlugin;
-import com.walhalla.appextractor.activity.string.StrFragment;
-import com.walhalla.appextractor.model.PackageMeta;
+    private var p: BaseFragment? = null
 
-import java.util.ArrayList;
-
-
-public class PagerFragment extends BaseFragment
-        implements View.OnClickListener {
-
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-
-    private static final String ARG_PARAM1 = "param1";
-
-    private PackageMeta meta;
-
-    private BaseFragment p;
-
-    public PagerFragment() {
-        // Required empty public constructor
-    }
-
-    public static PagerFragment newInstance(PackageMeta meta) {
-        PagerFragment fragment = new PagerFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, meta);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            meta = getArguments().getParcelable(ARG_PARAM1);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (arguments != null) {
+            meta = requireArguments().getParcelable(ARG_PARAM1)
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_viwpager, container, false);
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_viwpager, container, false)
     }
 
-    @Override
-    public void fab() {
-
+    override fun fab() {
     }
 
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         //FloatingActionButton fab = getActivity().findViewById(R.id.fab);
         //fab.setOnClickListener(this);
-
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        val actionBar = (activity as AppCompatActivity).supportActionBar
         if (actionBar != null) {
             //actionBar.setSubtitle(R.string.app_description);
         }
 
-        viewPager = view.findViewById(R.id.view_pager);
-        ViewpagerAdapter adapter = new ViewpagerAdapter(getChildFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPager = view.findViewById(R.id.view_pager)
+        val adapter = ViewpagerAdapter(
+            childFragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+        )
+
         //adapter.addFragment(new FirstFragment(), "auth");
         //adapter.addFragment(new DemoFragment(), "demo");
+        adapter.addFragment(FR0.newInstance(meta), "INFO")
+        adapter.addFragment(MetaFragment.newInstance(meta), "META")
 
-        adapter.addFragment(FR0.newInstance(meta), "INFO");
-        adapter.addFragment(MetaFragment.newInstance(meta), "META");
-
-//        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIM), "anim");
+        //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIM), "anim");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIMATOR), "animator");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ARRAY), "array");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ATTR), "attr");
@@ -107,62 +77,58 @@ public class PagerFragment extends BaseFragment
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.LAYOUT), "layout");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.MENU), "menu");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.RAW), "raw");
-        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STRING), "string");
-//        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STYLE), "style");
+        adapter.addFragment(newInstance(meta, ResourcesToolForPlugin.STRING), "string")
+        //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STYLE), "style");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STYLEABLE), "styleable");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.TRANSITION), "transition");
-        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.XML), "xml");
+        adapter.addFragment(newInstance(meta, ResourcesToolForPlugin.XML), "xml")
 
 
 
 
-        adapter.addFragment(AssetsFragment.newInstance(meta), "Assets");
+        adapter.addFragment(AssetsFragment.newInstance(meta), "Assets")
 
         //adapter.addFragment(new GalleryFragment(), getString(R.string.abc_tab_gallery));
         //adapter.addFragment(CollageFragment.newInstance("", ""), "Collage");
         //bb
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+        viewPager.setAdapter(adapter)
+        viewPager.addOnPageChangeListener(object : OnPageChangeListener {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
             }
 
-            @Override
-            public void onPageSelected(int position) {
-                Fragment tmp = adapter.getItem(position);
+            override fun onPageSelected(position: Int) {
+                val tmp = adapter.getItem(position)
                 //if (tmp instanceof BaseFragment && position > 0) {
-                p = (BaseFragment) tmp;
+                p = tmp as BaseFragment
                 //}
                 //DLog.d(fragment.getClass().getSimpleName());
             }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+            override fun onPageScrollStateChanged(state: Int) {
             }
-        });
-        tabLayout = getActivity().findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(viewPager);
+        })
+        tabLayout = requireActivity().findViewById(R.id.tabLayout)
+        tabLayout.setupWithViewPager(viewPager)
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    override fun onResume() {
+        super.onResume()
     }
 
     @SuppressLint("NonConstantResourceId")
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.fab) {
+    override fun onClick(v: View) {
+        if (v.id == R.id.fab) {
             if (p == null) {
-                p = (BaseFragment) getChildFragmentManager().getFragments().get(0);
+                p = childFragmentManager.fragments[0] as BaseFragment
             }
 
-            p.fab();
+            p!!.fab()
 
-//                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+            //                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 //            TweetComposer.Builder builder = new TweetComposer.Builder(this)
 //                    .text("Just setting up my Fabric!");
@@ -181,25 +147,15 @@ public class PagerFragment extends BaseFragment
     }
 
 
+    private class ViewpagerAdapter(private val fm: FragmentManager, behavior: Int) :
+        FragmentPagerAdapter(fm, behavior) {
+        private val mFragmentList = ArrayList<BaseFragment>()
+        private val mFragmentTitleList = ArrayList<String>()
 
 
-    private final static class ViewpagerAdapter extends FragmentPagerAdapter {
-
-        private final FragmentManager fm;
-        private final ArrayList<BaseFragment> mFragmentList = new ArrayList<>();
-        private final ArrayList<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewpagerAdapter(@NonNull FragmentManager fm, int behavior) {
-            super(fm, behavior);
-            this.fm = fm;
-        }
-
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-//            viewPager!!.currentItem;
+        override fun getItem(position: Int): Fragment {
+            return mFragmentList[position]
+            //            viewPager!!.currentItem;
 //            return when(position){
 //
 //                0-> download();
@@ -208,27 +164,36 @@ public class PagerFragment extends BaseFragment
 //            }
         }
 
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
+        override fun getCount(): Int {
+            return mFragmentList.size
         }
 
-        public void addFragment(BaseFragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
+        fun addFragment(fragment: BaseFragment, title: String) {
+            mFragmentList.add(fragment)
+            mFragmentTitleList.add(title)
         }
 
-        @Override
-        public String getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
+        override fun getPageTitle(position: Int): String? {
+            return mFragmentTitleList[position]
         }
 
-        @Override
-        public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
 //        if (getItem(position) != object) {
 //            DLog.d("22222222222" + getItem(position).getClass().getSimpleName());
 //        }
-            super.setPrimaryItem(container, position, object);
+            super.setPrimaryItem(container, position, `object`)
+        }
+    }
+
+    companion object {
+        private const val ARG_PARAM1 = "param1"
+
+        fun newInstance(meta: PackageMeta?): PagerFragment {
+            val fragment = PagerFragment()
+            val args = Bundle()
+            args.putParcelable(ARG_PARAM1, meta)
+            fragment.arguments = args
+            return fragment
         }
     }
 }

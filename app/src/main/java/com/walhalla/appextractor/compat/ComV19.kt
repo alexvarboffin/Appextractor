@@ -1,21 +1,19 @@
-package com.walhalla.appextractor.compat;
+package com.walhalla.appextractor.compat
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.os.Build
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.content.ContextCompat;
-
-public class ComV19 {
-    public static Drawable getDrawable(Context context, int res) {
-        Drawable draw;
-        if (Build.VERSION.SDK_INT > 19) {
-            draw = ContextCompat.getDrawable(context, res);
+object ComV19 {
+    fun getDrawable(context: Context, res: Int): Drawable? {
+        val draw = if (Build.VERSION.SDK_INT > 19) {
+            ContextCompat.getDrawable(context, res)
         } else {
             //Вектор падает на 4.4 sdk 19
-            draw = AppCompatResources.getDrawable(context, res);
+            AppCompatResources.getDrawable(context, res)
         }
-        return draw;
+        return draw
     }
 }
