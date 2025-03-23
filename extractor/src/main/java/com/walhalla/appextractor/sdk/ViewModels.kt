@@ -29,8 +29,7 @@ class FlagzObject(val flags: Int) : BaseViewModel {
     override fun toString(): String = "FlagzObject(flags=$flags)"
 }
 
-class InfoApkLine(val name: String, val value: String, @param:DrawableRes val icon: Int) :
-    BaseViewModel
+class InfoApkLine(val name: String, val value: String, @param:DrawableRes val icon: Int) : BaseViewModel
 
 class ProviderLine(
     val icon: Drawable?, val label: String, val class_name: String,

@@ -22,7 +22,7 @@
             android:adjustViewBounds="true"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
             android:contentDescription="@string/app_name"
             android:gravity="center|center_vertical"
             android:padding="4dp"
