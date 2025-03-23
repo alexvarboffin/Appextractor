@@ -10,8 +10,8 @@ import com.walhalla.appextractor.model.PackageMeta
 class ResourcesActivity : AppCompatActivity(), QCallback {
     private var meta: PackageMeta? = null
 
-    public override fun onCreate(bundle: Bundle?) {
-        super.onCreate(bundle)
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_assets_resources)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -31,9 +31,11 @@ class ResourcesActivity : AppCompatActivity(), QCallback {
             meta = intent.getParcelableExtra(KEY_OBJ_NAME)
         }
 
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container, ResourcesPagerFragment.newInstance(meta))
-            .commit()
+        meta?.let {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.container, ResourcesPagerFragment.newInstance(it))
+                .commit()
+        }
     }
 
 

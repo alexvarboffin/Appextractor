@@ -75,7 +75,7 @@ class ResourcesPagerFragment : BaseFragment(), android.view.View.OnClickListener
             }
 
             override fun onPageSelected(position: kotlin.Int) {
-                val tmp: androidx.fragment.app.Fragment? = adapter.getItem(position)
+                val tmp: androidx.fragment.app.Fragment = adapter.getItem(position)
                 //if (tmp instanceof BaseFragment && position > 0) {
                 p = tmp as BaseFragment
                 //}
@@ -169,10 +169,10 @@ class ResourcesPagerFragment : BaseFragment(), android.view.View.OnClickListener
     companion object {
         private const val ARG_PARAM1: kotlin.String = "param1"
 
-        fun newInstance(meta: PackageMeta?): ResourcesPagerFragment {
+        fun newInstance(meta: PackageMeta): ResourcesPagerFragment {
             val fragment: ResourcesPagerFragment = ResourcesPagerFragment()
             val args: android.os.Bundle = android.os.Bundle()
-            args.putParcelable(ResourcesPagerFragment.Companion.ARG_PARAM1, meta)
+            args.putParcelable(ARG_PARAM1, meta)
             fragment.setArguments(args)
             return fragment
         }

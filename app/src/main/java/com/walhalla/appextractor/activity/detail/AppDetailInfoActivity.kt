@@ -19,7 +19,7 @@ import com.walhalla.appextractor.activity.BaseActivity
 import com.walhalla.appextractor.activity.debug.DemoData
 import com.walhalla.appextractor.activity.manifest.ManifestActivity
 import com.walhalla.appextractor.databinding.ActivityAppDetailInfo0Binding
-import com.walhalla.appextractor.fragment.PagerFragment
+import com.walhalla.appextractor.fragment.ResourcePagerFragment
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.ui.DLog.d
 
@@ -116,7 +116,7 @@ class AppDetailInfoActivity : BaseActivity(), DetailContract.View {
 
         presenter = DetailPresenter(this, meta!!, this)
         supportFragmentManager.beginTransaction()
-            .add(R.id.container, PagerFragment.newInstance(meta))
+            .add(R.id.container, ResourcePagerFragment.newInstance(meta))
             .commit()
 
 

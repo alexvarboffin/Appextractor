@@ -19,7 +19,7 @@ import com.walhalla.appextractor.activity.string.StrFragment.Companion.newInstan
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 
-class PagerFragment : BaseFragment(), View.OnClickListener {
+class ResourcePagerFragment : BaseFragment(), View.OnClickListener {
 
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
@@ -63,7 +63,7 @@ class PagerFragment : BaseFragment(), View.OnClickListener {
         adapter.addFragment(FR0.newInstance(meta), "INFO")
         adapter.addFragment(MetaFragment.newInstance(meta), "META")
 
-        //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIM), "anim");
+//        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIM), "anim");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIMATOR), "animator");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ARRAY), "array");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ATTR), "attr");
@@ -188,8 +188,8 @@ class PagerFragment : BaseFragment(), View.OnClickListener {
     companion object {
         private const val ARG_PARAM1 = "param1"
 
-        fun newInstance(meta: PackageMeta?): PagerFragment {
-            val fragment = PagerFragment()
+        fun newInstance(meta: PackageMeta?): ResourcePagerFragment {
+            val fragment = ResourcePagerFragment()
             val args = Bundle()
             args.putParcelable(ARG_PARAM1, meta)
             fragment.arguments = args
