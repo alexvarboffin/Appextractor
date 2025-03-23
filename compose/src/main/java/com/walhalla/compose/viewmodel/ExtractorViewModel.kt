@@ -27,12 +27,15 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import androidx.core.net.toUri
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.walhalla.appextractor.utils.ExtractorUtils
 import com.walhalla.appextractor.utils.FileUtil
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.ui.res.stringResource
+import com.walhalla.compose.R
+import com.walhalla.ui.plugins.Launcher
+import com.walhalla.ui.plugins.Module_U
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     private val _apps = MutableStateFlow<List<PackageMeta>>(emptyList())
@@ -55,6 +58,9 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _selectedApps = MutableStateFlow<Set<PackageMeta>>(emptySet())
     val selectedApps: StateFlow<Set<PackageMeta>> = _selectedApps.asStateFlow()
+
+    private val _showAboutDialog = MutableStateFlow(false)
+    val showAboutDialog: StateFlow<Boolean> = _showAboutDialog.asStateFlow()
 
     init {
         loadInstalledApps()
@@ -386,5 +392,80 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         return _apps.value.find { it.packageName == packageName }
     }
 
+    fun shareApp() {
+        val context = getApplication<Application>()
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, context.getString(com.walhalla.extractor.R.string.app_name))
+            putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${context.packageName}")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(Intent.createChooser(intent, context.getString(com.walhalla.extractor.R.string.action_share_app)))
+    }
 
+    fun discoverMoreApps() {
+        val context = getApplication<Application>()
+        try {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("market://search?q=pub:${context.packageName}")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("https://play.google.com/store/apps/developer?id=${context.packageName}")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        }
+    }
+
+    fun rateApp() {
+        val context = getApplication<Application>()
+        try {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("market://details?id=${context.packageName}")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        }
+    }
+
+    fun showAbout() {
+        _showAboutDialog.value = true
+    }
+
+    fun hideAbout() {
+        _showAboutDialog.value = false
+    }
+
+    fun getAppVersion(): String {
+        return getApplication<Application>().packageManager.getPackageInfo(
+            getApplication<Application>().packageName, 0
+        ).versionName?:""
+    }
+
+    fun showPrivacyPolicy() {
+        val context = getApplication<Application>()
+        Launcher.openBrowser(context, context.getString(R.string.url_privacy_policy))
+    }
+
+    fun contactUs() {
+        val context = getApplication<Application>()
+        Module_U.feedback(context)
+    }
+
+    fun showAccessibility() {
+        val context = getApplication<Application>()
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }
 } 

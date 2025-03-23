@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">Compose</string>
+    <string name="app_name" translatable="false">ApkChief</string>
+    <string name="app_name_full" translatable="false">ApkChief</string>
+
     <string name="search">Search</string>
     <string name="sort">Sort</string>
     <string name="sort_by_name">Sort by name</string>

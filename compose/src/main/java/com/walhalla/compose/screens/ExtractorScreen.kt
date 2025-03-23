@@ -4,27 +4,35 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.SortByAlpha
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,7 +40,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -48,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.walhalla.compose.components.AppListItem
@@ -64,6 +72,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.ImeAction
+import com.walhalla.compose.R
 
 
 // Sort options
@@ -73,6 +82,139 @@ enum class SortOption {
     SIZE_ASC, SIZE_DESC,
     UPDATE_DATE_ASC, UPDATE_DATE_DESC,
     SYSTEM_FIRST, USER_FIRST
+}
+
+@Composable
+fun MainMenu(viewModel: ExtractorViewModel) {
+    var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Box {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = "More options"
+            )
+        }
+
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_share_app)) },
+                leadingIcon = { Icon(Icons.Default.Share, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.shareApp()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_discover_more_app)) },
+                leadingIcon = { Icon(Icons.Default.Apps, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.discoverMoreApps()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_rate_app)) },
+                leadingIcon = { Icon(Icons.Default.Star, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.rateApp()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_about)) },
+                leadingIcon = { Icon(Icons.Default.Info, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.showAbout()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_privacy_policy)) },
+                leadingIcon = { Icon(Icons.Default.Security, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.showPrivacyPolicy()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_contact_us)) },
+                leadingIcon = { Icon(Icons.Default.Feedback, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.contactUs()
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.action_accessibility)) },
+                leadingIcon = { Icon(Icons.Default.Accessibility, null) },
+                onClick = {
+                    showMenu = false
+                    viewModel.showAccessibility()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun AboutDialog(
+    onDismiss: () -> Unit,
+    appVersion: String
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = null,
+        text = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Android,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(48.dp)
+                )
+                
+                Column {
+                    Text(
+                        text = stringResource(R.string.app_name_full),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Text(
+                        text = stringResource(com.walhalla.extractor.R.string.about_version),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    
+                    Text(
+                        text = appVersion,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.ok))
+            }
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +235,7 @@ fun ExtractorScreen(
     var isSearchActive by remember { mutableStateOf(false) }
 
     val successMessage by viewModel.successMessage.collectAsState()
-
+    val showAboutDialog by viewModel.showAboutDialog.collectAsState()
 
     var currentSort by remember { mutableStateOf(SortOption.NAME_ASC) }
 
@@ -163,6 +305,13 @@ fun ExtractorScreen(
         )
     }
 
+    if (showAboutDialog) {
+        AboutDialog(
+            onDismiss = { viewModel.hideAbout() },
+            appVersion = viewModel.getAppVersion()
+        )
+    }
+
     val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -191,39 +340,23 @@ fun ExtractorScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        topBar = {
-
-
-            TopAppBar(
-                title = {
-                        //if (!isSearchActive) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
                         Text(stringResource(com.walhalla.extractor.R.string.app_name))
-                        //}
-                },
-                actions = {
+                    },
+                    actions = {
                         SortMenu(currentSort = {
                             currentSort = it
                         })
-                }
-            )
-        }
-    ) { paddingValues ->
+                        MainMenu(viewModel = viewModel)
+                    }
+                )
+            }
+        ) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues)
             ) {
-
-//                SearchBar(
-//                    query = searchQuery,
-//                    onQueryChange = { viewModel.setSearchQuery(it) },
-//                    onSearch = { isSearchActive = false },
-//                    active = isSearchActive,
-//                    onActiveChange = { isSearchActive = it },
-//                    placeholder = { Text(stringResource(com.walhalla.extractor.R.string.search_hint)) },
-//                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-//                    modifier = Modifier.animateContentSize()
-//                ) {
-//                    // Search suggestions will go here
-//                }
                 // Поисковая строка
                 OutlinedTextField(
                     value = searchQuery,
@@ -235,7 +368,6 @@ fun ExtractorScreen(
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     singleLine = true,
                     shape = MaterialTheme.shapes.medium,
-
 
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
@@ -250,8 +382,8 @@ fun ExtractorScreen(
 
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { /* Действие при нажатии на Done */ }),
+                )
 
-                    )
                 // Selection header
                 val currentSelectedSize = selectedApps.size
                 println("DEBUG: Current selected size: $currentSelectedSize")
@@ -368,16 +500,16 @@ fun ExtractorScreen(
                             }
                         }
                     }
-                            }
-                        }
-                    }
-
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        modifier = Modifier.align(Alignment.BottomCenter)
-                    )
                 }
             }
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
+    }
+}
 
 @Composable
 fun SortMenu(currentSort: (sort: SortOption) -> Unit) {
