@@ -15,7 +15,7 @@ import com.google.android.material.tabs.TabLayout
 import com.walhalla.appextractor.MetaFragment
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.resources.p001.AssetsFragment
-import com.walhalla.appextractor.activity.string.StrFragment.Companion.newInstance
+import com.walhalla.appextractor.activity.string.StrFragment
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 
@@ -60,7 +60,7 @@ class ResourcePagerFragment : BaseFragment(), View.OnClickListener {
 
         //adapter.addFragment(new FirstFragment(), "auth");
         //adapter.addFragment(new DemoFragment(), "demo");
-        adapter.addFragment(FR0.newInstance(meta), "INFO")
+        adapter.addFragment(InformationFragment.newInstance(meta), "INFO")
         adapter.addFragment(MetaFragment.newInstance(meta), "META")
 
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.ANIM), "anim");
@@ -77,11 +77,11 @@ class ResourcePagerFragment : BaseFragment(), View.OnClickListener {
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.LAYOUT), "layout");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.MENU), "menu");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.RAW), "raw");
-        adapter.addFragment(newInstance(meta, ResourcesToolForPlugin.STRING), "string")
+        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STRING), "string")
         //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STYLE), "style");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.STYLEABLE), "styleable");
 //        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.TRANSITION), "transition");
-        adapter.addFragment(newInstance(meta, ResourcesToolForPlugin.XML), "xml")
+        adapter.addFragment(StrFragment.newInstance(meta, ResourcesToolForPlugin.XML), "xml")
 
 
 

@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.compose.viewmodel.AppDetailViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,7 +30,7 @@ fun AppDetailScreen(
     onBackClick: () -> Unit,
     viewModel: AppDetailViewModel = viewModel()
 ) {
-    val appDetails : AppDetails? by viewModel.appDetails.collectAsState()
+    val appDetails by viewModel.appDetails.collectAsState()
 
     LaunchedEffect(app) {
         viewModel.loadAppDetails(app)
@@ -61,28 +64,39 @@ fun AppDetailScreen(
             )
         }
     ) { paddingValues ->
-//!!! androidx.compose.foundation.pager.HorizontalPager !!!!
-//!!!         InformationScreen(paddingValues, app, appDetails)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            var selectedTabIndex by remember { mutableStateOf(0) }
+            val tabs = listOf("INFO", "META", "STRING", "XML")
+
+            TabRow(selectedTabIndex = selectedTabIndex) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
+
+            HorizontalPager(
+                count = tabs.size,
+                state = rememberPagerState(initialPage = selectedTabIndex),
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> InformationScreen(paddingValues, app, appDetails)
+                    1 -> MetaScreen(app)
+                    2 -> StringScreen(app, ResourcesToolForPlugin.STRING)
+                    3 -> StringScreen(app, ResourcesToolForPlugin.XML)
+                }
+            }
+        }
     }
 }
 
 
 
-@Composable
-private fun ManifestTab(app: PackageMeta) {
-    ManifestScreen(
-        app = app,
-        onBackClick = { /* Ignore */ }
-    )
-}
-
-@Composable
-private fun ResourcesTab(app: PackageMeta) {
-    // TODO: Implement Resources tab
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Resources coming soon...")
-    }
-} 

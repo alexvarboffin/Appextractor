@@ -31,7 +31,7 @@ import com.walhalla.appextractor.utils.ShareUtils
 import com.walhalla.ui.plugins.Module_U
 import java.util.Locale
 
-class FR0 : BaseFragment(), DetailsF0.View {
+class InformationFragment : BaseFragment(), DetailsF0.View {
     private var meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta? = null
     private var mPresenter: F0Presenter? = null
 
@@ -156,8 +156,8 @@ class FR0 : BaseFragment(), DetailsF0.View {
     companion object {
         private const val ARG_PARAM1 = "param1"
         @JvmStatic
-        fun newInstance(meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta?): FR0 {
-            val fragment = FR0()
+        fun newInstance(meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta?): InformationFragment {
+            val fragment = InformationFragment()
             val args = Bundle()
             args.putParcelable(ARG_PARAM1, meta)
             fragment.arguments = args
