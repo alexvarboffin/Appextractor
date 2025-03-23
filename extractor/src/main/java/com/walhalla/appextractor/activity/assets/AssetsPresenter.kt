@@ -31,7 +31,7 @@ class AssetsPresenter(private val context: Context, private val view: MvpContrac
 
 
     fun configForPackage(packageName: String?): Boolean {
-        if (packageName == null || packageName == "") {
+        if (packageName.isNullOrBlank()) {
             //packageName = "com.zaimi.online.na.kartu.Buckridge";
             //packageName = "com.walhalla.appextractor";
         }
@@ -47,7 +47,7 @@ class AssetsPresenter(private val context: Context, private val view: MvpContrac
                 val list: MutableList<ResItem> = ArrayList()
                 treeViewer(am!!, list, "")
 
-                //                treeViewer(am, list, "dexopt");
+//                treeViewer(am, list, "dexopt");
 //                treeViewer(am, list, "images");
 //                treeViewer(am, list, "");
 //                treeViewer(am, list, "");
