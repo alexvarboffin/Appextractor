@@ -17,7 +17,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.walhalla.manifest.ManifestPresenterXml
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 import com.walhalla.appextractor.utils.NetworkUtils
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.e

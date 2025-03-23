@@ -1,6 +1,6 @@
 package com.walhalla.appextractor.adapter.viewholder
 
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 import com.walhalla.appextractor.databinding.ItemLoggerEmptyBinding
 
 class ResourceEmptyViewHolder(

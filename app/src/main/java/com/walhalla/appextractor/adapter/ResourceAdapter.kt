@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.walhalla.appextractor.BaseUtilsCallback
-import com.walhalla.appextractor.resources.ResItem.Companion.isXml
-import com.walhalla.appextractor.resources.ResType
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.ResItem.Companion.isXml
+import com.walhalla.appextractor.activity.assets.ResType
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 import com.walhalla.appextractor.adapter.viewholder.LogEmptyViewHolder
 import com.walhalla.appextractor.adapter.viewholder.ResourceEmptyViewHolder
 import com.walhalla.appextractor.adapter.viewholder.LogErrorViewHolder

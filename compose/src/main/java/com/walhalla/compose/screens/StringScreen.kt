@@ -12,13 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.walhalla.appextractor.activity.string.MvpContract
 import com.walhalla.appextractor.activity.string.StringsPresenter
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 
 @Composable
 fun StringScreen(app: PackageMeta, resourceType: String) {

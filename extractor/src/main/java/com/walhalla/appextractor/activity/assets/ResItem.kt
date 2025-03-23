@@ -1,4 +1,4 @@
-package com.walhalla.appextractor.resources
+package com.walhalla.appextractor.activity.assets
 
 import android.graphics.drawable.Drawable
 

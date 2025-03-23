@@ -1,4 +1,4 @@
-package com.walhalla.appextractor.resources
+package com.walhalla.appextractor.activity.assets
 
 open interface OnResourceItemClickListener {
     fun readAssetRequest(resource: ResItem)

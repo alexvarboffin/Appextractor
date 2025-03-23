@@ -4,7 +4,6 @@ import android.R
 import android.view.View
 import android.widget.TextView
 import com.walhalla.appextractor.model.ViewModel
-import com.walhalla.appextractor.resources.StringItemViewModel
 
 
 //class RecyclerViewSimpleTextViewHolder(view: View) : BaseVh<StringItemViewModel>(view) {

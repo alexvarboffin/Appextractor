@@ -1,10 +1,10 @@
-package com.walhalla.appextractor.resources
+package com.walhalla.appextractor.activity.assets
 
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 
-interface ManifestContract {
+interface MvpContract {
 
     interface View {
         fun showResourceRawText(resource: ResItem, content: String)
@@ -25,6 +25,6 @@ interface ManifestContract {
 
         fun readAssetRequest(context: Context, resource: ResItem)
 
-        fun zipAllAssetsRequest(activity: FragmentActivity, resource: ResItem)
+        fun zipAllAssetsRequest(activity: Context, resource: ResItem)
     }
 }

@@ -1,6 +1,6 @@
 package com.walhalla.appextractor.sdk
 
-import com.walhalla.appextractor.resources.ResType
+import com.walhalla.appextractor.activity.assets.ResType
 
 object ResourcesToolForPlugin {
     const val ANIM: String = "anim"

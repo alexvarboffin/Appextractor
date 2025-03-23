@@ -1,4 +1,4 @@
-package com.walhalla.appextractor.resources
+package com.walhalla.appextractor.activity.assets
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -10,7 +10,6 @@ import android.os.Environment
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.walhalla.abcsharedlib.Share
-import com.walhalla.appextractor.utils.IntentUtil.Companion.shareFile
 import com.walhalla.extractor.R
 
 import java.io.BufferedReader
@@ -24,8 +23,7 @@ import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class AssetsPresenter(private val context: Context, private val view: ManifestContract.View) :
-    ManifestContract.Presenter {
+class AssetsPresenter(private val context: Context, private val view: MvpContract.View) : MvpContract.Presenter {
     private var packageName: String? = null
     private var am: AssetManager? = null
     private var resources: Resources? = null
@@ -186,7 +184,7 @@ class AssetsPresenter(private val context: Context, private val view: ManifestCo
         }
     }
 
-    override fun zipAllAssetsRequest(activity: FragmentActivity, r0: ResItem) {
+    override fun zipAllAssetsRequest(activity: Context, r0: ResItem) {
         val name = "assets.zip" //+app_name
         val outputZipPath =
             File((Environment.getExternalStorageDirectory().absolutePath + "/Download/"), name)

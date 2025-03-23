@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -69,14 +70,19 @@ fun AppDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            var selectedTabIndex by remember { mutableStateOf(0) }
-            val tabs = listOf("INFO", "META", "STRING", "XML")
+            val pagerState = rememberPagerState(initialPage = 0)
+            val coroutineScope = rememberCoroutineScope()
+            val tabs = listOf("INFO", "META", "STRING", "XML", "ASSETS")
 
-            TabRow(selectedTabIndex = selectedTabIndex) {
+            TabRow(selectedTabIndex = pagerState.currentPage) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
                         text = { Text(title) }
                     )
                 }
@@ -84,7 +90,7 @@ fun AppDetailScreen(
 
             HorizontalPager(
                 count = tabs.size,
-                state = rememberPagerState(initialPage = selectedTabIndex),
+                state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
@@ -92,6 +98,7 @@ fun AppDetailScreen(
                     1 -> MetaScreen(app)
                     2 -> StringScreen(app, ResourcesToolForPlugin.STRING)
                     3 -> StringScreen(app, ResourcesToolForPlugin.XML)
+                    4 -> AssetsScreen(app)
                 }
             }
         }

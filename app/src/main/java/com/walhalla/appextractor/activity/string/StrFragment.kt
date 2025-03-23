@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.walhalla.appextractor.activity.manifest.ManifestActivity
-import com.walhalla.appextractor.resources.ResType
+import com.walhalla.appextractor.activity.assets.ResType
 import com.walhalla.appextractor.adapter.ResourceAdapter
 import com.walhalla.appextractor.databinding.TabStringsBinding
 import com.walhalla.appextractor.fragment.BaseFragment
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 
 class StrFragment : BaseFragment(), MvpContract.View, ResourceAdapter.OnItemClickListener {
     private var meta: PackageMeta? = null

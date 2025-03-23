@@ -1,7 +1,7 @@
 package com.walhalla.appextractor.activity.string
 
 import androidx.annotation.StringRes
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 
 interface MvpContract {
     interface View {

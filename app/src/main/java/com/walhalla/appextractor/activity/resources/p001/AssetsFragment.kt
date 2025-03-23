@@ -15,21 +15,21 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.walhalla.appextractor.activity.main.MainActivity
-import com.walhalla.appextractor.resources.ResItem
+import com.walhalla.appextractor.activity.assets.ResItem
 import com.walhalla.appextractor.activity.resources.ResourceAdapter
 import com.walhalla.appextractor.databinding.ActivityResourcesBinding
 import com.walhalla.appextractor.fragment.BaseFragment
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.resources.AssetsPresenter
-import com.walhalla.appextractor.resources.ManifestContract
-import com.walhalla.appextractor.resources.OnResourceItemClickListener
+import com.walhalla.appextractor.activity.assets.AssetsPresenter
+import com.walhalla.appextractor.activity.assets.MvpContract
+import com.walhalla.appextractor.activity.assets.OnResourceItemClickListener
 import com.walhalla.ui.DLog.d
 import es.dmoral.toasty.Toasty
 import java.util.Locale
 
-class AssetsFragment : BaseFragment(), ManifestContract.View, OnResourceItemClickListener {
+class AssetsFragment : BaseFragment(), MvpContract.View, OnResourceItemClickListener {
     private var adapter: ResourceAdapter? = null
-    private var presenter: ManifestContract.Presenter? = null
+    private var presenter: MvpContract.Presenter? = null
     private var meta: PackageMeta? = null
     private var binding: ActivityResourcesBinding? = null
 

@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.resources.ResourceAdapter.ResourceViewHolder
 import com.walhalla.appextractor.databinding.ItemResourceBinding
-import com.walhalla.appextractor.resources.OnResourceItemClickListener
-import com.walhalla.appextractor.resources.ResItem
-import com.walhalla.appextractor.resources.ResType
+import com.walhalla.appextractor.activity.assets.OnResourceItemClickListener
+import com.walhalla.appextractor.activity.assets.ResItem
+import com.walhalla.appextractor.activity.assets.ResType
 
 class ResourceAdapter(private val items: MutableList<ResItem>) : RecyclerView.Adapter<ResourceViewHolder>() {
 
-    private var mView: com.walhalla.appextractor.resources.OnResourceItemClickListener? = null
+    private var mView: OnResourceItemClickListener? = null
 
     fun setOnItemClickListener(listener: OnResourceItemClickListener?) {
         this.mView = listener

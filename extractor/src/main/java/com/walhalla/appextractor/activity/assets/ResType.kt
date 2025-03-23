@@ -1,4 +1,4 @@
-package com.walhalla.appextractor.resources
+package com.walhalla.appextractor.activity.assets
 
 import android.os.Parcelable
 import com.walhalla.appextractor.model.ViewModel

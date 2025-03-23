@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.content.res.Resources
 import android.text.TextUtils
-import com.walhalla.appextractor.resources.StringItemViewModel
+import com.walhalla.appextractor.activity.assets.StringItemViewModel
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin.getIconBySourceType
 import com.walhalla.ui.DLog.d
 import java.lang.reflect.Field
