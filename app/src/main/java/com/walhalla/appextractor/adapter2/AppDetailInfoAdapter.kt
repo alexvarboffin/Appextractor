@@ -341,7 +341,7 @@ class AppDetailInfoAdapter(
         }
         holder.binding.icon.setImageDrawable(`object`.icon)
         holder.binding.activityLabel.setText(`object`.label)
-        holder.binding.className.setText(`object`.class_name)
+        holder.binding.className.setText(`object`.className)
         holder.binding.authority.setText(`object`.authority)
 
         //this.text2.setBackgroundColor(Color.YELLOW);
@@ -358,7 +358,7 @@ class AppDetailInfoAdapter(
             holder.binding.authority.setTextColor(Color.DKGRAY)
         }
         holder.binding.className.setOnClickListener { v: View? ->
-            mView?.copyToBuffer(`object`.class_name)
+            mView?.copyToBuffer(`object`.className)
         }
         //                    h2.text2.setOnClickListener(v -> {
 //                        Toast.makeText(v.getContext(),
@@ -429,7 +429,7 @@ class AppDetailInfoAdapter(
                 val obj: ServiceLine = o as ServiceLine
                 h2.bind(obj, groupPosition)
                 h2.class_name.setOnClickListener(View.OnClickListener { v: View? ->
-                    mView?.copyToBuffer(obj.class_name)
+                    mView?.copyToBuffer(obj.className)
                 })
             } else if (o is PermissionLine) {
                 handlePerm(holder as PermissionViewHolder, o as PermissionLine, groupPosition)

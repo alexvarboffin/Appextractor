@@ -19,7 +19,7 @@ class SimpleViewHolder(view: View, private val presenter: AppDetailInfoAdapter) 
         if (position % 2 > 0) {
             layout.setBackgroundColor(Color.WHITE)
         }
-        text1.setText(o.res0)
+        text1.setText(o.name)
         text2.text = o.value
         btn.setOnClickListener { v: View? ->
             presenter.onItemClicked(v, o)

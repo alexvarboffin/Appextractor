@@ -27,13 +27,13 @@ class ServiceViewHolder(view: View, private val presenter: AppDetailInfoAdapter)
         }
         icon.setImageDrawable(`object`.icon)
         label.text = `object`.label
-        class_name.text = `object`.class_name
+        class_name.text = `object`.className
 
         //this.text2.setBackgroundColor(Color.YELLOW);
         if (`object`.exported) {
             launch.visibility = View.VISIBLE
             launch.setOnClickListener { v: View? ->
-                presenter.onLaunchService(`object`.class_name)
+                presenter.onLaunchService(`object`.className)
             }
         }
     }

@@ -74,7 +74,7 @@ fun AppDetailScreen(
             val coroutineScope = rememberCoroutineScope()
             val tabs = listOf("INFO", "META", "STRING", "XML", "ASSETS")
 
-            TabRow(selectedTabIndex = pagerState.currentPage) {
+            ScrollableTabRow(selectedTabIndex = pagerState.currentPage) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = pagerState.currentPage == index,
