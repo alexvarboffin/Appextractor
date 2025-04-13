@@ -15,7 +15,7 @@ private const val DEBUG = false
 
 private const val LOG_TAG = "StickyHeader"
 
-open class StickyHeader @JvmOverloads constructor(
+open class StickyHeader constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
