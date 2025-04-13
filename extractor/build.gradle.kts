@@ -62,5 +62,5 @@ dependencies {
     implementation(libs.dropbox.core.sdk)
     implementation(libs.okhttp)
     implementation(project(":shared"))
-    implementation("org.qiyi.video:neptune:2.7.0")
+    implementation(libs.neptune)
 }

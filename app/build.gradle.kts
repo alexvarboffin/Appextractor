@@ -208,7 +208,7 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk8)
 
     //implementation("com.github.iqiyi:Neptune:2.7.0")
-    implementation("org.qiyi.video:neptune:2.7.0")
+    implementation(libs.neptune)
 }
 
 //apply plugin: "com.getkeepsafe.dexcount"

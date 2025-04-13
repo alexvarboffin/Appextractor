@@ -39,6 +39,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.net.toUri
+import com.walhalla.appextractor.utils.FileUtil
+import java.io.File
 
 
 class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
@@ -225,14 +227,19 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         data.add(CertLine("DescriptionRes", "" + applicationInfo.descriptionRes))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            data.add(CertLine("AppComponentFactory", applicationInfo.appComponentFactory?:"None"))
+            data.add(CertLine("AppComponentFactory", applicationInfo.appComponentFactory ?: "None"))
         }
 
         applicationInfo.backupAgentName?.let {
             data.add(CertLine("BackupAgentName", it))
         }
 
-        data.add(CertLine("ManageSpaceActivityName", applicationInfo.manageSpaceActivityName?:"Unknown"))
+        data.add(
+            CertLine(
+                "ManageSpaceActivityName",
+                applicationInfo.manageSpaceActivityName ?: "Unknown"
+            )
+        )
         //
         data.add(CertLine("ProcessName", applicationInfo.processName))
 
@@ -252,10 +259,11 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
         val installerPackageName = packageManager.getInstallerPackageName(
             targetPackageInfo.packageName
-        )?: "Unknown"
+        ) ?: "Unknown"
         data.add(
             SimpleLine(
-                R.string.app_info_installation_source, "" + handleInstallSource(packageManager, installerPackageName)
+                R.string.app_info_installation_source,
+                "" + handleInstallSource(packageManager, installerPackageName)
             )
         )
 
@@ -513,14 +521,10 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         )
         data.add(SimpleLine(R.string.app_info_uid, "" + applicationInfo.uid))
 
-        data.add(
-            DirLine(
-                "NativeLibraryDir",
-                applicationInfo.nativeLibraryDir,
-                R.drawable.ic_folder_blue_36dp
-            )
-        )
 
+        //=================================================
+        prettyDir(applicationInfo.nativeLibraryDir, "NativeLibraryDir", data)
+        //=================================================
 
         val sourceDir = applicationInfo.sourceDir
         val extractedPackageName =
@@ -529,8 +533,9 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
         // Строим путь к папке данных приложения
         val dataDirPath = "/data/data/" + meta.packageName
-        data.add(InfoApkLine("dataDirPath", dataDirPath, R.drawable.ic_folder_blue_36dp))
-
+        //=================================================
+        prettyDir(dataDirPath, "dataDirPath", data)
+        //=================================================
 
         data.add(InfoApkLine("sourceDir", sourceDir, R.drawable.ic_folder_blue_36dp))
         data.add(
@@ -540,7 +545,12 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
                 R.drawable.ic_folder_blue_36dp
             )
         )
-        data.add(DirLine("dataDir", applicationInfo.dataDir, R.drawable.ic_folder_blue_36dp))
+
+        //=================================================
+        prettyDir(applicationInfo.dataDir, "dataDir", data)
+        //=================================================
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             data.add(
                 DirLine(
@@ -571,6 +581,41 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
 
         //Intent count0 = getPackageManager().getLaunchIntentForPackage_DEPRECATED(packageInfo.packageName);
+    }
+
+    private fun prettyDir(nativeLibraryDir: String, title: String, data: MutableList<BaseViewModel>) {
+        val m = File(nativeLibraryDir)
+        val files = m.listFiles()
+        if (files != null && files.size > 0) {
+            val hobject = HeaderCollapsedObject(
+                (
+                        "$title ${nativeLibraryDir}" + DEVIDER_START + files.size + DEVIDER_END),
+                R.drawable.ic_category_activity
+            )
+            files.forEach {
+                val x=File(m, it.name)
+                hobject.list.add(
+                    InfoApkLine(x.absolutePath, FileUtil.getFileSizeMegaBytes(x), R.drawable.ic_baseline_text_snippet_24)
+                )
+            }
+            data.add(hobject)
+        } else {
+            if(files==null){
+                data.add(
+                    DirLine(
+                        "$title ${nativeLibraryDir}", nativeLibraryDir,
+                        R.drawable.ic_folder_blue_36dp
+                    )
+                )
+            }else{
+                data.add(
+                    DirLine(
+                        "$title ${nativeLibraryDir}", files.contentToString(),
+                        R.drawable.ic_folder_blue_36dp
+                    )
+                )
+            }
+        }
     }
 
 
@@ -647,7 +692,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
             }
 
 
-            //            Log.d("Cache directory", cachePath);
+//            Log.d("Cache directory", cachePath);
 //            Log.d("Files directory", filesPath);
 //            Log.d("External files directory", externalFilesPath);
             val appBytes = stats.appBytes
@@ -893,7 +938,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
             activityLine.intentFilters = activity.intentFilters
             map[activity.className] = activityLine
         }
-        var arrayOfActivityInfos = targetPackageInfo?.activities?: emptyArray()
+        var arrayOfActivityInfos = targetPackageInfo?.activities ?: emptyArray()
         val actzz =
             if ((targetPackageInfo!!.activities == null)) 0 else arrayOfActivityInfos.size
         val app_info_activities = myActivityContext.getString(R.string.app_info_activities)
