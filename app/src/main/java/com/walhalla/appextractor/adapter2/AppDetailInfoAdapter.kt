@@ -218,8 +218,21 @@ class AppDetailInfoAdapter(
                 } else if (o is FlagzObject) {
                     handleFlags(holder as FlagViewHolder, o as FlagzObject, childPosition)
                 }
-
-                //                if (holder instanceof CertViewHolder) {
+                else if (o is InfoApkLine) {
+                    val h2: InfoApkHolder = (holder as InfoApkHolder)
+                    val obj: InfoApkLine = o as InfoApkLine
+                    h2.bind(obj, groupPosition)
+                    h2.binding.text2.setOnClickListener { v: View? ->
+                        mView?.copyToBuffer(obj.value)
+                    }
+                    h2.binding.overflowMenu.setOnClickListener { view: View ->
+                        showPopupMenu(
+                            view,
+                            obj
+                        )
+                    }
+                }
+//                if (holder instanceof CertViewHolder) {
 //                    holder.itemView.setBackgroundColor(Color.BLUE);
 //                } else if (holder instanceof SimpleViewHolder) {
 //                    holder.itemView.setBackgroundColor(Color.RED);
@@ -395,7 +408,9 @@ class AppDetailInfoAdapter(
                 h2.binding.text2.setOnClickListener(View.OnClickListener { v: View? ->
                     mView?.copyToBuffer(obj.value)
                 })
-            } else if (o is InfoApkLine) {
+            }
+
+            else if (o is InfoApkLine) {
                 val h2: InfoApkHolder = (holder as InfoApkHolder)
                 val obj: InfoApkLine = o as InfoApkLine
                 h2.bind(obj, groupPosition)
