@@ -328,7 +328,7 @@ class AppDetailInfoAdapter(
 
     private fun onLaunchReceiver(pkg: String, receiverName: String) {
         try {
-            DLog.d("@@$pkg $receiverName")
+            println("@@$pkg $receiverName")
 
             // Создаем Intent для вызова приемника
 //            Intent intent = new Intent();
@@ -353,9 +353,9 @@ class AppDetailInfoAdapter(
             holder.binding.lLayout1.setBackgroundColor(Color.WHITE)
         }
         holder.binding.icon.setImageDrawable(`object`.icon)
-        holder.binding.activityLabel.setText(`object`.label)
-        holder.binding.className.setText(`object`.className)
-        holder.binding.authority.setText(`object`.authority)
+        holder.binding.activityLabel.text = `object`.label
+        holder.binding.className.text = `object`.className
+        holder.binding.authority.text = `object`.authority
 
         //this.text2.setBackgroundColor(Color.YELLOW);
         if (`object`.exported) {
@@ -478,7 +478,7 @@ class AppDetailInfoAdapter(
         }
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             val itemId = menuItem.itemId
-            //                case R.id.action_save_icon:
+//                case R.id.action_save_icon:
 //                    if (mView != null) {
 //                        mView.saveIconRequest(resource);
 //                    }
@@ -626,29 +626,29 @@ class AppDetailInfoAdapter(
         return EMPTY_VIEW
     }
 
-    override fun onCreateGroupViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateGroupViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val v0: View
-        val inflater = LayoutInflater.from(parent.context)
+        val inflater = LayoutInflater.from(viewGroup.context)
         if (viewType == TYPE_SIMPLE) {
-            v0 = inflater.inflate(R.layout.item_line_simple, parent, false)
+            v0 = inflater.inflate(R.layout.item_line_simple, viewGroup, false)
             return SimpleViewHolder(v0, this)
         } else if (viewType == TYPE_PERMISSION) {
-            val binding = ItemLinePermissionBinding.inflate(inflater, parent, false)
+            val binding = ItemLinePermissionBinding.inflate(inflater, viewGroup, false)
             return PermissionViewHolder(binding, ap)
         } else if (viewType == TYPE_DIR) {
-            val binding0 = ItemDirBinding.inflate(inflater, parent, false)
+            val binding0 = ItemDirBinding.inflate(inflater, viewGroup, false)
             return DirViewHolder(binding0, this)
         } else if (viewType == TYPE_INFO_APK) {
-            val v0a = ItemInfoApkBinding.inflate(inflater, parent, false)
+            val v0a = ItemInfoApkBinding.inflate(inflater, viewGroup, false)
             return InfoApkHolder(v0a, this)
         } else if (viewType == TYPE_SERVICE) {
-            v0 = inflater.inflate(R.layout.item_service, parent, false)
+            v0 = inflater.inflate(R.layout.item_service, viewGroup, false)
             return ServiceViewHolder(v0, this)
         } else if (viewType == COLLAPSE_HEADER_ITEM) {
-            v0 = inflater.inflate(R.layout.item_group_header, parent, false)
+            v0 = inflater.inflate(R.layout.item_group_header, viewGroup, false)
             return HeaderCollapsedVH(v0)
         } else {
-            return mBase(parent, viewType)
+            return mBase(viewGroup, viewType)
         }
     }
 
@@ -661,13 +661,17 @@ class AppDetailInfoAdapter(
     }
 
 
-    fun onLaunchService(class_name: String) {
-        mView?.onLaunchExportedService(class_name)
+    fun onLaunchService(className: String) {
+        mView?.onLaunchExportedService(className)
     }
 
 
     fun onLaunchActivityRequest(className: String) {
         mView!!.onLaunchExportedActivity0(className)
+    }
+
+    fun copyToBuffer(name: String) {
+        mView?.copyToBuffer(name)
     }
 
     class ProviderViewHolder(
@@ -685,7 +689,7 @@ class AppDetailInfoAdapter(
             val featureRecycler: RecyclerView = binding.actionName
             val layoutManager: FlexboxLayoutManager =
                 FlexboxLayoutManager(itemView.context, FlexDirection.ROW, FlexWrap.WRAP)
-            layoutManager.setJustifyContent(JustifyContent.FLEX_START)
+            layoutManager.justifyContent = JustifyContent.FLEX_START
             featureRecycler.layoutManager = layoutManager
 
             //featureRecycler.setRecycledViewPool(mFeatureViewPool);
@@ -791,9 +795,9 @@ class AppDetailInfoAdapter(
     }
 
     interface DetailAdapterCallback : BaseUtilsCallback {
-        fun onLaunchExportedActivity0(class_name: String)
+        fun onLaunchExportedActivity0(className: String)
 
-        fun onLaunchExportedService(class_name: String)
+        fun onLaunchExportedService(className: String)
 
         fun onLaunchAuthorityRequest(authority: ProviderLine)
 

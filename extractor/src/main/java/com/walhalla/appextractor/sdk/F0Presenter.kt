@@ -99,7 +99,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
         targetPackageInfo: PackageInfo
     ): MutableList<BaseViewModel> {
 
-        // Контекст для другого приложения
+
         var otherAppContext: Context? = null
         var otherAppPackageManager: PackageManager? = null
         try {
@@ -112,8 +112,9 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
             handleException(e)
         }
         if (otherAppContext != null) {
-            otherAppPackageManager =
-                otherAppContext.packageManager // Получаем PackageManager для другого приложения
+
+            otherAppPackageManager = otherAppContext.packageManager // Получаем PackageManager для другого приложения
+            println("@@@ // Контекст для другого приложения ${otherAppContext.packageManager.javaClass}")
         }
 
 

@@ -22,6 +22,7 @@ import com.walhalla.appextractor.activity.manifest.ManifestActivity
 import com.walhalla.appextractor.adapter2.viewholders.PermissionViewHolder
 
 import com.walhalla.appextractor.databinding.IncludeAppDetailInfoBinding
+import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.F0Presenter
 import com.walhalla.appextractor.sdk.BaseViewModel
 import com.walhalla.appextractor.sdk.PermissionLine
@@ -32,7 +33,7 @@ import com.walhalla.ui.plugins.Module_U
 import java.util.Locale
 
 class InformationFragment : BaseFragment(), DetailsF0.View {
-    private var meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta? = null
+    private var meta: PackageMeta? = null
     private var mPresenter: F0Presenter? = null
 
     private var binding: IncludeAppDetailInfoBinding? = null
@@ -62,8 +63,8 @@ class InformationFragment : BaseFragment(), DetailsF0.View {
                     LauncherUtils.onLaunchExportedActivity(requireActivity(), meta!!.packageName, className)
                 }
 
-                override fun onLaunchExportedService(class_name: String) {
-                    mPresenter!!.onLaunchExportedService(class_name)
+                override fun onLaunchExportedService(className: String) {
+                    mPresenter!!.onLaunchExportedService(className)
                 }
 
                 override fun onLaunchAuthorityRequest(provider: ProviderLine) {

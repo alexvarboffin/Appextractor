@@ -64,20 +64,34 @@ class StringsPresenter(private val context: Context, private val mView: MvpContr
 
             val appContext = context.createPackageContext(
                 packageName,
-                Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
+                /**/Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
             )
             //drawableItems = Class.forName(packageName + ".R$drawable", true, appContext.getClassLoader()).getFields();
             drawableItems =
                 Class.forName("$packageName.R$$resourceType", true, appContext.classLoader).fields
-        } catch (e: ClassNotFoundException) {
+
+            println("@@@@ www0 @@@@ $drawableItems")
+        }
+
+
+        catch (e: java.lang.UnsatisfiedLinkError) {
             mView.showError("@ww@$e")
-            return
-        } catch (e: Exception) {
-            d("@ww@$e")
+            println("@@@@ www @@@@ ${e.message}")
+            e.printStackTrace()
             return
         }
-        for (f in drawableItems) {
-            var name = f.name
+        catch (e: ClassNotFoundException) {
+            mView.showError("@ww@$e")
+            return
+        }
+
+
+        catch (e: Exception) {
+            println("@@@@ www @@@@ ${e.message}")
+            return
+        }
+        for (field in drawableItems) {
+            var name = field.name
             val icon = name.lowercase(Locale.getDefault())
             name = name.replace("_".toRegex(), ".")
             var stringValue = ""

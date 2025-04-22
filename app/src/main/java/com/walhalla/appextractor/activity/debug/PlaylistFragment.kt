@@ -238,10 +238,10 @@ ${otherContext.resources.displayMetrics} ${DisplayMetrics()} """ + otherContext
                 d("@@@@@@@@@@@@@@$name")
             }
         } catch (e: ClassNotFoundException) {
-            d("@ww@$e")
+            d("@ww-ww@$e")
             return
         } catch (e: Exception) {
-            d("@ww@$e")
+            d("@ww-www@$e")
             return
         }
     }
@@ -259,7 +259,7 @@ ${otherContext.resources.displayMetrics} ${DisplayMetrics()} """ + otherContext
             drawableItems =
                 Class.forName("$packageName.R\$string", true, appContext.classLoader).fields
         } catch (e: Exception) {
-            d("@ww@$e")
+            d("@w-w@$e")
             return
         }
         for (f in drawableItems) {

@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Proxy
 
 object Mimiq {
-    @JvmField
+
     var actions: Array<String> = arrayOf(
         Intent.ACTION_MAIN,  //category_launcher
         Intent.ACTION_VIEW,

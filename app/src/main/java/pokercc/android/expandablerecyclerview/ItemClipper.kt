@@ -6,7 +6,7 @@ import androidx.annotation.UiThread
 import kotlin.math.ceil
 import kotlin.math.floor
 
-@UiThread
+
 internal class ItemClipper(private val target: View) {
 
     private val clipRect = Rect()

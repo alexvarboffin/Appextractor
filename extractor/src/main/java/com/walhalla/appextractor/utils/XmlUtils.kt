@@ -49,7 +49,8 @@ object XmlUtils {
             parser = null
         }
         return false
-    } //    public static boolean findNetworkSecurityConfig(Context context, String packageName) {
+    }
+    //    public static boolean findNetworkSecurityConfig(Context context, String packageName) {
     //        AssetManager am;
     //        try {
     //            Context otherContext = context.createPackageContext(packageName, 0);

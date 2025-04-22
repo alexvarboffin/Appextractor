@@ -61,8 +61,8 @@ class MetaFragment : BaseFragment(), DetailsF0.View {
                     LauncherUtils.onLaunchExportedActivity(requireActivity(), meta!!.packageName, className)
                 }
 
-                override fun onLaunchExportedService(class_name: String) {
-                    mPresenter!!.onLaunchExportedService(class_name)
+                override fun onLaunchExportedService(className: String) {
+                    mPresenter!!.onLaunchExportedService(className)
                 }
 
                 override fun onLaunchAuthorityRequest(authority: ProviderLine) {
