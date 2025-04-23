@@ -63,7 +63,7 @@ class ResourceAdapter(private val items: MutableList<ResItem>) : RecyclerView.Ad
 
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             val itemId = menuItem.itemId
-            //                case R.id.action_copy_package_name:
+//                case R.id.action_copy_package_name:
 //                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 //                    if (clipboard != null) {
 //                        ClipData clip = ClipData.newPlainText("packageName", "" + packageInfo.packageName);

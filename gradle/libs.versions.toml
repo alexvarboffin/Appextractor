@@ -91,6 +91,7 @@ push = "4.0.0"
 review = "2.0.2"
 runner = "1.6.2"
 taptargetview = "1.15.0"
+roomRuntimeAndroid = "2.7.0"
 [libraries]
 accompanist-swiperefresh = { version.ref = "accompanistSwiperefresh", module = "com.google.accompanist:accompanist-swiperefresh"}
 analytics = { version.ref = "analytics", module = "io.appmetrica.analytics:analytics"}
@@ -184,6 +185,7 @@ review = { version.ref = "review", module = "com.google.android.play:review"}
 review-ktx = { version.ref = "review", module = "com.google.android.play:review-ktx"}
 room-ktx = { version.ref = "room", module = "androidx.room:room-ktx"}
 taptargetview = { version.ref = "taptargetview", module = "com.getkeepsafe.taptargetview:taptargetview"}
+androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
 
 [plugins]
 android-application = { version.ref = "agp", id = "com.android.application"}

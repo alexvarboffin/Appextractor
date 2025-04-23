@@ -16,6 +16,7 @@ import com.walhalla.appextractor.databinding.TabStringsBinding
 import com.walhalla.appextractor.fragment.BaseFragment
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.activity.assets.StringItemViewModel
+import com.walhalla.ui.DLog
 
 class StrFragment : BaseFragment(), MvpContract.View, ResourceAdapter.OnItemClickListener {
     private var meta: PackageMeta? = null
@@ -110,7 +111,7 @@ class StrFragment : BaseFragment(), MvpContract.View, ResourceAdapter.OnItemClic
     override fun shareText(value: String) {
     }
 
-    override fun xmlViewerRequest(value: String?) {
+    override fun xmlViewerRequest(value: String) {DLog.d("@@@ $value")
         //Toast.makeText(getActivity(), value, Toast.LENGTH_SHORT).show();
         ManifestActivity.newIntent(requireActivity(), meta, null, value)
     }

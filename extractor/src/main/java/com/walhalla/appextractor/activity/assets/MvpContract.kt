@@ -13,7 +13,7 @@ interface MvpContract {
 
         fun showSuccess(list: List<ResItem>)
 
-        fun successToast(@StringRes res: Int, aaa: String)
+        fun successToast(@StringRes res: Int, message: String)
 
         fun errorToast(@StringRes res: Int, aaa: String)
     }

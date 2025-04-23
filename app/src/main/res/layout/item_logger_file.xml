@@ -102,7 +102,7 @@
 
 
         <ImageView
-            android:id="@+id/overflow_menu"
+            android:id="@+id/overflowMenu"
             android:layout_width="70dp"
             android:layout_height="@dimen/ic_album_overflow_height"
             android:layout_alignParentTop="true"
@@ -110,7 +110,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
             android:background="@null"
-            android:contentDescription="@+id/overflow_menu"
+            android:contentDescription="@+id/overflowMenu"
             android:scaleType="fitEnd"
             app:srcCompat="@drawable/ic_dots"
             app:tint="@color/colorPrimary"

@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.activity.assets.ResItem
 import com.walhalla.appextractor.activity.assets.ResType
+import com.walhalla.compose.model.AssetTreeNode
 import com.walhalla.compose.viewmodel.AssetsViewModel
 
 @Composable
@@ -31,7 +32,8 @@ fun AssetsScreen(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
-    val assets by viewModel.assets.collectAsState()
+    val assetTree by viewModel.assetTree.collectAsState()
+    val expandedNodes by viewModel.expandedNodes.collectAsState()
     val error by viewModel.error.collectAsState()
     val selectedAssetWithContent by viewModel.selectedAsset.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
@@ -82,142 +84,187 @@ fun AssetsScreen(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(assets) { asset ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (asset.type == ResType.Dir) {
-                            Icon(
-                                Icons.Default.Folder,
-                                contentDescription = "Folder",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        } else if (asset.drawable != null) {
-                            Icon(
-                                Icons.Default.Image,
-                                contentDescription = "Image",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        
-                        Text(
-                            text = asset.fullPath,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        
-                        if (asset.type != ResType.Dir) {
-                            Box {
-                                IconButton(onClick = { 
-                                    selectedAsset = asset
-                                    showMenu = true 
-                                }) {
-                                    Icon(Icons.Default.MoreVert, "More options")
-                                }
-                                
-                                DropdownMenu(
-                                    expanded = showMenu && selectedAsset == asset,
-                                    onDismissRequest = { showMenu = false }
-                                ) {
-                                    if (!ResItem.isImages(asset)) {
-                                        DropdownMenuItem(
-                                            text = { Text("Read File") },
-                                            leadingIcon = { Icon(Icons.Default.Description, null) },
-                                            onClick = {
-                                                showMenu = false
-                                                viewModel.readAsset(context, asset)
-                                            }
-                                        )
-                                    }
-                                    
-                                    if (asset.drawable != null) {
-                                        DropdownMenuItem(
-                                            text = { Text("Save Icon") },
-                                            leadingIcon = { Icon(Icons.Default.Save, null) },
-                                            onClick = {
-                                                showMenu = false
-                                                lastAction = "save"
-                                                if (ContextCompat.checkSelfPermission(
-                                                    context,
-                                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                                ) == PackageManager.PERMISSION_GRANTED) {
-                                                    viewModel.saveIcon(context, asset)
-                                                } else {
-                                                    permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                                }
-                                            }
-                                        )
-                                        
-                                        DropdownMenuItem(
-                                            text = { Text("Share Icon") },
-                                            leadingIcon = { Icon(Icons.Default.Share, null) },
-                                            onClick = {
-                                                showMenu = false
-                                                lastAction = "export"
-                                                if (ContextCompat.checkSelfPermission(
-                                                    context,
-                                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                                ) == PackageManager.PERMISSION_GRANTED) {
-                                                    viewModel.exportIcon(context, asset)
-                                                } else {
-                                                    permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                                }
-                                            }
-                                        )
-                                    }
-                                    
-                                    DropdownMenuItem(
-                                        text = { Text("Copy Name") },
-                                        leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
-                                        onClick = {
-                                            showMenu = false
-                                            clipboardManager.setText(AnnotatedString(asset.fullPath))
-                                        }
-                                    )
-                                    
-//                                    if (asset.text.isNotEmpty()) {
-//                                        DropdownMenuItem(
-//                                            text = { Text("Copy Content") },
-//                                            leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
-//                                            onClick = {
-//                                                showMenu = false
-//                                                clipboardManager.setText(AnnotatedString(asset.text))
-//                                            }
-//                                        )
-//                                    }
-                                    
-                                    DropdownMenuItem(
-                                        text = { Text("Zip All Assets") },
-                                        leadingIcon = { Icon(Icons.Default.Archive, null) },
-                                        onClick = {
-                                            showMenu = false
-                                            viewModel.zipAllAssets(context, asset)
-                                        }
-                                    )
-                                }
+        items(assetTree) { node ->
+            AssetTreeItem(
+                node = node,
+                expandedNodes = expandedNodes,
+                onToggleExpansion = { viewModel.toggleNodeExpansion(it) },
+                onAssetAction = { asset, action ->
+                    when (action) {
+                        "read" -> viewModel.readAsset(context, asset)
+                        "save" -> {
+                            selectedAsset = asset
+                            lastAction = "save"
+                            if (ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ) == PackageManager.PERMISSION_GRANTED) {
+                                viewModel.saveIcon(context, asset)
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             }
                         }
+                        "export" -> {
+                            selectedAsset = asset
+                            lastAction = "export"
+                            if (ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ) == PackageManager.PERMISSION_GRANTED) {
+                                viewModel.exportIcon(context, asset)
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            }
+                        }
+                        "copy" -> clipboardManager.setText(AnnotatedString(asset.fullPath))
+                        "zip" -> viewModel.zipAllAssets(context, asset)
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun AssetTreeItem(
+    node: AssetTreeNode,
+    expandedNodes: Set<String>,
+    onToggleExpansion: (String) -> Unit,
+    onAssetAction: (ResItem, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = (node.level * 16).dp,
+                top = 4.dp,
+                end = 4.dp,
+                bottom = 4.dp
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (node.children.isNotEmpty()) {
+                        IconButton(
+                            onClick = { onToggleExpansion(node.asset.fullPath) }
+                        ) {
+                            Icon(
+                                if (expandedNodes.contains(node.asset.fullPath)) 
+                                    Icons.Default.ExpandMore 
+                                else 
+                                    Icons.Default.ChevronRight,
+                                contentDescription = "Toggle"
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(40.dp))
                     }
                     
-//                    if (asset.text.isNotEmpty() && asset.type != ResType.Dir) {
-//                        Spacer(modifier = Modifier.height(8.dp))
-//                        Text(
-//                            text = asset.text,
-//                            style = MaterialTheme.typography.bodyMedium
-//                        )
-//                    }
+                    Icon(
+                        imageVector = when {
+                            node.asset.type == ResType.Dir -> Icons.Default.Folder
+                            node.asset.drawable != null -> Icons.Default.Image
+                            else -> Icons.Default.InsertDriveFile
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Text(
+                        text = node.asset.fullPath.substringAfterLast('/'),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                
+                if (node.asset.type != ResType.Dir) {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, "More options")
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            if (!ResItem.isImages(node.asset)) {
+                                DropdownMenuItem(
+                                    text = { Text("Read File") },
+                                    leadingIcon = { Icon(Icons.Default.Description, null) },
+                                    onClick = {
+                                        showMenu = false
+                                        onAssetAction(node.asset, "read")
+                                    }
+                                )
+                            }
+                            
+                            if (node.asset.drawable != null) {
+                                DropdownMenuItem(
+                                    text = { Text("Save Icon") },
+                                    leadingIcon = { Icon(Icons.Default.Save, null) },
+                                    onClick = {
+                                        showMenu = false
+                                        onAssetAction(node.asset, "save")
+                                    }
+                                )
+                                
+                                DropdownMenuItem(
+                                    text = { Text("Share Icon") },
+                                    leadingIcon = { Icon(Icons.Default.Share, null) },
+                                    onClick = {
+                                        showMenu = false
+                                        onAssetAction(node.asset, "export")
+                                    }
+                                )
+                            }
+                            
+                            DropdownMenuItem(
+                                text = { Text("Copy Name") },
+                                leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onAssetAction(node.asset, "copy")
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { Text("Zip All Assets") },
+                                leadingIcon = { Icon(Icons.Default.Archive, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onAssetAction(node.asset, "zip")
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            
+            if (expandedNodes.contains(node.asset.fullPath)) {
+                node.children.forEach { childNode ->
+                    AssetTreeItem(
+                        node = childNode,
+                        expandedNodes = expandedNodes,
+                        onToggleExpansion = onToggleExpansion,
+                        onAssetAction = onAssetAction,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
                 }
             }
         }

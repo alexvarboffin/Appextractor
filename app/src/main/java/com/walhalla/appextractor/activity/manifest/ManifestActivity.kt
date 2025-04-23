@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.XmlResourceParser
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -13,66 +12,68 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.debug.DemoData
 import com.walhalla.appextractor.databinding.ManifestTabsExplorerBinding
 import com.walhalla.appextractor.fragment.QCallback
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.manifest.MainManifestPresenter
 import com.walhalla.manifest.ManifestContract
 import androidx.core.net.toUri
+import com.walhalla.manifest.ManifestViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
+class ManifestActivity : AppCompatActivity(), QCallback {
+
+    private val viewModel: ManifestViewModel by viewModels()
+    private lateinit var binding: ManifestTabsExplorerBinding
     private var meta: PackageMeta? = null
-    private var presenter: MainManifestPresenter? = null
     private var apkPath: Array<String>? = null
     private var xmlFileName: String? = null
 
-    private var binding: ManifestTabsExplorerBinding? = null
-
-
     public override fun onCreate(savedInstanceState: Bundle?) {
-        //ArrayAdapter<String> spinnerArrayAdapter;
         super.onCreate(savedInstanceState)
-
-        binding = ManifestTabsExplorerBinding.inflate(
-            layoutInflater
-        )
-        setContentView(binding!!.root)
-        setSupportActionBar(binding!!.toolbar)
-        val aaa = supportActionBar
-        if (aaa != null) {
-            aaa.setDisplayShowCustomEnabled(true)
-            aaa.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setTitle(null)
-            aaa.setDisplayShowTitleEnabled(false)
-            aaa.setDisplayShowHomeEnabled(true)
+        binding = ManifestTabsExplorerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        
+        supportActionBar?.apply {
+            setDisplayShowCustomEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            title = null
+            setDisplayShowTitleEnabled(false)
+            setDisplayShowHomeEnabled(true)
         }
+        
         makeUI()
     }
 
     private fun makeUI() {
-        if (intent != null && intent.hasExtra(KEY_OBJ_NAME)) {
-            meta = this.intent.getParcelableExtra(KEY_OBJ_NAME)
-        }
-        if (intent != null && intent.hasExtra(KEY_OBJ_APK_PATH)) {
-            apkPath = intent.getStringArrayExtra(KEY_OBJ_APK_PATH)
-        }
-        if (intent != null && intent.hasExtra(KEY_OBJ_XML_FILENAME)) {
-            xmlFileName = intent.getStringExtra(KEY_OBJ_XML_FILENAME)
-        }
+        meta = intent.getParcelableExtra(KEY_OBJ_NAME)
+        apkPath = intent.getStringArrayExtra(KEY_OBJ_APK_PATH)
+        xmlFileName = intent.getStringExtra(KEY_OBJ_XML_FILENAME)
 
         if (meta == null) {
             meta = DemoData.demoData(this, meta)
-        } else {
-//                int pos = spinnerArrayAdapter.getPosition(packageName);
-//                if (pos > -1)
-//                {
-//                    this.spinner.setSelection(pos);
-//                }
         }
 
-        presenter = MainManifestPresenter(this, meta!!, this)
+        lifecycleScope.launch {
+            viewModel.data.collectLatest { state ->
+                binding.appName.text = state.title
+                binding.subTitle.text = state.packageName
+                binding.icon.setImageDrawable(state.icon)
+                
+                binding.appName.setOnClickListener { copyToBuffer(state.title) }
+                binding.subTitle.setOnClickListener { copyToBuffer(state.packageName) }
+            }
+        }
+
+        meta?.let { packageMeta ->
+            viewModel.doStuff(packageManager, packageMeta)
+        }
+
         supportFragmentManager.beginTransaction()
             .add(R.id.container, ManifestPagerFragment.instanceXmlViewer(meta, apkPath, xmlFileName))
             .commit()
@@ -95,7 +96,7 @@ class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
             startActivity(intent)
             return true
         }
-        //        else if (menuItem.getItemId() == R.id.menu_copy_manifest_txt0) {
+//        else if (menuItem.getItemId() == R.id.menu_copy_manifest_txt0) {
 //            Tools.copyToClipboard(presenter.mOutgetText("AndroidManifest.xml"), this);
 //            return true;
 //        } else if (menuItem.getItemId() == R.id.menu_share_text0) {
@@ -149,22 +150,7 @@ class ManifestActivity : AppCompatActivity(), QCallback, ManifestContract.View {
     override fun success(text: Int) {
     }
 
-    override fun setTitleWithIcon(title: String?, packageName: String?, icon: Drawable?) {
-        binding!!.appName.text = title
-        binding!!.subTitle.text = packageName
-        binding!!.icon.setImageDrawable(icon)
 
-        binding!!.appName.setOnClickListener { v: View? ->
-            copyToBuffer(
-                title!!
-            )
-        }
-        binding!!.subTitle.setOnClickListener { v: View? ->
-            copyToBuffer(
-                packageName!!
-            )
-        }
-    }
 
     companion object {
         const val KEY_OBJ_NAME: String = "key_obj_iii"

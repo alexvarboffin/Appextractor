@@ -111,13 +111,13 @@
 
 
         <ImageView
-            android:id="@+id/overflow_menu"
+            android:id="@+id/overflowMenu"
             android:layout_width="100dp"
             android:layout_height="64dp"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
             android:background="@null"
-            android:contentDescription="@+id/overflow_menu"
+            android:contentDescription="@+id/overflowMenu"
             android:paddingBottom="24dp"
             android:scaleType="fitEnd"
             app:srcCompat="@drawable/ic_dots"

@@ -23,7 +23,7 @@ class ResourceAdapter(private val items: MutableList<StringItemViewModel>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener : BaseUtilsCallback {
-        fun xmlViewerRequest(value: String?)
+        fun xmlViewerRequest(value: String)
     }
 
     private var mView: OnItemClickListener? = null

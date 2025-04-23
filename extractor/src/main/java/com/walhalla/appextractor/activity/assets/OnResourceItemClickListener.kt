@@ -8,4 +8,6 @@ open interface OnResourceItemClickListener {
     fun exportIconRequest(resource: ResItem)
 
     fun zipAllAssetsRequest(resource: ResItem)
+
+    fun xmlViewerRequest(fullPath: String)
 }

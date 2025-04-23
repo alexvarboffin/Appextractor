@@ -7,14 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.walhalla.appextractor.activity.assets.AssetsPresenter
 import com.walhalla.appextractor.activity.assets.MvpContract
 import com.walhalla.appextractor.activity.assets.ResItem
+import com.walhalla.compose.model.AssetTreeNode
+import com.walhalla.compose.model.buildAssetTree
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AssetsViewModel(application: Application) : AndroidViewModel(application) {
-    private val _assets = MutableStateFlow<List<ResItem>>(emptyList())
-    val assets: StateFlow<List<ResItem>> = _assets.asStateFlow()
+    private val _assetTree = MutableStateFlow<List<AssetTreeNode>>(emptyList())
+    val assetTree: StateFlow<List<AssetTreeNode>> = _assetTree.asStateFlow()
+
+    private val _expandedNodes = MutableStateFlow<Set<String>>(emptySet())
+    val expandedNodes: StateFlow<Set<String>> = _expandedNodes.asStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
@@ -35,7 +40,7 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             override fun showSuccess(list: List<ResItem>) {
-                _assets.value = list
+                _assetTree.value = buildAssetTree(list)
             }
 
             override fun successToast(res: Int, aaa: String) {}
@@ -43,6 +48,20 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
         })
 
         presenter?.loadManifestContent(packageName)
+    }
+
+    fun toggleNodeExpansion(nodePath: String) {
+        val currentExpanded = _expandedNodes.value.toMutableSet()
+        if (currentExpanded.contains(nodePath)) {
+            currentExpanded.remove(nodePath)
+        } else {
+            currentExpanded.add(nodePath)
+        }
+        _expandedNodes.value = currentExpanded
+    }
+
+    fun isNodeExpanded(nodePath: String): Boolean {
+        return _expandedNodes.value.contains(nodePath)
     }
 
     fun readAsset(context: Context, asset: ResItem) {

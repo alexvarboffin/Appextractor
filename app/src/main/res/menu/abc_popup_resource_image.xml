@@ -14,6 +14,11 @@
         android:title="@string/action_read_file" />
 
     <item
+        android:id="@+id/actionXmlViewer"
+        android:icon="@drawable/ic_xml_viewer"
+        android:orderInCategory="106"
+        android:title="@string/action_xml_viewer" />
+    <item
         android:id="@+id/action_save_file"
         android:icon="@drawable/ic_download"
         android:orderInCategory="106"

@@ -105,7 +105,7 @@ class ManifestPagerFragment : BaseFragment(), View.OnClickListener {
     }
 
 
-    private fun makeUI(context: Context, meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta, adapter: ViewpagerAdapter) {
+    private fun makeUI(context: Context, meta: PackageMeta, adapter: ViewpagerAdapter) {
         if (apkPath == null || apkPath.isEmpty()) {
             try {
                 val applicationInfo = context.packageManager.getApplicationInfo(
@@ -210,7 +210,7 @@ class ManifestPagerFragment : BaseFragment(), View.OnClickListener {
         private val KEY_OBJ_XML_FILENAME = ManifestPagerFragment::class.java.simpleName + "var3"
 
         fun instanceXmlViewer(
-            meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta?,
+            meta: PackageMeta?,
             apkPath: Array<String>?,
             xmlFileName: String?
         ): ManifestPagerFragment {

@@ -21,6 +21,7 @@ import com.walhalla.appextractor.utils.IntentUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.net.toUri
 
 class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
     context: Context,
@@ -95,37 +96,37 @@ class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
 //            DLog.handleException(e);
 //        }firebase_url app_name
         try {
-            val o = HashSet<String>()
+            val stringHashSet = HashSet<String>()
             run {
-                o.add("app_name")
-                o.add("app_id")
-                o.add("firebase_database_url")
-                o.add("gcm_defaultSenderId")
-                o.add("google_api_key")
-                o.add("google_app_id")
-                o.add("google_crash_reporting_api_key")
-                o.add("google_storage_bucket")
+                stringHashSet.add("app_name")
+                stringHashSet.add("app_id")
+                stringHashSet.add("firebase_database_url")
+                stringHashSet.add("gcm_defaultSenderId")
+                stringHashSet.add("google_api_key")
+                stringHashSet.add("google_app_id")
+                stringHashSet.add("google_crash_reporting_api_key")
+                stringHashSet.add("google_storage_bucket")
 
-                o.add("secret_key")
-                o.add("access_token")
-                o.add("client_id")
-                o.add("client_secret")
-                o.add("encryption_key")
-                o.add("signing_key")
-                o.add("keystore_password")
-                o.add("oauth_client_id")
-                o.add("firebase_server_key")
+                stringHashSet.add("secret_key")
+                stringHashSet.add("access_token")
+                stringHashSet.add("client_id")
+                stringHashSet.add("client_secret")
+                stringHashSet.add("encryption_key")
+                stringHashSet.add("signing_key")
+                stringHashSet.add("keystore_password")
+                stringHashSet.add("oauth_client_id")
+                stringHashSet.add("firebase_server_key")
 
-                o.add("default_web_client_id")
-                o.add("fb_app_id")
-                o.add("fb_app_name")
+                stringHashSet.add("default_web_client_id")
+                stringHashSet.add("fb_app_id")
+                stringHashSet.add("fb_app_name")
 
-                o.add("project_number")
-                o.add("firebase_url")
-                o.add("project_id")
-                o.add("storage_bucket")
-                o.add("package_name")
-                o.add("api_key")
+                stringHashSet.add("project_number")
+                stringHashSet.add("firebase_url")
+                stringHashSet.add("project_id")
+                stringHashSet.add("storage_bucket")
+                stringHashSet.add("package_name")
+                stringHashSet.add("api_key")
             }
 
             data.add(
@@ -135,7 +136,7 @@ class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
                 )
             )
             val packageManager = context.packageManager
-            for (string in o) {
+            for (string in stringHashSet) {
                 val resources = packageManager.getResourcesForApplication(packageName)
                 val stringId = resources.getIdentifier(string, "string", packageName)
                 if (stringId != 0) {
@@ -182,7 +183,7 @@ class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
     @Throws(PackageManager.NameNotFoundException::class)
     private fun meta7(data: MutableList<BaseViewModel>) {
-        //    <activity>*
+//    <activity>*
 //    <activity-alias>
 //    <application>*
 //    <provider>*
@@ -394,7 +395,7 @@ class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
 
                 //info.pathPermissions;
-                val uri = Uri.parse("content://" + info.authority + "/")
+                val uri = ("content://" + info.authority + "/").toUri()
                 DLog.d("@p@$uri")
 
                 val line = ProviderLine(
