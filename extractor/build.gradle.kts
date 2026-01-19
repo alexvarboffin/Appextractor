@@ -22,9 +22,9 @@ android {
             buildConfigField(
                 "String",
                 "KEY_TELEGRAM_TOKEN",
-                "\"220535441:AAGSE2J0uJp0X87cxyup4kL9ytybvb78AGk\""
+                "\"${property("TELEGRAM_TOKEN_DEBUG")}\""
             )
-            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"-1001857544330\"")
+            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"${property("TELEGRAM_CHAT_ID_DEBUG")}\"")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -33,8 +33,8 @@ android {
                 "proguard-rules.pro"
             )
             
-            buildConfigField("String", "KEY_TELEGRAM_TOKEN", "\"\"")
-            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"\"")
+            buildConfigField("String", "KEY_TELEGRAM_TOKEN", "\"${property("TELEGRAM_TOKEN_RELEASE")}\"")
+            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"${property("TELEGRAM_CHAT_ID_RELEASE")}\"")
         }
     }
     compileOptions {
