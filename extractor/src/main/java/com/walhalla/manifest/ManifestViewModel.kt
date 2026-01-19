@@ -2,15 +2,16 @@ package com.walhalla.manifest
 
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
+
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 
 import com.walhalla.appextractor.model.PackageMeta
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 data class ManifestUiState(
 //    val isLoading: Boolean = false,
@@ -27,18 +28,19 @@ class ManifestViewModel : ViewModel() {
     val data: StateFlow<ManifestUiState> = _data.asStateFlow()
 
     fun doStuff(packageManager: PackageManager, meta: PackageMeta) {
-        try {
-            val applicationInfo = packageManager.getApplicationInfo(meta.packageName, 0)
-            val title = applicationInfo.loadLabel(packageManager)
-            val icon = applicationInfo.loadIcon(packageManager)
-            _data.value = _data.value.copy(
-                title = title.toString(),
-                packageName = applicationInfo.packageName,
-                icon = icon
-            )
-
-        } catch (e: PackageManager.NameNotFoundException) {
-            throw RuntimeException(e)
+        viewModelScope.launch {
+            try {
+                val applicationInfo = packageManager.getApplicationInfo(meta.packageName, 0)
+                val title = applicationInfo.loadLabel(packageManager)
+                val icon = applicationInfo.loadIcon(packageManager)
+                _data.value = _data.value.copy(
+                    title = title.toString(),
+                    packageName = applicationInfo.packageName,
+                    icon = icon
+                )
+            } catch (e: PackageManager.NameNotFoundException) {
+                throw RuntimeException(e)
+            }
         }
     }
 }
