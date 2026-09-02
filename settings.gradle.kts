@@ -41,10 +41,10 @@ rootProject.name = "Appextractor"
 //project(":wads").projectDir = File("D:\\walhalla\\sdk\\android\\UI\\wads")
 
 include(":features:ui")
-project(":features:ui").projectDir = File("../WalhallaUI\\features\\ui")
+project(":features:ui").projectDir = File("C:\\src\\Synced\\WalhallaUI\\features\\ui\\")
 
 include(":shared")
-project(":shared").projectDir = File("../WalhallaUI\\shared")
+project(":shared").projectDir = File("C:\\src\\Synced\\WalhallaUI\\shared\\")
 
 //include(":SdkLibrary")
 //project(":SdkLibrary").projectDir = File("D:\\Nonesorted\\Neptune\\SdkLibrary")
