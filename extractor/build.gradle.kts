@@ -4,6 +4,11 @@ plugins {
     id("kotlin-parcelize")
 }
 
+fun quoteBuildConfig(value: String?): String {
+    val escaped = (value ?: "").replace("\\", "\\\\").replace("\"", "\\\"")
+    return "\"$escaped\""
+}
+
 android {
     namespace = "com.walhalla.extractor"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -18,13 +23,16 @@ android {
 
     buildTypes {
         getByName("debug") {
-
             buildConfigField(
                 "String",
                 "KEY_TELEGRAM_TOKEN",
-                "\"${property("TELEGRAM_TOKEN_DEBUG")}\""
+                quoteBuildConfig(findProperty("TELEGRAM_TOKEN_DEBUG")?.toString())
             )
-            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"${property("TELEGRAM_CHAT_ID_DEBUG")}\"")
+            buildConfigField(
+                "String",
+                "KEY_TELEGRAM_CHAT_ID",
+                quoteBuildConfig(findProperty("TELEGRAM_CHAT_ID_DEBUG")?.toString())
+            )
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -32,9 +40,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            
-            buildConfigField("String", "KEY_TELEGRAM_TOKEN", "\"${property("TELEGRAM_TOKEN_RELEASE")}\"")
-            buildConfigField("String", "KEY_TELEGRAM_CHAT_ID", "\"${property("TELEGRAM_CHAT_ID_RELEASE")}\"")
+
+            buildConfigField(
+                "String",
+                "KEY_TELEGRAM_TOKEN",
+                quoteBuildConfig(findProperty("TELEGRAM_TOKEN_RELEASE")?.toString())
+            )
+            buildConfigField(
+                "String",
+                "KEY_TELEGRAM_CHAT_ID",
+                quoteBuildConfig(findProperty("TELEGRAM_CHAT_ID_RELEASE")?.toString())
+            )
         }
     }
     compileOptions {

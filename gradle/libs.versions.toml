@@ -1,4 +1,8 @@
 [versions]
+android-compileSdk = "37"
+android-minSdk = "21"
+android-targetSdk = "37"
+android-buildTools = "37.0.0"
 compileSdk = "37"
 buildTools = "37.0.0"
 dropboxCoreSdk = "3.1.5"

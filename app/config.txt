@@ -1,4 +1,4 @@
-# The proguard configuration file for the following section is C:\src\Synced\Appextractor\app\build\intermediates\aapt_proguard_file\release\processReleaseResources\aapt_rules.txt
+# The proguard configuration file for the following section is D:\dev\android\Appextractor\app\build\intermediates\aapt_proguard_file\release\processReleaseResources\aapt_rules.txt
 -keep class androidx.core.app.CoreComponentFactory { <init>(); }
 -keep class androidx.core.content.FileProvider { <init>(); }
 -keep class androidx.profileinstaller.ProfileInstallReceiver { <init>(); }
@@ -197,8 +197,8 @@
 -keep class pokercc.android.expandablerecyclerview.ExpandableRecyclerView { <init>(android.content.Context, android.util.AttributeSet); }
 
 
-# End of content from C:\src\Synced\Appextractor\app\build\intermediates\aapt_proguard_file\release\processReleaseResources\aapt_rules.txt
-# The proguard configuration file for the following section is C:\src\Synced\Appextractor\app\build\intermediates\default_proguard_files\global\proguard-android.txt-8.7.3
+# End of content from D:\dev\android\Appextractor\app\build\intermediates\aapt_proguard_file\release\processReleaseResources\aapt_rules.txt
+# The proguard configuration file for the following section is D:\dev\android\Appextractor\app\build\intermediates\default_proguard_files\global\proguard-android.txt-8.13.2
 # This is a configuration file for ProGuard.
 # http://proguard.sourceforge.net/index.html#manual/usage.html
 #
@@ -295,8 +295,8 @@
 # These classes are duplicated between android.jar and core-lambda-stubs.jar.
 -dontnote java.lang.invoke.**
 
-# End of content from C:\src\Synced\Appextractor\app\build\intermediates\default_proguard_files\global\proguard-android.txt-8.7.3
-# The proguard configuration file for the following section is C:\src\Synced\Appextractor\app\proguard-rules.pro
+# End of content from D:\dev\android\Appextractor\app\build\intermediates\default_proguard_files\global\proguard-android.txt-8.13.2
+# The proguard configuration file for the following section is D:\dev\android\Appextractor\app\proguard-rules.pro
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Application
 -keep public class * extends android.app.Service
@@ -545,7 +545,8 @@
 -keep class * {
     public private *;
 }
-# End of content from C:\src\Synced\Appextractor\app\proguard-rules.pro
+# End of content from D:\dev\android\Appextractor\app\proguard-rules.pro
+# The proguard configuration file for the following section is C:\src\Synced\WalhallaUI\features\ui\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
 #-classobfuscationdictionary D:\android\GitHub\facebook\proguard\examples\dictionaries\compact.txt
 #-packageobfuscationdictionary D:\android\GitHub\facebook\proguard\examples\dictionaries\windows.txt
 #-optimizationpasses 3
@@ -553,48 +554,10 @@
 #-repackageclasses ''
 #-allowaccessmodification
 
-
-# The proguard configuration file for the following section is C:\android\proguard\dagger2.pro
--dontwarn com.google.errorprone.annotations.**
-# End of content from C:\android\proguard\dagger2.pro
-
-
-# The proguard configuration file for the following section is C:\android\proguard\okhttp3.pro
--dontwarn okhttp3.**
--dontwarn okio.**
-#-dontwarn javax.annotation.**
--dontwarn org.conscrypt.**
-# A resource is loaded with a relative path so the package of this class must be preserved.
--keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
-# End of content from C:\android\proguard\okhttp3.pro
-
-
-# The proguard configuration file for the following section is C:\android\proguard\admob.pro
--keep public class com.google.android.gms.ads.** {
-    public *;
-}
-
--keep public class com.google.ads.** {
-    public *;
-}
-# End of content from C:\android\proguard\admob.pro
-
-
-# The proguard configuration file for the following section is C:\android\proguard\mytracker.pro
--keep class com.my.tracker.** { *; }
--dontwarn com.my.tracker.**
--keep class com.google.android.gms.ads.identifier.AdvertisingIdClient {
-    com.google.android.gms.ads.identifier.AdvertisingIdClient$Info getAdvertisingIdInfo(android.content.Context);
-}
--keep class com.google.android.gms.ads.identifier.AdvertisingIdClient$Info {
-    java.lang.String getId();
-    boolean isLimitAdTrackingEnabled();
-}
--keep class com.android.installreferrer.** { *; }
--keep class com.android.vending.billing.** { *; }
--keep class com.android.billingclient.api.** { *; }
-# End of content from C:\android\proguard\mytracker.pro
-
+#@@@-include "C:\android\proguard\dagger2.pro"
+#@@@-include "C:\android\proguard\okhttp3.pro"
+#@@@-include "C:\android\proguard\admob.pro"
+#@@@-include "C:\android\proguard\mytracker.pro"
 
 # Firebase
 -dontwarn retrofit2.Call
@@ -610,57 +573,12 @@
 #-keepclassmembers class com.google.samples.apps.iosched.model.** { <fields>; }
 #-repackageclasses 'c'
 -repackageclasses ''
-
-# The proguard configuration file for the following section is C:\android\proguard\bottom.pro
-#=============================================================
-#-keepattributes Annotation
-#-keepattributes *Annotation*
-
-
-#указывает, что методы, к которым это правило применяется, не имеют побочных эффектов,
-#и их вызовы могут быть безопасно удалены или оптимизированы компилятором или инструментами сборки
-#-assumenosideeffects class android.annotation.SuppressLint {
-#    public *;
-#}
-#-assumenosideeffects class androidx.annotation.NonNull {
-#    *;
-#}
-#-assumenosideeffects class androidx.annotation.Nullable {
-#    *;
-#}
-
-#=============================================================
--assumenosideeffects class android.util.Log {
-    public static *** d(...);
-    public static *** v(...);
-}
-
--assumenosideeffects class android.util.Log{
-    public static *** d(...);
-    public static *** v(...);
-}
-
-
-#You can remove logging calls with this option in proguard-project.txt:
--assumenosideeffects class android.util.Log {
-    public static boolean isLoggable(java.lang.String, int);
-    public static int v(...);
-    public static int i(...);
-    public static int w(...);
-    public static int d(...);
-    public static int e(...);
-}
-
--repackageclasses ''
-#=============================================================
-# End of content from C:\android\proguard\bottom.pro
-# The proguard configuration file for the following section is C:\src\Synced\WalhallaUI\features\ui\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
-
+#@@@-include "C:\android\proguard\bottom.pro"
 # End of content from C:\src\Synced\WalhallaUI\features\ui\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
-# The proguard configuration file for the following section is C:\src\Synced\Appextractor\extractor\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
+# The proguard configuration file for the following section is D:\dev\android\Appextractor\extractor\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
 
-# End of content from C:\src\Synced\Appextractor\extractor\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\67d51d05e614284bb1dcab4dca99f579\transformed\material-1.12.0\proguard.txt
+# End of content from D:\dev\android\Appextractor\extractor\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\ccf56fe99c909270b24b3eb112081576\transformed\material-1.12.0\proguard.txt
 # Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -708,8 +626,8 @@
 }
 
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\67d51d05e614284bb1dcab4dca99f579\transformed\material-1.12.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\2c84e087db791314c8246988d1f4872c\transformed\preference-1.2.1\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\ccf56fe99c909270b24b3eb112081576\transformed\material-1.12.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\fd98037651467d6aea529a13364409b1\transformed\preference-1.2.1\proguard.txt
 # Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -732,8 +650,8 @@
     public <init>(android.content.Context, android.util.AttributeSet);
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\2c84e087db791314c8246988d1f4872c\transformed\preference-1.2.1\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\99739a5535b50774925dc0e4e4df4ed9\transformed\appcompat-1.7.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\fd98037651467d6aea529a13364409b1\transformed\preference-1.2.1\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\967c5786b72b057f95eef7327d8befc2\transformed\appcompat-1.7.0\proguard.txt
 # Copyright (C) 2018 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -753,8 +671,8 @@
   <methods>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\99739a5535b50774925dc0e4e4df4ed9\transformed\appcompat-1.7.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\29afffc6c67bf09cff998e0e9ea9571f\transformed\rules\lib\META-INF\proguard\okhttp3.pro
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\967c5786b72b057f95eef7327d8befc2\transformed\appcompat-1.7.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\4a898289020af62a076a81e0334cd97d\transformed\shrink-rules\lib\META-INF\proguard\okhttp3.pro
 # JSR 305 annotations are for embedding nullability information.
 -dontwarn javax.annotation.**
 
@@ -770,11 +688,11 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\29afffc6c67bf09cff998e0e9ea9571f\transformed\rules\lib\META-INF\proguard\okhttp3.pro
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\4a898289020af62a076a81e0334cd97d\transformed\shrink-rules\lib\META-INF\proguard\okhttp3.pro
 # The proguard configuration file for the following section is C:\src\Synced\WalhallaUI\shared\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
 
 # End of content from C:\src\Synced\WalhallaUI\shared\build\intermediates\consumer_proguard_dir\release\exportReleaseConsumerProguardFiles\lib0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\3ac2d22b61b18991a067c644da22f035\transformed\jetified-glide-4.16.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\f8200f231914e76bc78011810c5ca4d3\transformed\jetified-glide-4.16.0\proguard.txt
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep class * extends com.bumptech.glide.module.AppGlideModule {
  <init>(...);
@@ -790,20 +708,20 @@
 # Uncomment for DexGuard only
 #-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\3ac2d22b61b18991a067c644da22f035\transformed\jetified-glide-4.16.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\8c9dae09c13c3f776bbb7a2e2bede32b\transformed\jetified-app-update-ktx-2.1.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\f8200f231914e76bc78011810c5ca4d3\transformed\jetified-glide-4.16.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\13a13c9eabaa59a469c56f3daa51c65a\transformed\jetified-app-update-ktx-2.1.0\proguard.txt
 # Proguard cannot process META-INF/versions/9.
 # See https://discuss.gradle.org/t/meta-inf-version-duplicate-error-when-using-proguard/31380
 -dontwarn module-info
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\8c9dae09c13c3f776bbb7a2e2bede32b\transformed\jetified-app-update-ktx-2.1.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\e9e9bba995198dc89ee85521aaccf8ab\transformed\jetified-review-ktx-2.0.2\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\13a13c9eabaa59a469c56f3daa51c65a\transformed\jetified-app-update-ktx-2.1.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\8c08f61f78d86378459a27a6d30c1262\transformed\jetified-review-ktx-2.0.2\proguard.txt
 # Proguard cannot process META-INF/versions/9.
 # See https://discuss.gradle.org/t/meta-inf-version-duplicate-error-when-using-proguard/31380
 -dontwarn module-info
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\e9e9bba995198dc89ee85521aaccf8ab\transformed\jetified-review-ktx-2.0.2\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\605fc29e05075c2d49f83c806b99cf64\transformed\jetified-play-services-ads-24.0.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\8c08f61f78d86378459a27a6d30c1262\transformed\jetified-review-ktx-2.0.2\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\7661b022ea48b8ca82165acce2d5276c\transformed\jetified-play-services-ads-24.0.0\proguard.txt
 -keep public class com.google.android.gms.ads.internal.ClientApi {
   <init>();
 }
@@ -879,8 +797,8 @@
 -dontwarn com.google.android.gms.ads.internal.util.zzx
 
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\605fc29e05075c2d49f83c806b99cf64\transformed\jetified-play-services-ads-24.0.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\f5a6a4cbd14d5c831d83b74b5655c8aa\transformed\jetified-play-services-ads-lite-24.0.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\7661b022ea48b8ca82165acce2d5276c\transformed\jetified-play-services-ads-24.0.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\b49e1d1780332beb65be4b77239e05c2\transformed\jetified-play-services-ads-lite-24.0.0\proguard.txt
 # Keep implementations of the AdMob mediation adapter interfaces. Adapters for
 # third party ad networks implement these interfaces and are invoked by the
 # AdMob SDK via reflection.
@@ -939,8 +857,8 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\f5a6a4cbd14d5c831d83b74b5655c8aa\transformed\jetified-play-services-ads-lite-24.0.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\ae9d14f5d2a2d90174d45e41be3296dc\transformed\jetified-play-services-measurement-22.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\b49e1d1780332beb65be4b77239e05c2\transformed\jetified-play-services-ads-lite-24.0.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\ee8d43ad2668ea282a2d99e7898f89e3\transformed\jetified-play-services-measurement-22.3.0\proguard.txt
 # We keep all fields for every generated proto file as the runtime uses
 # reflection over them that ProGuard cannot detect. Without this keep
 # rule, fields may be removed that would cause runtime failures.
@@ -948,8 +866,8 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\ae9d14f5d2a2d90174d45e41be3296dc\transformed\jetified-play-services-measurement-22.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\63bdb4f8f0623bcb5ecb35914352bfb6\transformed\jetified-play-services-measurement-api-22.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\ee8d43ad2668ea282a2d99e7898f89e3\transformed\jetified-play-services-measurement-22.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\a9b1063b373e6aecf0dd97c77c7319aa\transformed\jetified-play-services-measurement-api-22.3.0\proguard.txt
 # Can be removed once we pull in a dependency on firebase-common that includes
 # https://github.com/firebase/firebase-android-sdk/pull/1472/commits/856f1ca1151cdd88679bbc778892f23dfa34fc06#diff-a2ed34b5a38b4c6c686b09e54865eb48
 -dontwarn com.google.auto.value.AutoValue
@@ -962,8 +880,8 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\63bdb4f8f0623bcb5ecb35914352bfb6\transformed\jetified-play-services-measurement-api-22.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\8376df4b39fa5b3fbc5832cf0bad9b88\transformed\jetified-play-services-measurement-sdk-22.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\a9b1063b373e6aecf0dd97c77c7319aa\transformed\jetified-play-services-measurement-api-22.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\40674e3078b8f6948a9a8d6e53cefb97\transformed\jetified-play-services-measurement-sdk-22.3.0\proguard.txt
 # We keep all fields for every generated proto file as the runtime uses
 # reflection over them that ProGuard cannot detect. Without this keep
 # rule, fields may be removed that would cause runtime failures.
@@ -971,8 +889,8 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\8376df4b39fa5b3fbc5832cf0bad9b88\transformed\jetified-play-services-measurement-sdk-22.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\6c4e23649817cbabb04610ec0a523ffd\transformed\jetified-play-services-measurement-impl-22.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\40674e3078b8f6948a9a8d6e53cefb97\transformed\jetified-play-services-measurement-sdk-22.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\ec5254810fdf2f4ac1fd08dbd30329b4\transformed\jetified-play-services-measurement-impl-22.3.0\proguard.txt
 # We keep all fields for every generated proto file as the runtime uses
 # reflection over them that ProGuard cannot detect. Without this keep
 # rule, fields may be removed that would cause runtime failures.
@@ -980,14 +898,35 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\6c4e23649817cbabb04610ec0a523ffd\transformed\jetified-play-services-measurement-impl-22.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\c9089e3301227cb3b0b8f568714d4428\transformed\jetified-firebase-common-21.0.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\ec5254810fdf2f4ac1fd08dbd30329b4\transformed\jetified-play-services-measurement-impl-22.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\8de332b39b1e3a5557fd29c30f615830\transformed\jetified-firebase-common-21.0.0\proguard.txt
 -dontwarn com.google.firebase.platforminfo.KotlinDetector
 -dontwarn com.google.auto.value.AutoValue
 -dontwarn com.google.auto.value.AutoValue$Builder
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\c9089e3301227cb3b0b8f568714d4428\transformed\jetified-firebase-common-21.0.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\76f4f86ecf4858a0debd012dd05fa346\transformed\coordinatorlayout-1.1.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\8de332b39b1e3a5557fd29c30f615830\transformed\jetified-firebase-common-21.0.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\6b48382b6c25b00013726f5eaa317f12\transformed\transition-1.5.0\proguard.txt
+# Copyright (C) 2017 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Keep a field in transition that is used to keep a reference to weakly-referenced object
+-keepclassmembers class androidx.transition.ChangeBounds$* extends android.animation.AnimatorListenerAdapter {
+  androidx.transition.ChangeBounds$ViewBounds mViewBounds;
+}
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\6b48382b6c25b00013726f5eaa317f12\transformed\transition-1.5.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\9bb98ff90b1bfe9f1e27a09f0398ed85\transformed\coordinatorlayout-1.1.0\proguard.txt
 # Copyright (C) 2016 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1011,29 +950,8 @@
 # Make sure we keep annotations for CoordinatorLayout's DefaultBehavior and ViewPager's DecorView
 -keepattributes *Annotation*
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\76f4f86ecf4858a0debd012dd05fa346\transformed\coordinatorlayout-1.1.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\84662c9e126ee50a3c98e691c636750d\transformed\transition-1.5.0\proguard.txt
-# Copyright (C) 2017 The Android Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# Keep a field in transition that is used to keep a reference to weakly-referenced object
--keepclassmembers class androidx.transition.ChangeBounds$* extends android.animation.AnimatorListenerAdapter {
-  androidx.transition.ChangeBounds$ViewBounds mViewBounds;
-}
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\84662c9e126ee50a3c98e691c636750d\transformed\transition-1.5.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\41fdb148f3f68bd63b0c662f0baeb809\transformed\vectordrawable-animated-1.1.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\9bb98ff90b1bfe9f1e27a09f0398ed85\transformed\coordinatorlayout-1.1.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\6ec444048a328b10a8be08cfdf3fd1a1\transformed\vectordrawable-animated-1.1.0\proguard.txt
 # Copyright (C) 2016 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1054,8 +972,8 @@
    *** get*();
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\41fdb148f3f68bd63b0c662f0baeb809\transformed\vectordrawable-animated-1.1.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\cccaa7752048d647efaf0c6a908edf4a\transformed\webkit-1.11.0-alpha02\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\6ec444048a328b10a8be08cfdf3fd1a1\transformed\vectordrawable-animated-1.1.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\be148e1a326def2ebc45d3056a619a14\transformed\webkit-1.11.0-alpha02\proguard.txt
 # Copyright 2018 The Chromium Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -1088,8 +1006,8 @@
 -keepnames public class androidx.webkit.ProcessGlobalConfig {
     private static final *** sProcessGlobalConfig;
 }
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\cccaa7752048d647efaf0c6a908edf4a\transformed\webkit-1.11.0-alpha02\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\e06a07d3cf6ed3698bbdb96ae9d93271\transformed\recyclerview-1.1.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\be148e1a326def2ebc45d3056a619a14\transformed\webkit-1.11.0-alpha02\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\2b42eecea8e2e3598112a02bc8e6eca0\transformed\recyclerview-1.1.0\proguard.txt
 # Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1115,8 +1033,8 @@
     public void suppressLayout(boolean);
     public boolean isLayoutSuppressed();
 }
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\e06a07d3cf6ed3698bbdb96ae9d93271\transformed\recyclerview-1.1.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\47403b2e64164f460fecc4f825d4a9cc\transformed\work-runtime-2.7.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\2b42eecea8e2e3598112a02bc8e6eca0\transformed\recyclerview-1.1.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\667935d1704fe958a81eafc07b60b833\transformed\work-runtime-2.7.0\proguard.txt
 -keep class * extends androidx.work.Worker
 -keep class * extends androidx.work.InputMerger
 # Keep all constructors on ListenableWorker, Worker (also marked with @Keep)
@@ -1126,8 +1044,8 @@
 # We need to keep WorkerParameters for the ListenableWorker constructor
 -keep class androidx.work.WorkerParameters
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\47403b2e64164f460fecc4f825d4a9cc\transformed\work-runtime-2.7.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\ab2f499524bfca4c7c2e034acb291c64\transformed\jetified-window-1.0.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\667935d1704fe958a81eafc07b60b833\transformed\work-runtime-2.7.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\16796b1a8537902af8427b95f728ec3d\transformed\jetified-window-1.0.0\proguard.txt
 # Copyright (C) 2020 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1153,8 +1071,8 @@
   public onDeviceStateChanged(androidx.window.sidecar.SidecarDeviceState);
   public onWindowLayoutChanged(android.os.IBinder, androidx.window.sidecar.SidecarWindowLayoutInfo);
 }
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\ab2f499524bfca4c7c2e034acb291c64\transformed\jetified-window-1.0.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\10d6fe3591b9ed7931c8c76216fc8ccc\transformed\jetified-play-services-base-18.5.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\16796b1a8537902af8427b95f728ec3d\transformed\jetified-window-1.0.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\dc4386e1dc26eaa6e08ebde2de73ab39\transformed\jetified-play-services-base-18.5.0\proguard.txt
 # b/35135904 Ensure that proguard will not strip the mResultGuardian.
 -keepclassmembers class com.google.android.gms.common.api.internal.BasePendingResult {
   com.google.android.gms.common.api.internal.BasePendingResult$ReleasableResultGuardian mResultGuardian;
@@ -1162,8 +1080,8 @@
 
 
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\10d6fe3591b9ed7931c8c76216fc8ccc\transformed\jetified-play-services-base-18.5.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\0cf1eed312e52009c2f9518f61ced602\transformed\core-1.15.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\dc4386e1dc26eaa6e08ebde2de73ab39\transformed\jetified-play-services-base-18.5.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\2832eb4862e5d3bf38e9fda3af12dd00\transformed\core-1.15.0\proguard.txt
 # Never inline methods, but allow shrinking and obfuscation.
 -keepclassmembernames,allowobfuscation,allowshrinking class androidx.core.view.ViewCompat$Api* {
   <methods>;
@@ -1181,8 +1099,8 @@
   <methods>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\0cf1eed312e52009c2f9518f61ced602\transformed\core-1.15.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\4887c0c278b89d0f79d54bd93c0df324\transformed\jetified-savedstate-1.2.1\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\2832eb4862e5d3bf38e9fda3af12dd00\transformed\core-1.15.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\d96c66ea7bd2bc5ce95aea604456d2a6\transformed\jetified-savedstate-1.2.1\proguard.txt
 # Copyright (C) 2019 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1201,18 +1119,8 @@
     <init>();
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\4887c0c278b89d0f79d54bd93c0df324\transformed\jetified-savedstate-1.2.1\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\9861c5fea240ead23b00c8d7b5fa11de\transformed\jetified-lifecycle-viewmodel-release\proguard.txt
--keepclassmembers,allowobfuscation class * extends androidx.lifecycle.ViewModel {
-    <init>();
-}
-
--keepclassmembers,allowobfuscation class * extends androidx.lifecycle.AndroidViewModel {
-    <init>(android.app.Application);
-}
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\9861c5fea240ead23b00c8d7b5fa11de\transformed\jetified-lifecycle-viewmodel-release\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\7691d454e60e62fc0a60cdb87efcf877\transformed\jetified-lifecycle-runtime-release\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\d96c66ea7bd2bc5ce95aea604456d2a6\transformed\jetified-savedstate-1.2.1\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\7e34ef80be9d63a7c87ff49210e012e9\transformed\jetified-lifecycle-runtime-release\proguard.txt
 -keepattributes AnnotationDefault,
                 RuntimeVisibleAnnotations,
                 RuntimeVisibleParameterAnnotations,
@@ -1240,8 +1148,18 @@
 # Also this rule prevents registerIn from being inlined.
 -keepclassmembers class androidx.lifecycle.ReportFragment$LifecycleCallbacks { *; }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\7691d454e60e62fc0a60cdb87efcf877\transformed\jetified-lifecycle-runtime-release\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\92df64fe24cbe1d3237779006a358147\transformed\jetified-lifecycle-viewmodel-savedstate-2.8.7\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\7e34ef80be9d63a7c87ff49210e012e9\transformed\jetified-lifecycle-runtime-release\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\9cd8eea279c85bdfcf414a72a199c026\transformed\jetified-lifecycle-viewmodel-release\proguard.txt
+-keepclassmembers,allowobfuscation class * extends androidx.lifecycle.ViewModel {
+    <init>();
+}
+
+-keepclassmembers,allowobfuscation class * extends androidx.lifecycle.AndroidViewModel {
+    <init>(android.app.Application);
+}
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\9cd8eea279c85bdfcf414a72a199c026\transformed\jetified-lifecycle-viewmodel-release\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\5bddc9f640151f84484d4be33e609bb7\transformed\jetified-lifecycle-viewmodel-savedstate-2.8.7\proguard.txt
 -keepclassmembers,allowobfuscation class * extends androidx.lifecycle.ViewModel {
     <init>(androidx.lifecycle.SavedStateHandle);
 }
@@ -1250,12 +1168,12 @@
     <init>(android.app.Application,androidx.lifecycle.SavedStateHandle);
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\92df64fe24cbe1d3237779006a358147\transformed\jetified-lifecycle-viewmodel-savedstate-2.8.7\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\fe0547c5aa75a26e62404c8e930c6a69\transformed\jetified-lifecycle-process-2.8.7\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\5bddc9f640151f84484d4be33e609bb7\transformed\jetified-lifecycle-viewmodel-savedstate-2.8.7\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\8679d7df557c6642ea20be0925dc1281\transformed\jetified-lifecycle-process-2.8.7\proguard.txt
 # this rule is need to work properly when app is compiled with api 28, see b/142778206
 -keepclassmembers class * extends androidx.lifecycle.EmptyActivityLifecycleCallbacks { *; }
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\fe0547c5aa75a26e62404c8e930c6a69\transformed\jetified-lifecycle-process-2.8.7\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\9f43544d82348c4483a9eb11125ac403\transformed\rules\lib\META-INF\com.android.tools\r8-from-1.6.0\coroutines.pro
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\8679d7df557c6642ea20be0925dc1281\transformed\jetified-lifecycle-process-2.8.7\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\24b479f533ce20ba0f85e48945f46d85\transformed\shrink-rules\lib\META-INF\com.android.tools\r8-from-1.6.0\coroutines.pro
 # Allow R8 to optimize away the FastServiceLoader.
 # Together with ServiceLoader optimization in R8
 # this results in direct instantiation when loading Dispatchers.Main
@@ -1279,13 +1197,13 @@
     boolean getRECOVER_STACK_TRACES() return false;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\9f43544d82348c4483a9eb11125ac403\transformed\rules\lib\META-INF\com.android.tools\r8-from-1.6.0\coroutines.pro
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\23cf4623d9536b9be25d06b85862b91e\transformed\jetified-datastore-preferences-1.0.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\24b479f533ce20ba0f85e48945f46d85\transformed\shrink-rules\lib\META-INF\com.android.tools\r8-from-1.6.0\coroutines.pro
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\e6c77c8236371e1aff6d02bb322d78d0\transformed\jetified-datastore-preferences-1.0.0\proguard.txt
 -keepclassmembers class * extends androidx.datastore.preferences.protobuf.GeneratedMessageLite {
     <fields>;
 }
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\23cf4623d9536b9be25d06b85862b91e\transformed\jetified-datastore-preferences-1.0.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\5b8dd42dfb7bb82abd8c653790da0fca\transformed\rules\lib\META-INF\com.android.tools\r8\coroutines.pro
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\e6c77c8236371e1aff6d02bb322d78d0\transformed\jetified-datastore-preferences-1.0.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\0bca39091897c2ffcb09c995c1f37f71\transformed\shrink-rules\lib\META-INF\com.android.tools\r8\coroutines.pro
 # When editing this file, update the following files as well:
 # - META-INF/proguard/coroutines.pro
 # - META-INF/com.android.tools/proguard/coroutines.pro
@@ -1313,12 +1231,12 @@
 
 # An annotation used for build tooling, won't be directly accessed.
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\5b8dd42dfb7bb82abd8c653790da0fca\transformed\rules\lib\META-INF\com.android.tools\r8\coroutines.pro
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\2c1ce2968092350f20aaf8abe6cf45e6\transformed\jetified-play-services-tasks-18.2.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\0bca39091897c2ffcb09c995c1f37f71\transformed\shrink-rules\lib\META-INF\com.android.tools\r8\coroutines.pro
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\ca513422f4b226af2288466e257b1bad\transformed\jetified-play-services-tasks-18.2.0\proguard.txt
 
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\2c1ce2968092350f20aaf8abe6cf45e6\transformed\jetified-play-services-tasks-18.2.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\04897cfa959b336e172bf580a32040f3\transformed\jetified-play-services-measurement-sdk-api-22.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\ca513422f4b226af2288466e257b1bad\transformed\jetified-play-services-tasks-18.2.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\3a40f7f08f51cfd5aa799ed3aaf8d43b\transformed\jetified-play-services-measurement-sdk-api-22.3.0\proguard.txt
 # We keep all fields for every generated proto file as the runtime uses
 # reflection over them that ProGuard cannot detect. Without this keep
 # rule, fields may be removed that would cause runtime failures.
@@ -1326,8 +1244,8 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\04897cfa959b336e172bf580a32040f3\transformed\jetified-play-services-measurement-sdk-api-22.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\b6e56a89520ba0a2354e7b6fd4da6509\transformed\jetified-play-services-measurement-base-22.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\3a40f7f08f51cfd5aa799ed3aaf8d43b\transformed\jetified-play-services-measurement-sdk-api-22.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\84ef4c443993ae066edb879f87762b7c\transformed\jetified-play-services-measurement-base-22.3.0\proguard.txt
 # We keep all fields for every generated proto file as the runtime uses
 # reflection over them that ProGuard cannot detect. Without this keep
 # rule, fields may be removed that would cause runtime failures.
@@ -1335,8 +1253,8 @@
   <fields>;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\b6e56a89520ba0a2354e7b6fd4da6509\transformed\jetified-play-services-measurement-base-22.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\36d5d283f37886d05e79dbec44a6acd7\transformed\jetified-play-services-basement-18.5.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\84ef4c443993ae066edb879f87762b7c\transformed\jetified-play-services-measurement-base-22.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\12f0cf041f4c887129762ae7e906d9fc\transformed\jetified-play-services-basement-18.5.0\proguard.txt
 # Needed when building against pre-Marshmallow SDK.
 -dontwarn android.security.NetworkSecurityPolicy
 
@@ -1414,8 +1332,8 @@
 
 
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\36d5d283f37886d05e79dbec44a6acd7\transformed\jetified-play-services-basement-18.5.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\e6181a09eb850222e7b454e95955dc9a\transformed\fragment-1.5.4\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\12f0cf041f4c887129762ae7e906d9fc\transformed\jetified-play-services-basement-18.5.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\6e7015bd5856db65c4781a1c15532d55\transformed\fragment-1.5.4\proguard.txt
 # Copyright (C) 2020 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1436,8 +1354,8 @@
     public <init>();
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\e6181a09eb850222e7b454e95955dc9a\transformed\fragment-1.5.4\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\e04ad5acf0c450cf658b48e6e5229e89\transformed\jetified-flexbox-2.0.1\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\6e7015bd5856db65c4781a1c15532d55\transformed\fragment-1.5.4\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\c68985fa0665fe67afb208937d590e8d\transformed\jetified-flexbox-2.0.1\proguard.txt
 #
 # Copyright 2016 Google Inc. All rights reserved.
 #
@@ -1458,13 +1376,74 @@
 # tries to instantiate the layout manager using reflection.
 # This is to prevent the layout manager from being obfuscated.
 -keepnames public class com.google.android.flexbox.FlexboxLayoutManager
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\e04ad5acf0c450cf658b48e6e5229e89\transformed\jetified-flexbox-2.0.1\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\aebdea471a43f5436c31c675c672a77c\transformed\jetified-transport-backend-cct-3.3.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\c68985fa0665fe67afb208937d590e8d\transformed\jetified-flexbox-2.0.1\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\58274bcf2ff88e1d536b01761ca190db\transformed\jetified-startup-runtime-1.1.1\proguard.txt
+# It's important that we preserve initializer names, given they are used in the AndroidManifest.xml.
+-keepnames class * extends androidx.startup.Initializer
+
+# These Proguard rules ensures that ComponentInitializers are are neither shrunk nor obfuscated,
+# and are a part of the primary dex file. This is because they are discovered and instantiated
+# during application startup.
+-keep class * extends androidx.startup.Initializer {
+    # Keep the public no-argument constructor while allowing other methods to be optimized.
+    <init>();
+}
+
+-assumenosideeffects class androidx.startup.StartupLogger { public static <methods>; }
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\58274bcf2ff88e1d536b01761ca190db\transformed\jetified-startup-runtime-1.1.1\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\88675bf6542a73a1d5c9da9c0f0c76a2\transformed\versionedparcelable-1.1.1\proguard.txt
+-keep class * implements androidx.versionedparcelable.VersionedParcelable
+-keep public class android.support.**Parcelizer { *; }
+-keep public class androidx.**Parcelizer { *; }
+-keep public class androidx.versionedparcelable.ParcelImpl
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\88675bf6542a73a1d5c9da9c0f0c76a2\transformed\versionedparcelable-1.1.1\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\ff3fb8313a24d47c79c3c7bb3d94910c\transformed\jetified-firebase-components-18.0.0\proguard.txt
+-dontwarn com.google.firebase.components.Component$Instantiation
+-dontwarn com.google.firebase.components.Component$ComponentType
+
+-keep class * implements com.google.firebase.components.ComponentRegistrar
+-keep,allowshrinking interface com.google.firebase.components.ComponentRegistrar
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\ff3fb8313a24d47c79c3c7bb3d94910c\transformed\jetified-firebase-components-18.0.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\a81d579ab3c408867d6122afe43c10e9\transformed\jetified-transport-backend-cct-3.3.0\proguard.txt
 -dontwarn com.google.auto.value.AutoValue
 -dontwarn com.google.auto.value.AutoValue$Builder
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\aebdea471a43f5436c31c675c672a77c\transformed\jetified-transport-backend-cct-3.3.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\ed3023c3a9e68d8d948a5b8246e09968\transformed\jetified-neptune-2.7.0\proguard.txt
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\a81d579ab3c408867d6122afe43c10e9\transformed\jetified-transport-backend-cct-3.3.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\53dc1e745f4fac8b7126278e4598c68c\transformed\jetified-transport-api-3.2.0\proguard.txt
+-dontwarn com.google.auto.value.AutoValue
+-dontwarn com.google.auto.value.AutoValue$Builder
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\53dc1e745f4fac8b7126278e4598c68c\transformed\jetified-transport-api-3.2.0\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\d4dc2d49c80248535ff90e282975753a\transformed\room-runtime-2.2.5\proguard.txt
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn androidx.room.paging.**
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\d4dc2d49c80248535ff90e282975753a\transformed\room-runtime-2.2.5\proguard.txt
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\604fcef173131a943b37432a6622e7c3\transformed\shrink-rules\lib\META-INF\proguard\androidx-annotations.pro
+-keep,allowobfuscation @interface androidx.annotation.Keep
+-keep @androidx.annotation.Keep class * {*;}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <init>(...);
+}
+
+-keepclassmembers,allowobfuscation class * {
+  @androidx.annotation.DoNotInline <methods>;
+}
+
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\604fcef173131a943b37432a6622e7c3\transformed\shrink-rules\lib\META-INF\proguard\androidx-annotations.pro
+# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.14.5\transforms\70f21ec6232b38aebf50b0bf8401a607\transformed\jetified-neptune-2.7.0\proguard.txt
 # Neptune SDK混淆配置
 -dontwarn android.content.IContentProvider
 -dontwarn android.app.ActivityThread
@@ -1491,68 +1470,7 @@
     static final java.lang.ThreadLocal sConstructors;
 }
 
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\ed3023c3a9e68d8d948a5b8246e09968\transformed\jetified-neptune-2.7.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\ba595906cb59231c28e21116183a4b43\transformed\jetified-startup-runtime-1.1.1\proguard.txt
-# It's important that we preserve initializer names, given they are used in the AndroidManifest.xml.
--keepnames class * extends androidx.startup.Initializer
-
-# These Proguard rules ensures that ComponentInitializers are are neither shrunk nor obfuscated,
-# and are a part of the primary dex file. This is because they are discovered and instantiated
-# during application startup.
--keep class * extends androidx.startup.Initializer {
-    # Keep the public no-argument constructor while allowing other methods to be optimized.
-    <init>();
-}
-
--assumenosideeffects class androidx.startup.StartupLogger { public static <methods>; }
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\ba595906cb59231c28e21116183a4b43\transformed\jetified-startup-runtime-1.1.1\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\00fac048a67947cf6b569d7b8f54ba35\transformed\versionedparcelable-1.1.1\proguard.txt
--keep class * implements androidx.versionedparcelable.VersionedParcelable
--keep public class android.support.**Parcelizer { *; }
--keep public class androidx.**Parcelizer { *; }
--keep public class androidx.versionedparcelable.ParcelImpl
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\00fac048a67947cf6b569d7b8f54ba35\transformed\versionedparcelable-1.1.1\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\6879322097d4025604522e2b46fa4c9d\transformed\jetified-firebase-components-18.0.0\proguard.txt
--dontwarn com.google.firebase.components.Component$Instantiation
--dontwarn com.google.firebase.components.Component$ComponentType
-
--keep class * implements com.google.firebase.components.ComponentRegistrar
--keep,allowshrinking interface com.google.firebase.components.ComponentRegistrar
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\6879322097d4025604522e2b46fa4c9d\transformed\jetified-firebase-components-18.0.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\a54d4196120a19f6d07fe762b05c8bdf\transformed\jetified-transport-api-3.2.0\proguard.txt
--dontwarn com.google.auto.value.AutoValue
--dontwarn com.google.auto.value.AutoValue$Builder
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\a54d4196120a19f6d07fe762b05c8bdf\transformed\jetified-transport-api-3.2.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\cc3621c47b7648b31adddfc8c87ef387\transformed\room-runtime-2.2.5\proguard.txt
--keep class * extends androidx.room.RoomDatabase
--dontwarn androidx.room.paging.**
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\cc3621c47b7648b31adddfc8c87ef387\transformed\room-runtime-2.2.5\proguard.txt
-# The proguard configuration file for the following section is C:\Users\combo\.gradle\caches\8.10.2\transforms\a7e556a75ae783420cab827a0638ab9d\transformed\rules\lib\META-INF\proguard\androidx-annotations.pro
--keep,allowobfuscation @interface androidx.annotation.Keep
--keep @androidx.annotation.Keep class * {*;}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <methods>;
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <fields>;
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <init>(...);
-}
-
--keepclassmembers,allowobfuscation class * {
-  @androidx.annotation.DoNotInline <methods>;
-}
-
-# End of content from C:\Users\combo\.gradle\caches\8.10.2\transforms\a7e556a75ae783420cab827a0638ab9d\transformed\rules\lib\META-INF\proguard\androidx-annotations.pro
+# End of content from C:\Users\combo\.gradle\caches\8.14.5\transforms\70f21ec6232b38aebf50b0bf8401a607\transformed\jetified-neptune-2.7.0\proguard.txt
 # The proguard configuration file for the following section is <unknown>
 
 # End of content from <unknown>
