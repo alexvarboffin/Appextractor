@@ -11,8 +11,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.debug.DemoData
@@ -20,7 +25,6 @@ import com.walhalla.appextractor.databinding.ManifestTabsExplorerBinding
 import com.walhalla.appextractor.fragment.QCallback
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.manifest.ManifestContract
-import androidx.core.net.toUri
 import com.walhalla.manifest.ManifestViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -35,8 +39,21 @@ class ManifestActivity : AppCompatActivity(), QCallback {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ManifestTabsExplorerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // CoordinatorLayout often consumes insets before children see them.
+        // Apply top on root; L/B/R on content container (no topMargin on content).
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            binding.container.updatePadding(
+                left = insets.left,
+                right = insets.right,
+                bottom = insets.bottom
+            )
+            WindowInsetsCompat.CONSUMED
+        }
         setSupportActionBar(binding.toolbar)
         
         supportActionBar?.apply {

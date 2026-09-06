@@ -1,13 +1,13 @@
 package com.walhalla.appextractor.activity.debug
 
-import android.R
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.walhalla.appextractor.R
 import com.walhalla.appextractor.utils.MarketUtils.openGooglePlayCategory
 
 class GooglePlayCategoryLauncher : AppCompatActivity() {
@@ -50,24 +50,17 @@ class GooglePlayCategoryLauncher : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_google_play_category_launcher)
 
-        val listView = ListView(this)
-        val layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        listView.layoutParams = layoutParams
-
-        val adapter = ArrayAdapter(this, R.layout.simple_list_item_1, items)
-        listView.adapter = adapter
+        val listView = findViewById<ListView>(R.id.list)
+        listView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
         listView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
-                val category = items[position]
+            AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                 openGooglePlayCategory(
                     this@GooglePlayCategoryLauncher,
-                    category
+                    items[position]
                 )
             }
-        setContentView(listView)
     }
 }
