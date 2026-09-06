@@ -133,6 +133,7 @@ dependencies {
 
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.activity.ktx) // enableEdgeToEdge
 
     implementation(libs.androidx.preference.ktx)
     //    implementation("com.google.firebase:firebase-ads:$FOO"){

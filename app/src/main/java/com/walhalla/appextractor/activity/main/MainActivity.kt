@@ -18,12 +18,16 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.core.app.ActivityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 
 import com.dropbox.core.android.Auth
@@ -83,7 +87,10 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        // Android 15+/16: edge-to-edge is enforced for targetSdk 35+.
+        // Use enableEdgeToEdge (not setDecorFitsSystemWindows). Docs:
+        // https://developer.android.com/develop/ui/views/layout/edge-to-edge
+        enableEdgeToEdge()
 
         val powerManager = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(
@@ -95,6 +102,17 @@ class MainActivity : AppCompatActivity(), MainView {
 
         mBinding = MainBinding.inflate(layoutInflater)
         setContentView(mBinding!!.root)
+        // Bottom critical UI (ad banner): systemBars as margins — same pattern as FAB in Google docs.
+        // Do NOT apply top inset here (AppBarLayout handles top via fitsSystemWindows).
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding!!.adView) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = insets.left
+                bottomMargin = insets.bottom
+                rightMargin = insets.right
+            }
+            windowInsets
+        }
         setSupportActionBar(mBinding!!.toolbar)
 
 
