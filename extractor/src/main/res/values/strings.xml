@@ -19,6 +19,7 @@
     <string name="action_extract">Extract apk</string>
     <string name="search_hint">Search</string>
     <string name="data_empty">(No items)</string>
+    <string name="search_no_results">No apps match \"%1$s\"</string>
     <string name="google_drive_success">Saved in Google Drive cloud!\n%1$s</string>
     <string name="file_created">Created file: %1$s.</string>
     <string name="telegram_token_title">Token</string>

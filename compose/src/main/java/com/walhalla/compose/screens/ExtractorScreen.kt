@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -461,52 +462,80 @@ fun ExtractorScreen(
 
                 // Apps list
                 Box(modifier = Modifier.fillMaxSize()) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            items(sortedApps) { app ->
-                                AppListItem(
-                                    app = app,
-                                    isSelected = app in selectedApps,
-                                    onSelect = {
-                                        println("DEBUG: Selection clicked for ${app.label}")
-                                        viewModel.toggleAppSelection(app)
-                                    },
-                                    onExtractClick = {
-                                        //@@@@@
-                                        println("DEBUG: Extract clicked for ${app.label}")
-                                        permissionLauncher.launch(permissions)
-                                        viewModel.extractApkRequest(app)
-                                    },
-                                    onShareClick = {
-                                        println("DEBUG: Share clicked for ${app.label}")
-                                        viewModel.shareApk(app)
-                                    },
-                                    onInfoClick = {
-                                        println("DEBUG: Info clicked for ${app.label}")
-                                        onNavigateToAppDetail(app.packageName)
-                                    },
-                                    onOpenPlayStoreClick = { viewModel.openPlayStore(app) },
-                                    onLaunchClick = { viewModel.launchApp(app) },
-                                    onUninstallClick = { viewModel.uninstallApp(app) },
-                                    onCopyPackageNameClick = { viewModel.copyPackageName(app) },
-                                    onManifestClick = { viewManifest(app) },
-                                    onSaveIconClick = { viewModel.saveIcon(app) },
-                                    onShareIconClick = { viewModel.shareIcon(app) }
+                    when {
+                        isLoading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                        sortedApps.isEmpty() -> {
+                            Column(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-
-                                // Show extraction progress if this app is being extracted
-                                extractionProgress?.let { (packageName, progress) ->
-                                    if (packageName == app.packageName) {
-                                        LinearProgressIndicator(
-                                            progress = progress / 100f,
-                                            modifier = Modifier.fillMaxWidth()
+                                Text(
+                                    text = if (searchQuery.isBlank()) {
+                                        stringResource(ExtR.string.data_empty)
+                                    } else {
+                                        stringResource(
+                                            ExtR.string.search_no_results,
+                                            searchQuery
                                         )
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                items(sortedApps) { app ->
+                                    AppListItem(
+                                        app = app,
+                                        isSelected = app in selectedApps,
+                                        onSelect = {
+                                            viewModel.toggleAppSelection(app)
+                                        },
+                                        onExtractClick = {
+                                            permissionLauncher.launch(permissions)
+                                            viewModel.extractApkRequest(app)
+                                        },
+                                        onShareClick = {
+                                            viewModel.shareApk(app)
+                                        },
+                                        onInfoClick = {
+                                            onNavigateToAppDetail(app.packageName)
+                                        },
+                                        onOpenPlayStoreClick = { viewModel.openPlayStore(app) },
+                                        onLaunchClick = { viewModel.launchApp(app) },
+                                        onUninstallClick = { viewModel.uninstallApp(app) },
+                                        onCopyPackageNameClick = {
+                                            viewModel.copyPackageName(app)
+                                        },
+                                        onManifestClick = { viewManifest(app) },
+                                        onSaveIconClick = { viewModel.saveIcon(app) },
+                                        onShareIconClick = { viewModel.shareIcon(app) }
+                                    )
+
+                                    extractionProgress?.let { (packageName, progress) ->
+                                        if (packageName == app.packageName) {
+                                            LinearProgressIndicator(
+                                                progress = progress / 100f,
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        }
                                     }
                                 }
                             }

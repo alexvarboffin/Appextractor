@@ -39,6 +39,9 @@ import com.walhalla.ui.plugins.Launcher
 import com.walhalla.ui.plugins.Module_U
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
+    /** Full installed list — never shrink by search. */
+    private val _allApps = MutableStateFlow<List<PackageMeta>>(emptyList())
+
     private val _apps = MutableStateFlow<List<PackageMeta>>(emptyList())
     val apps: StateFlow<List<PackageMeta>> = _apps.asStateFlow()
 
@@ -73,7 +76,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
-        filterApps()
+        applySearchFilter()
     }
 
     private fun loadInstalledApps() {
@@ -121,7 +124,8 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
                     meta
                 }
-                _apps.value = appsList
+                _allApps.value = appsList
+                applySearchFilter()
             } catch (e: Exception) {
                 // Handle error
             } finally {
@@ -130,19 +134,16 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    private fun filterApps() {
-        val query = _searchQuery.value
-        if (query.isEmpty()) {
-            loadInstalledApps()
-            return
-        }
-
-        viewModelScope.launch {
-            val filteredApps = _apps.value.filter { app ->
+    /** Always filter from full [_allApps], never from already-filtered [_apps]. */
+    private fun applySearchFilter() {
+        val query = _searchQuery.value.trim()
+        _apps.value = if (query.isEmpty()) {
+            _allApps.value
+        } else {
+            _allApps.value.filter { app ->
                 app.label.contains(query, ignoreCase = true) ||
                         app.packageName.contains(query, ignoreCase = true)
             }
-            _apps.value = filteredApps
         }
     }
 
@@ -396,7 +397,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                 ?.map { it.nameWithoutExtension }
                 ?: return@launch
 
-            _selectedApps.value = _apps.value.filter { app ->
+            _selectedApps.value = _allApps.value.filter { app ->
                 extractedFiles.any { fileName ->
                     fileName.startsWith(app.label.replace(" ", "_"))
                 }
@@ -405,7 +406,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun getAppByPackageName(packageName: String?): PackageMeta? {
-        return _apps.value.find { it.packageName == packageName }
+        return _allApps.value.find { it.packageName == packageName }
     }
 
     fun shareApp() {
