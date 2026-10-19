@@ -100,6 +100,10 @@ class MainActivity : ComponentActivity() {
                                             "app",
                                             it
                                         )
+                                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                                            "xml_file",
+                                            null as String?
+                                        )
                                         navController.navigate("manifest")
                                     }
                                 )
@@ -108,10 +112,14 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Settings.route) { SettingsScreen() }
                             composable(Screen.Manifest.route) { backStackEntry ->
                                 val app = navController.previousBackStackEntry?.savedStateHandle?.get<PackageMeta>("app")
-                                println("DEBUG: Manifest screen app: $app")
+                                val xmlFileName = navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.get<String>("xml_file")
+                                println("DEBUG: Manifest screen app: $app xml=$xmlFileName")
                                 if (app != null) {
                                     ManifestScreen(
                                         app = app,
+                                        xmlFileName = xmlFileName,
                                         onBackClick = { navController.navigateUp() }
                                     )
                                 } else {
@@ -131,7 +139,18 @@ class MainActivity : ComponentActivity() {
                                 if (app != null) {
                                     AppDetailScreen(
                                         app = app,
-                                        onBackClick = { navController.navigateUp() }
+                                        onBackClick = { navController.navigateUp() },
+                                        onViewManifest = { meta, xml ->
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "app",
+                                                meta
+                                            )
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "xml_file",
+                                                xml
+                                            )
+                                            navController.navigate("manifest")
+                                        }
                                     )
                                 } else {
                                     // No meta passed — leave immediately (should not happen)

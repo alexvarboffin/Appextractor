@@ -1,5 +1,6 @@
 package com.walhalla.compose.viewmodel
 
+import android.app.Activity
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -9,33 +10,36 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.Settings
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.walhalla.appextractor.CloudBackupCoordinator
+import com.walhalla.appextractor.ExtractorHelper
+import com.walhalla.appextractor.interactors.SimpleMeta
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.model.ViewModel as ExtractorLineViewModel
 import com.walhalla.appextractor.utils.ApkUtils
+import com.walhalla.appextractor.utils.IconSaver
+import com.walhalla.appextractor.utils.MarketUtils
 import com.walhalla.appextractor.utils.XmlUtils
+import com.walhalla.compose.R
+import com.walhalla.compose.log.AppLogBus
+import com.walhalla.ui.plugins.Launcher
+import com.walhalla.ui.plugins.Module_U
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
-import androidx.core.net.toUri
-import com.walhalla.appextractor.utils.ExtractorUtils
-import kotlinx.coroutines.Dispatchers
-import android.net.Uri
-import android.provider.Settings
-import androidx.compose.ui.res.stringResource
-import com.walhalla.compose.R
-import com.walhalla.compose.log.AppLogBus
-import com.walhalla.ui.plugins.Launcher
-import com.walhalla.ui.plugins.Module_U
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     /** Full installed list — never shrink by search. */
@@ -69,8 +73,105 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     private val _showAboutDialog = MutableStateFlow(false)
     val showAboutDialog: StateFlow<Boolean> = _showAboutDialog.asStateFlow()
 
+    /** Host Activity for Dropbox OAuth / dialogs — set from Compose screen. */
+    var activityProvider: (() -> Activity?)? = null
+
+    private var cloudBackup: CloudBackupCoordinator? = null
+
+    private val extractorHelper = ExtractorHelper(
+        mThreadExecutor = CoroutineScope(Dispatchers.Default),
+        mMainThread = CoroutineScope(Dispatchers.Main),
+        mView = object : ExtractorHelper.Callback {
+            override fun rbcProgressCallback(
+                position: Int,
+                totalFileSize: Int,
+                file: File,
+                fileSize: String,
+                progress: Double
+            ) {
+                _extractionProgress.value = file.name to progress.toInt()
+                _extractionFileCount.value = file.name to totalFileSize
+            }
+
+            override fun failureExtracted(resId: Int) {
+                val msg = getApplication<Application>().getString(resId)
+                _successMessage.value = msg
+                AppLogBus.error(msg)
+            }
+
+            override fun makeSnackBar(file: File) {
+                val msg = "APK extracted to:\n${file.path}"
+                _successMessage.value = msg
+                AppLogBus.success(msg)
+            }
+
+            override fun printOutput(viewModel: ExtractorLineViewModel) {
+                AppLogBus.success(viewModel.toString())
+            }
+
+            override fun successExtracted(mFile: Map<SimpleMeta, List<File>>) {
+                val count = mFile.values.sumOf { it.size }
+                val paths = mFile.values.flatten().joinToString("\n") { it.path }
+                val msg = if (count == 1) {
+                    "APK extracted to:\n$paths"
+                } else {
+                    "Extracted $count files:\n$paths"
+                }
+                _successMessage.value = msg
+                AppLogBus.success(msg)
+                runCloudBackup(mFile)
+            }
+
+            override fun makeStorageLocalProgressBar(totalFileSize: Int) {
+                _extractionFileCount.value = "extract" to totalFileSize
+            }
+
+            override fun hideProgressBar(size: Int) {
+                _extractionProgress.value = null
+                _extractionFileCount.value = null
+            }
+
+            override fun extractOnePleaseDialog(noneExtracted: List<PackageMeta>) {
+                val names = noneExtracted.joinToString { it.label }
+                val msg = "Need root to extract: $names"
+                _successMessage.value = msg
+                AppLogBus.error(msg)
+            }
+        }
+    )
+
     init {
         loadInstalledApps()
+    }
+
+    private fun runCloudBackup(listMap: Map<SimpleMeta, List<File>>) {
+        val ctx = getApplication<Application>()
+        cloudBackup?.cancel()
+        cloudBackup = CloudBackupCoordinator(
+            ctx,
+            activityProvider?.invoke(),
+            object : CloudBackupCoordinator.Listener {
+                override fun onCloudMessage(success: Boolean, message: String) {
+                    if (success) {
+                        _successMessage.value = message
+                        AppLogBus.success(message)
+                    } else {
+                        AppLogBus.error(message)
+                    }
+                }
+
+                override fun onCloudProgress(progress: Int, file: File?, fileSize: String?) {
+                    _extractionProgress.value = (file?.name ?: "cloud") to progress
+                }
+
+                override fun onCloudBusy(busy: Boolean) {
+                    if (!busy) {
+                        _extractionProgress.value = null
+                    }
+                }
+            }
+        )
+        cloudBackup!!.handleSuccessExtracted(listMap)
     }
 
     fun setSearchQuery(query: String) {
@@ -147,132 +248,36 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun extractApkRequest(app: PackageMeta) {
-        viewModelScope.launch(Dispatchers.Default) {
-            extractApk(app)
-        }
+        extractorHelper.executeInternal(listOf(app), getApplication())
     }
 
     fun extractSelectedApps() {
         val selected = _selectedApps.value.toList()
         if (selected.isEmpty()) return
-        viewModelScope.launch(Dispatchers.Default) {
-            selected.forEach { extractApk(it) }
-        }
-    }
-
-    private fun extractApk(app: PackageMeta): File? {
-        println("DEBUG: Starting APK extraction for ${app.label}")
-        try {
-            val context = getApplication<Application>()
-
-            // Get all APK files including splits
-            val uniqueApkFiles =
-                ExtractorUtils.getAllApkFilesForCurrentPackage(context, app.packageName)
-            println("DEBUG: Found ${uniqueApkFiles.size} APK files to extract")
-
-            // Show total file count
-            _extractionFileCount.value = app.packageName to uniqueApkFiles.size
-            println("DEBUG: Set extraction file count to ${uniqueApkFiles.size}")
-
-            val apkDir = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                "ExtractedApks"
-            )
-            if (!apkDir.exists()) {
-                apkDir.mkdirs()
-            }
-
-            // Create package directory
-            val packageDir = File(apkDir, app.packageName.replace(".", "_"))
-            if (!packageDir.exists()) {
-                packageDir.mkdirs()
-            }
-
-            val extractedFiles = mutableListOf<File>()
-            var currentFileIndex = 0
-
-            // Copy each APK file
-            for (sourceFile in uniqueApkFiles) {
-                if (!sourceFile.exists()) continue
-
-                currentFileIndex++
-                println("DEBUG: Extracting file ${currentFileIndex}/${uniqueApkFiles.size}: ${sourceFile.name}")
-                val destFile = File(packageDir, sourceFile.name)
-                FileInputStream(sourceFile).use { input ->
-                    FileOutputStream(destFile).use { output ->
-                        val buffer = ByteArray(1024)
-                        var length: Int
-                        var totalBytes: Long = 0
-                        val fileSize = sourceFile.length()
-
-                        while (input.read(buffer).also { length = it } > 0) {
-                            output.write(buffer, 0, length)
-                            totalBytes += length
-                            val progress =
-                                ((totalBytes.toDouble() / fileSize.toDouble()) * 100).toInt()
-                            _extractionProgress.value = app.packageName to progress
-                            println("DEBUG: Progress for ${sourceFile.name}: $progress%")
-                        }
-                    }
-                }
-                extractedFiles.add(destFile)
-            }
-
-            println("DEBUG: Extraction completed")
-            _extractionProgress.value = null
-            _extractionFileCount.value = null
-
-            if (extractedFiles.isNotEmpty()) {
-                val count = extractedFiles.size
-                val totalBytes = extractedFiles.sumOf { it.length() }
-                val totalSize = String.format(
-                    java.util.Locale.CANADA,
-                    "%.2f MB",
-                    totalBytes.toDouble() / (1024 * 1024)
-                )
-                val message = if (count == 1) {
-                    "APK extracted to:\n${extractedFiles[0].path}\n$totalSize"
-                } else {
-                    "Extracted $count files to:\n${packageDir.path}\n$totalSize"
-                }
-                _successMessage.value = message
-                AppLogBus.success(message)
-                return extractedFiles[0]
-            }
-            AppLogBus.error("Failed to extract APK: ${app.packageName}")
-            return null
-        } catch (e: IOException) {
-            println("DEBUG: Error extracting APK: ${e.message}")
-            e.printStackTrace()
-            _extractionProgress.value = null
-            _extractionFileCount.value = null
-            _successMessage.value = null
-            AppLogBus.error("Extract error: ${e.message}")
-            return null
-        }
+        extractorHelper.executeInternal(selected, getApplication())
     }
 
     fun shareApk(app: PackageMeta) {
-        println("DEBUG: Sharing APK for ${app.label}")
-        viewModelScope.launch {
-            val apkFile = extractApk(app) ?: return@launch
-            val context = getApplication<Application>()
-            val uri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.provider",
-                apkFile
-            )
-
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "application/vnd.android.package-archive"
-                putExtra(Intent.EXTRA_STREAM, uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(Intent.createChooser(intent, "Share APK").apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
+        // Extract first (via helper); share when snack reports the file — use source APK for share
+        val context = getApplication<Application>()
+        val src = File(app.sourceDir)
+        if (!src.exists()) {
+            extractApkRequest(app)
+            return
         }
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            src
+        )
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/vnd.android.package-archive"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(Intent.createChooser(intent, "Share APK").apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
     }
 
     fun openPlayStore(app: PackageMeta) {
@@ -320,28 +325,21 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
 
     fun saveIcon(app: PackageMeta) {
-        viewModelScope.launch {
-            try {
-                val context = getApplication<Application>()
-                val drawable = context.packageManager.getApplicationIcon(app.packageName)
-                val bitmap = drawable.toBitmap()
-
-                val iconDir = File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                    "AppIcons"
-                )
-                if (!iconDir.exists()) {
-                    iconDir.mkdirs()
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = IconSaver.saveAppIcon(getApplication(), app)) {
+                is IconSaver.Result.Success -> {
+                    _successMessage.value = result.message
+                    AppLogBus.success(result.message)
                 }
-
-                val iconFile = File(iconDir, "${app.label}_icon.png")
-                FileOutputStream(iconFile).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                is IconSaver.Result.Error -> {
+                    AppLogBus.error(result.message)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
+    }
+
+    fun openGooglePlayCategory(category: String) {
+        MarketUtils.openGooglePlayCategory(getApplication(), category)
     }
 
     fun shareIcon(app: PackageMeta) {

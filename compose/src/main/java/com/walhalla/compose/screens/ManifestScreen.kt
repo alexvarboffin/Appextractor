@@ -39,6 +39,7 @@ import coil3.compose.AsyncImage
 fun ManifestScreen(
     app: PackageMeta,
     onBackClick: () -> Unit,
+    xmlFileName: String? = null,
     viewModel: ManifestViewModel = viewModel()
 ) {
     println("DEBUG: ManifestScreen started with package: ${app.packageName}")
@@ -91,11 +92,13 @@ fun ManifestScreen(
         }
     }
 
-    LaunchedEffect(app) {
-        println("DEBUG: ManifestScreen started with package: ${app.packageName}")
-        println("DEBUG: App icon: ${app.icon}")
-        println("DEBUG: App label: ${app.label}")
-        viewModel.loadManifests(app)
+    LaunchedEffect(app.packageName, xmlFileName) {
+        println("DEBUG: ManifestScreen started with package: ${app.packageName} xml=$xmlFileName")
+        if (xmlFileName.isNullOrBlank()) {
+            viewModel.loadManifests(app)
+        } else {
+            viewModel.loadXmlResource(app, xmlFileName)
+        }
     }
 
     fun showSnackbar(message: String) {

@@ -1,0 +1,29 @@
+---
+description: Keep AI-PROJECT-CHECKLIST.md as living source of truth for review and rebuild
+alwaysApply: true
+---
+
+# AI Project Checklist (mandatory)
+
+**Before starting work:** read the **global** skill `ai-project-checklist` (`~/.cursor/skills/ai-project-checklist/SKILL.md`), then read [`AI-PROJECT-CHECKLIST.md`](../../AI-PROJECT-CHECKLIST.md).
+
+Canonical checklist: repo root `AI-PROJECT-CHECKLIST.md`. In other repos, the same skill looks for that filename at the workspace root.
+
+## When to update (same session, do not wait for the user to ask)
+
+1. **New understanding** — User states a requirement, constraint, correction, or preference that differs from the checklist → edit the matching section (or add a dated bullet under §14).
+2. **Feature closed** — Task fully implemented and verified (build/install/device test, or explicit user confirmation) → mark `[x]`, list key files, update §12 status table if relevant.
+3. **Architecture / reuse** — Any new shared API in `:extractor` or parity decision → document under §2 / the feature section; never leave a duplicate Compose-only reimplementation undocumented.
+
+## How to use the checklist
+
+- **Before large parity or rebuild work:** read `AI-PROJECT-CHECKLIST.md`.
+- **As AI reviewer:** follow §15; report gaps only.
+- **As rebuilder from empty tree:** follow §16, then §15.
+- Prefer this file over outdated `FEATURES.md` when they conflict.
+
+## Do not
+
+- Invent checklist items for unfinished brainstorming.
+- Mark `[x]` without implementation (or clear user acceptance).
+- Put Play-publish / edge-to-edge items here — those belong to the `android-prepublish-refresh` skill.

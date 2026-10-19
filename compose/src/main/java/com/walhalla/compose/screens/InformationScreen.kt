@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -29,9 +30,12 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -82,7 +86,10 @@ private data class InfoSection(
 fun InformationScreen(
     paddingValues: PaddingValues,
     app: PackageMeta,
-    appDetails: AppDetails?
+    appDetails: AppDetails?,
+    onLaunchService: (className: String) -> Unit = {},
+    onOpenAppSettings: () -> Unit = {},
+    onViewXml: (xmlPath: String) -> Unit = {}
 ) {
     val sections = remember(appDetails?.infoLines, app.packageName) {
         val lines = appDetails?.infoLines.orEmpty()
@@ -125,7 +132,13 @@ fun InformationScreen(
                 ) {
                     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                         section.items.forEach { line ->
-                            InfoLineItem(line, app.packageName)
+                            InfoLineItem(
+                                line,
+                                app.packageName,
+                                onLaunchService,
+                                onOpenAppSettings,
+                                onViewXml
+                            )
                         }
                     }
                 }
@@ -180,7 +193,13 @@ private fun groupIntoSections(
 }
 
 @Composable
-private fun InfoLineItem(line: BaseViewModel, packageName: String) {
+private fun InfoLineItem(
+    line: BaseViewModel,
+    packageName: String,
+    onLaunchService: (String) -> Unit = {},
+    onOpenAppSettings: () -> Unit = {},
+    onViewXml: (String) -> Unit = {}
+) {
     when (line) {
         is SimpleLine -> {
             val ctx = LocalContext.current
@@ -189,22 +208,20 @@ private fun InfoLineItem(line: BaseViewModel, packageName: String) {
         is CertLine -> DetailRow(line.res0.ifBlank { "—" }, line.value, copyable = true)
         is V2Line -> DetailRow(line.key, line.value, copyable = true)
         is DirLine -> DetailRow(line.name, line.value, copyable = true)
-        is InfoApkLine -> DetailRow(line.name, line.value, copyable = true)
-        is PermissionLine -> PermissionRow(line)
+        is InfoApkLine -> InfoApkRow(line, onViewXml)
+        is PermissionLine -> PermissionRow(line, onOpenAppSettings)
         is FlagzObject -> FlagsRow(line.flags)
-        is HeaderCollapsedObject -> CollapsedHeader(line, packageName)
-        is ActivityLine -> ActivityRow(line, packageName)
-        is ServiceLine -> ComponentRow(
-            label = line.label.ifBlank { line.className.substringAfterLast('.') },
-            className = line.className,
-            exported = line.exported
+        is HeaderCollapsedObject -> CollapsedHeader(
+            line, packageName, onLaunchService, onOpenAppSettings, onViewXml
         )
+        is ActivityLine -> ActivityRow(line, packageName)
+        is ServiceLine -> ServiceRow(line, onLaunchService)
         is ReceiverLine -> ComponentRow(
             label = line.label.ifBlank { line.receiverName.substringAfterLast('.') },
             className = line.receiverName,
             exported = line.exported
         )
-        is ProviderLine -> ProviderRow(line)
+        is ProviderLine -> ProviderRow(line, packageName)
         else -> DetailRow(line::class.simpleName ?: "?", line.toString())
     }
 }
@@ -246,7 +263,13 @@ private fun FlagsRow(flags: Int) {
 }
 
 @Composable
-private fun CollapsedHeader(header: HeaderCollapsedObject, packageName: String) {
+private fun CollapsedHeader(
+    header: HeaderCollapsedObject,
+    packageName: String,
+    onLaunchService: (String) -> Unit = {},
+    onOpenAppSettings: () -> Unit = {},
+    onViewXml: (String) -> Unit = {}
+) {
     var expanded by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -288,7 +311,9 @@ private fun CollapsedHeader(header: HeaderCollapsedObject, packageName: String) 
         ) {
             Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
                 header.list.forEach { child ->
-                    InfoLineItem(child, packageName)
+                    InfoLineItem(
+                        child, packageName, onLaunchService, onOpenAppSettings, onViewXml
+                    )
                 }
             }
         }
@@ -299,7 +324,7 @@ private val PermissionGrantedGreen = Color(0xFF2E7D32)
 private val PermissionDeniedRed = Color(0xFFC62828)
 
 @Composable
-private fun PermissionRow(line: PermissionLine) {
+private fun PermissionRow(line: PermissionLine, onOpenAppSettings: () -> Unit = {}) {
     val context = LocalContext.current
     val statusColor = if (line.isGranted) PermissionGrantedGreen else PermissionDeniedRed
     val description = remember(line.res0) {
@@ -314,6 +339,7 @@ private fun PermissionRow(line: PermissionLine) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onOpenAppSettings)
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -418,6 +444,47 @@ private fun ActivityRow(line: ActivityLine, packageName: String) {
 }
 
 @Composable
+private fun ServiceRow(line: ServiceLine, onLaunchService: (String) -> Unit) {
+    val label = line.label.ifBlank { line.className.substringAfterLast('.') }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = line.className,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = if (line.exported) "Exported" else "Not exported",
+                style = MaterialTheme.typography.labelSmall,
+                color = if (line.exported) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
+        }
+        if (line.exported) {
+            IconButton(onClick = { onLaunchService(line.className) }) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Launch service",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ComponentRow(label: String, className: String, exported: Boolean) {
     Column(
         modifier = Modifier
@@ -446,34 +513,91 @@ private fun ComponentRow(label: String, className: String, exported: Boolean) {
 }
 
 @Composable
-private fun ProviderRow(line: ProviderLine) {
-    Column(
+private fun InfoApkRow(line: InfoApkLine, onViewXml: (String) -> Unit) {
+    var showMenu by remember { mutableStateOf(false) }
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = line.label.ifBlank { line.className.substringAfterLast('.') },
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = line.className,
-            style = MaterialTheme.typography.bodySmall,
-            fontFamily = FontFamily.Monospace,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        if (line.authority.isNotBlank()) {
-            DetailRow("Authority", line.authority, copyable = true)
+        Column(modifier = Modifier.weight(1f)) {
+            DetailRow(line.name, line.value, copyable = true)
         }
-        Text(
-            text = buildString {
-                append(if (line.exported) "Exported" else "Not exported")
-                append(" · ")
-                append(if (line.enabled) "Enabled" else "Disabled")
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Box {
+            IconButton(onClick = { showMenu = true }) {
+                Icon(Icons.Default.MoreVert, contentDescription = "More")
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("View as XML path") },
+                    onClick = {
+                        showMenu = false
+                        onViewXml(line.value)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProviderRow(line: ProviderLine, packageName: String) {
+    val context = LocalContext.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = line.label.ifBlank { line.className.substringAfterLast('.') },
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = line.className,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (line.authority.isNotBlank()) {
+                DetailRow("Authority", line.authority, copyable = true)
+            }
+            Text(
+                text = buildString {
+                    append(if (line.exported) "Exported" else "Not exported")
+                    append(" · ")
+                    append(if (line.enabled) "Enabled" else "Disabled")
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        if (line.exported && line.authority.isNotBlank()) {
+            IconButton(
+                onClick = {
+                    LauncherUtils.onLaunchProvider(
+                        context,
+                        line,
+                        object : LauncherUtils.LauCallback {
+                            override fun showError(s: String) {
+                                Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Query provider",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }
 

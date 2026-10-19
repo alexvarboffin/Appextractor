@@ -90,15 +90,29 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-<!--        <receiver-->
-<!--            android:name="com.walhalla.appextractor.receiver.IntentReceiver"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="true"-->
-<!--            tools:ignore="ExportedReceiver">-->
-<!--            <intent-filter android:priority="999">-->
-<!--                <action android:name="com.walhalla.appextractor.EXTRACT" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:exported="true"
+            android:launchMode="singleTask"
+            tools:ignore="DiscouragedApi">
+            <intent-filter>
+                <data android:scheme="@string/db_scheme" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name="com.walhalla.appextractor.receiver.IntentReceiver"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter android:priority="999">
+                <action android:name="com.walhalla.appextractor.EXTRACT" />
+            </intent-filter>
+        </receiver>
 
     </application>
     <queries>

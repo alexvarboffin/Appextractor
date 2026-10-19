@@ -1,5 +1,6 @@
 package com.walhalla.compose.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,6 +19,14 @@ fun SettingsScreen(
 ) {
     val settings by viewModel.settings.collectAsState()
     val scrollState = rememberScrollState()
+    var showAbout by remember { mutableStateOf(false) }
+
+    if (showAbout) {
+        AboutDialog(
+            onDismiss = { showAbout = false },
+            appVersion = settings.appVersion
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -116,7 +125,8 @@ fun SettingsScreen(
 
             ListItem(
                 headlineContent = { Text(settings.appName) },
-                supportingContent = { Text("Version ${settings.appVersion}") }
+                supportingContent = { Text("Version ${settings.appVersion}") },
+                modifier = Modifier.clickable { showAbout = true }
             )
 
             // Additional Info

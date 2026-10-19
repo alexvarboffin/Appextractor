@@ -54,6 +54,52 @@ class ManifestViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun loadXmlResource(app: PackageMeta, xmlFileName: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                val apkPaths = getApkPaths(app.packageName)
+                val apkPath = apkPaths.firstOrNull() ?: run {
+                    _error.value = "No APK found"
+                    return@launch
+                }
+                val state = withContext(Dispatchers.IO) {
+                    currentApkPath = apkPath
+                    val presenter = ManifestPresenterXml(getApplication(), this@ManifestViewModel)
+                    currentPresenter = presenter
+                    if (!presenter.configForPackage(app.packageName, apkPath)) {
+                        return@withContext null
+                    }
+                    val content = presenter.mOutgetText(xmlFileName)
+                    val s = ManifestState(
+                        name = xmlFileName.substringAfterLast('/'),
+                        content = content,
+                        apkPath = apkPath,
+                        formattedContent = null
+                    )
+                    pendingState = s
+                    presenter.renderXML(xmlFileName)
+                    var attempts = 0
+                    while (pendingState?.formattedContent == null && attempts < 10) {
+                        delay(100)
+                        attempts++
+                    }
+                    pendingState
+                }
+                _manifestStates.value = listOfNotNull(state)
+                if (state == null) {
+                    _error.value = "Failed to load $xmlFileName"
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load XML"
+            } finally {
+                pendingState = null
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun loadManifests(app: PackageMeta) {
         viewModelScope.launch {
             _isLoading.value = true

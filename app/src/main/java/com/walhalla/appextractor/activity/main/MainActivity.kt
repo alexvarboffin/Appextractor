@@ -408,45 +408,11 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     fun saveIcons0(context: Context, meta: PackageMeta) {
-//        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Apk Extractor/");
-//        if (!dir.exists()) {
-//            dir.mkdir();
-//        }
-//        File iconDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Apk Extractor/", "/App Icons/");
-//        if (!iconDir.exists()) {
-//            iconDir.mkdir();
-//        }
-        //final PackageManager pm = getPackageManager();
-        //String name = meta.applicationInfo.loadLabel(pm).toString();
-        val name = meta.label
-        val newFile = File(
-            (Environment.getExternalStorageDirectory().absolutePath
-                    + "/Download/"), "$name.png"
-        )
-        if (newFile.exists()) {
-            val b = newFile.delete()
-            d("@@$b")
-        }
-        val bitmap = PackageMetaUtils.drw(context, meta.packageName)
-        try {
-            val outputStream: OutputStream = FileOutputStream(newFile)
-            if (bitmap != null) {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                outputStream.flush()
-                outputStream.close()
-            }
-            successToast(
-                resources
-                    .getString(R.string.savedicon) + " " + name + " ✔"
-            )
-        } catch (e: FileNotFoundException) {
-            //errorToast(getResources()
-            //.getString(R.string.err_unable_saved_icon) + " " + name + " ✘");
-            //DLog.handleException(e);
-        } catch (e: IOException) {
-            //errorToast(getResources()
-            //.getString(R.string.err_unable_saved_icon) + " " + name + " ✘");
-            //DLog.handleException(e);
+        when (val result = com.walhalla.appextractor.utils.IconSaver.saveAppIcon(context, meta)) {
+            is com.walhalla.appextractor.utils.IconSaver.Result.Success ->
+                successToast(result.message)
+            is com.walhalla.appextractor.utils.IconSaver.Result.Error ->
+                errorToast(result.message)
         }
     }
 

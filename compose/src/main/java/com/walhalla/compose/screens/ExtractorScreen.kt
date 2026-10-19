@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
@@ -91,7 +92,14 @@ enum class SortOption {
 @Composable
 fun MainMenu(viewModel: ExtractorViewModel) {
     var showMenu by remember { mutableStateOf(false) }
+    var showPlayCategories by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val playCategories = remember {
+        listOf(
+            "GAME", "FAMILY", "COMMUNICATION", "PRODUCTIVITY", "TOOLS",
+            "SOCIAL", "PHOTOGRAPHY", "MUSIC_AND_AUDIO", "VIDEO_PLAYERS", "SHOPPING"
+        )
+    }
 
     Box {
         IconButton(onClick = { showMenu = true }) {
@@ -105,6 +113,14 @@ fun MainMenu(viewModel: ExtractorViewModel) {
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
         ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(com.walhalla.extractor.R.string.open_on_google_play)) },
+                leadingIcon = { Icon(Icons.Default.Shop, null) },
+                onClick = {
+                    showMenu = false
+                    showPlayCategories = true
+                }
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(com.walhalla.extractor.R.string.action_share_app)) },
                 leadingIcon = { Icon(Icons.Default.Share, null) },
@@ -165,6 +181,30 @@ fun MainMenu(viewModel: ExtractorViewModel) {
                 onClick = {
                     showMenu = false
                     viewModel.showAccessibility()
+                }
+            )
+        }
+
+        if (showPlayCategories) {
+            AlertDialog(
+                onDismissRequest = { showPlayCategories = false },
+                title = { Text(stringResource(com.walhalla.extractor.R.string.open_on_google_play)) },
+                text = {
+                    Column {
+                        playCategories.forEach { category ->
+                            TextButton(onClick = {
+                                showPlayCategories = false
+                                viewModel.openGooglePlayCategory(category)
+                            }) {
+                                Text(category.replace('_', ' '))
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showPlayCategories = false }) {
+                        Text("Cancel")
+                    }
                 }
             )
         }
@@ -229,6 +269,10 @@ fun ExtractorScreen(
     viewManifest: (app: PackageMeta) -> Unit
 ) {
     val context = LocalContext.current
+    val activity = context as? android.app.Activity
+    LaunchedEffect(activity) {
+        viewModel.activityProvider = { activity }
+    }
     val apps by viewModel.apps.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()

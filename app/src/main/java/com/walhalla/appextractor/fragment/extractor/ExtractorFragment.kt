@@ -36,6 +36,7 @@ import com.dropbox.core.android.Auth
 import com.dropbox.core.v2.files.FileMetadata
 import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.AppListAdapterCallback
+import com.walhalla.appextractor.CloudBackupCoordinator
 import com.walhalla.appextractor.ExtractorHelper
 import com.walhalla.appextractor.R
 import com.walhalla.appextractor.activity.main.MainActivity
@@ -767,65 +768,48 @@ class ExtractorFragment : Fragment(), AppListAdapterCallback, ExtractorHelper.Ca
     override fun successExtracted(listMap: Map<SimpleMeta, List<File>>) {
         val mpm = LocalStorage.getInstance(requireContext())
         if (mpm.enableGoogleDrive()) {
-            //new Storage.GoogleDrive().push(getContext(), path);
-            //123 this.driveAdapter.signIn(getContext(), files, appName);
+            // reserved
         }
-
-        if (mpm.enableDropBox() && activity != null) {
-            //new Storage.DropBox().push(getContext(), path);
-            if (mpm.hasDropBoxToken()) {
-                //user info
-                //
-                // startActivity(FilesActivity.getIntent(DropBoxUserActivity.this, ""));
-            } else {
-                Auth.startOAuth2Authentication(activity, getString(R.string.db_app_key))
-            }
-
-            if (!mpm.hasDropBoxToken()) {
-//                accessToken = Auth.getOAuth2Token();
-//                if (accessToken != null) {
-//                    mpm1111(accessToken);
-//                    initAndLoadData(accessToken, files, appName);
-//                }
-            } else {
-                initAndLoadData(mpm.dropboxAccessToken(), listMap)
-            }
-        }
-
-        if (mpm.enableTelegram()) {
-            val chatId = mpm.telegramChatId() ?: ""
-            val token = mpm.telegramToken() ?: ""
-
-            if (!validate(chatId) || !validate(token)) {
-//                mExtractorExtractorViewCallback.printOutput(
-//                        new LErrorViewModel(R.drawable.ic_telegram,
-//                                validate(chatId)+""+validate(token)));
-                return
-            }
-
-
-            pd0 = DialogUtils.loadDialog(requireActivity(), R.drawable.ic_telegram)
-            pd0?.setButton(
-                DialogInterface.BUTTON_NEGATIVE,
-                requireActivity().getString(android.R.string.cancel),
-                DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
-                    //progressDialogValueTextView.setText("You canceled the onProgress.");
-                    interactor!!.cancel()
+        CloudBackupCoordinator(
+            requireContext(),
+            activity,
+            object : CloudBackupCoordinator.Listener {
+                override fun onCloudMessage(success: Boolean, message: String) {
+                    val type = if (success) LogType.Success else LogType.Error
+                    showMessage(LogViewModel(type, R.drawable.ic_log_db, message))
                 }
-            )
-            pd0?.show()
 
-            val telegramClient = TelegramClient(chatId, token)
-            interactor = TelegramInteractorImpl(
-//                BackgroundExecutor.getInstance(),
-//                MainThreadImpl.getInstance(),
-                mThreadExecutor = CoroutineScope(Dispatchers.Default),
-                mMainThread = CoroutineScope(Dispatchers.Main),
-                telegramClient
-            )
+                override fun onCloudProgress(progress: Int, file: File?, fileSize: String?) {
+                    pd0?.progress = progress
+                    if (file != null && fileSize != null) {
+                        pd0?.setMessage("${file.name}\n$fileSize")
+                    }
+                    var0?.progress = progress
+                }
 
-            interactor!!.sendDocument(listMap, requireContext(), this)
-        }
+                override fun onCloudBusy(busy: Boolean) {
+                    if (busy) {
+                        if (mpm.enableTelegram() && pd0 == null) {
+                            pd0 = DialogUtils.loadDialog(requireActivity(), R.drawable.ic_telegram)
+                            pd0?.setButton(
+                                DialogInterface.BUTTON_NEGATIVE,
+                                requireActivity().getString(android.R.string.cancel)
+                            ) { _: DialogInterface?, _: Int -> }
+                            pd0?.show()
+                        }
+                        if (mpm.enableDropBox() && var0 == null) {
+                            var0 = DialogUtils.loadDialog(requireActivity(), R.drawable.ic_dropbox)
+                            var0?.show()
+                        }
+                    } else {
+                        pd0?.dismiss()
+                        pd0 = null
+                        var0?.dismiss()
+                        var0 = null
+                    }
+                }
+            }
+        ).handleSuccessExtracted(listMap)
     }
 
 

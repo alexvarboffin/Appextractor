@@ -19,10 +19,15 @@ import com.walhalla.appextractor.activity.assets.StringItemViewModel
 import com.walhalla.appextractor.activity.string.MvpContract
 import com.walhalla.appextractor.activity.string.StringsPresenter
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 
 
 @Composable
-fun StringScreen(app: PackageMeta, resourceType: String) {
+fun StringScreen(
+    app: PackageMeta,
+    resourceType: String,
+    onViewXml: (String) -> Unit = {}
+) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     var stringResources by remember { mutableStateOf<List<StringItemViewModel>>(emptyList()) }
@@ -96,9 +101,28 @@ fun StringScreen(app: PackageMeta, resourceType: String) {
                                 Icon(Icons.Default.ContentCopy, "Copy value")
                             }
                             IconButton(onClick = {
-                                // TODO: Implement sharing
+                                val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(android.content.Intent.EXTRA_TEXT, "${resource.name}\n${resource.text}")
+                                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                context.startActivity(
+                                    android.content.Intent.createChooser(send, "Share").apply {
+                                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                )
                             }) {
                                 Icon(Icons.Default.Share, "Share")
+                            }
+                            if (resourceType == ResourcesToolForPlugin.XML) {
+                                IconButton(onClick = { onViewXml(resource.name) }) {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = com.walhalla.extractor.R.drawable.ic_baseline_text_snippet_24
+                                        ),
+                                        contentDescription = "View XML"
+                                    )
+                                }
                             }
                         }
                     }

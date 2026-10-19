@@ -28,6 +28,7 @@ import com.walhalla.compose.viewmodel.AssetsViewModel
 @Composable
 fun AssetsScreen(
     app: PackageMeta,
+    onViewXml: (String) -> Unit = {},
     viewModel: AssetsViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -35,10 +36,18 @@ fun AssetsScreen(
     val assetTree by viewModel.assetTree.collectAsState()
     val expandedNodes by viewModel.expandedNodes.collectAsState()
     val error by viewModel.error.collectAsState()
+    val toastMessage by viewModel.toastMessage.collectAsState()
     val selectedAssetWithContent by viewModel.selectedAsset.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var selectedAsset by remember { mutableStateOf<ResItem?>(null) }
     var lastAction by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(toastMessage) {
+        toastMessage?.let {
+            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+            viewModel.clearToast()
+        }
+    }
     
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -118,6 +127,7 @@ fun AssetsScreen(
                         }
                         "copy" -> clipboardManager.setText(AnnotatedString(asset.fullPath))
                         "zip" -> viewModel.zipAllAssets(context, asset)
+                        "xml" -> onViewXml(asset.fullPath)
                     }
                 }
             )
@@ -212,6 +222,16 @@ fun AssetTreeItem(
                                         onAssetAction(node.asset, "read")
                                     }
                                 )
+                                if (node.asset.fullPath.endsWith(".xml", ignoreCase = true)) {
+                                    DropdownMenuItem(
+                                        text = { Text("View XML") },
+                                        leadingIcon = { Icon(Icons.Default.Code, null) },
+                                        onClick = {
+                                            showMenu = false
+                                            onAssetAction(node.asset, "xml")
+                                        }
+                                    )
+                                }
                             }
                             
                             if (node.asset.drawable != null) {

@@ -24,10 +24,17 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _toastMessage = MutableStateFlow<String?>(null)
+    val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
+
     private val _selectedAsset = MutableStateFlow<Pair<ResItem, String>?>(null)
     val selectedAsset: StateFlow<Pair<ResItem, String>?> = _selectedAsset.asStateFlow()
 
     private var presenter: AssetsPresenter? = null
+
+    fun clearToast() {
+        _toastMessage.value = null
+    }
 
     fun loadAssets(packageName: String) {
         presenter = AssetsPresenter(getApplication(), object : MvpContract.View {
@@ -43,8 +50,16 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
                 _assetTree.value = buildAssetTree(list)
             }
 
-            override fun successToast(res: Int, aaa: String) {}
-            override fun errorToast(res: Int, aaa: String) {}
+            override fun successToast(res: Int, aaa: String) {
+                val ctx = getApplication<Application>()
+                _toastMessage.value = ctx.getString(res) + " " + aaa
+            }
+
+            override fun errorToast(res: Int, aaa: String) {
+                val ctx = getApplication<Application>()
+                _toastMessage.value = ctx.getString(res) + " " + aaa
+                _error.value = aaa
+            }
         })
 
         presenter?.loadManifestContent(packageName)
