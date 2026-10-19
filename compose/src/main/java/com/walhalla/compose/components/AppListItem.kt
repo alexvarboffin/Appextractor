@@ -1,27 +1,62 @@
 package com.walhalla.compose.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Shop
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.prettyFileSize
-import com.walhalla.compose.R
+import com.walhalla.extractor.R as ExtR
 import java.text.DateFormat
-import java.util.*
+import java.util.Date
 
+private val IconSize = 40.dp
+private val ContentStart = 12.dp
+private val IconTextGap = 12.dp
+private val FeaturesStart = ContentStart + IconSize + IconTextGap
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppListItem(
     app: PackageMeta,
@@ -39,264 +74,301 @@ fun AppListItem(
     onShareIconClick: () -> Unit = {}
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    Card(
+    val dateTimeFormat = remember {
+        DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+    }
+    val installMs = remember(app.firstInstallTime, app.installTime) {
+        app.firstInstallTime.takeIf { it > 0 } ?: app.installTime
+    }
+    val updateMs = remember(app.lastUpdateTime, app.updateTime) {
+        app.lastUpdateTime.takeIf { it > 0 } ?: app.updateTime
+    }
+    val versionLabel = remember(app.versionName, app.versionCode) {
+        "v${app.versionName ?: "?"} (${app.versionCode})"
+    }
+
+    val features = remember(app.hasSplits, app.isSystemApp, app.hasPinning) {
+        buildList {
+            if (app.hasSplits) add(FeatureKind.Split)
+            if (app.isSystemApp) add(FeatureKind.System)
+            if (app.hasPinning) add(FeatureKind.SslPinning)
+        }
+    }
+
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .selectable(
-                selected = isSelected, onClick = onSelect
-            ), colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // App Icon
-
-
-            if (app.icon == null) {//|| app.icon<=0
-                Icon(
-                    imageVector = Icons.Default.Android,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-
-            } else {
-                AsyncImage(
-                    model = app.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // App Info
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = app.label,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = app.packageName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Row(
-                    modifier = Modifier.padding(top = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    if (app.isSystemApp) {
-                        AssistChip(
-                            onClick = { },
-                            label = { Text("System") },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Android,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            modifier = Modifier.height(24.dp),
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                labelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        )
-                    }
-                    if (app.hasPinning) {
-                        AssistChip(
-                            onClick = { },
-                            label = { Text("SSL Pinning") },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.PushPin,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            modifier = Modifier.height(24.dp),
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                labelColor = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        )
-                    }
-                    if (app.hasSplits) {
-                        AssistChip(
-                            onClick = { },
-                            label = { Text("Split APK") },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.CallSplit,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            modifier = Modifier.height(24.dp),
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                labelColor = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().background(Color.Red),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        modifier = Modifier.weight(1f).background(Color.Yellow),
-                        text = "v${app.versionName} (${app.versionCode})",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Text(
-
-                        text = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(app.updateTime)),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                if (app.fileSize > 0) {
-                    val x : String = prettyFileSize(app.fileSize)
-                    Text(
-                        text = "Size: $x", style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-
-            // Menu
-            Box {
-                IconButton(onClick = { showMenu = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert, contentDescription = "More options"
-                    )
-                }
-
-                DropdownMenu(
-                    expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                    // Extract APK
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_extract)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.SaveAlt, contentDescription = null)
-                        },
-                        onClick = {
-                            println("DEBUG: Extract menu item clicked")
-                            showMenu = false
-                            onExtractClick()
-                        })
-
-                    // Open in Play Store
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.open_on_google_play)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Shop, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onOpenPlayStoreClick()
-                        })
-
-                    // Launch App
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_launch_app)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onLaunchClick()
-                        })
-
-                    // Uninstall App
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_uninstall_app)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Delete, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onUninstallClick()
-                        })
-
-                    // Copy Package Name
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_copy_package_name)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.ContentCopy, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onCopyPackageNameClick()
-                        })
-
-                    // App Info
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_app_info)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Info, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onInfoClick()
-                        })
-
-                    // View Manifest
-                    DropdownMenuItem(
-                        text = { Text(stringResource(com.walhalla.extractor.R.string.action_app_manifest)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Description, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onManifestClick()
-                        })
-
-                    // Save Icon
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_save_icon)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Download, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onSaveIconClick()
-                        })
-
-                    // Share Icon
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.action_export_icon)) },
-                        leadingIcon = {
-                            Icon(Icons.Default.Share, contentDescription = null)
-                        },
-                        onClick = {
-                            showMenu = false
-                            onShareIconClick()
-                        })
-                }
-            }
+            .selectable(selected = isSelected, onClick = onSelect),
+        // Distinct from selection bar (secondaryContainer) so the first row doesn't blend
+        color = if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
+        contentColor = if (isSelected) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurface
         }
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = ContentStart, top = 8.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (app.icon == null) {
+                    Icon(
+                        imageVector = Icons.Default.Android,
+                        contentDescription = null,
+                        modifier = Modifier.size(IconSize)
+                    )
+                } else {
+                    AsyncImage(
+                        model = app.icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(IconSize)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(IconTextGap))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = app.label,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = app.packageName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = versionLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    // Legacy parity: first install + last update | size (Compose density)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                            if (installMs > 0) {
+                                Text(
+                                    text = stringResource(
+                                        ExtR.string.backup_app_feature_install_date,
+                                        dateTimeFormat.format(Date(installMs))
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            if (updateMs > 0) {
+                                Text(
+                                    text = stringResource(
+                                        ExtR.string.backup_app_feature_update_date,
+                                        dateTimeFormat.format(Date(updateMs))
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                        if (app.fileSize > 0) {
+                            Text(
+                                text = prettyFileSize(app.fileSize),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                }
+
+                Box {
+                    IconButton(
+                        onClick = { showMenu = true },
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = null
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_extract)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.SaveAlt, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onExtractClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.open_on_google_play)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Shop, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onOpenPlayStoreClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_launch_app)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.PlayArrow, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onLaunchClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_uninstall_app)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Delete, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onUninstallClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_copy_package_name)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.ContentCopy, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onCopyPackageNameClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_app_info)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Info, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onInfoClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_app_manifest)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Description, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onManifestClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_save_icon)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Download, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onSaveIconClick()
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(ExtR.string.action_export_icon)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Share, contentDescription = null)
+                            },
+                            onClick = {
+                                showMenu = false
+                                onShareIconClick()
+                            }
+                        )
+                    }
+                }
+            }
+
+            if (features.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = FeaturesStart, end = 12.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    features.forEach { kind ->
+                        FeatureBadge(kind = kind)
+                    }
+                }
+            }
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+        }
+    }
+}
+
+private enum class FeatureKind {
+    Split,
+    System,
+    SslPinning
+}
+
+@Composable
+private fun FeatureBadge(kind: FeatureKind) {
+    val label = when (kind) {
+        FeatureKind.Split -> stringResource(ExtR.string.backup_app_feature_split)
+        FeatureKind.System -> stringResource(ExtR.string.backup_app_feature_system_app)
+        FeatureKind.SslPinning -> stringResource(ExtR.string.backup_app_feature_ssl_pinning)
+    }
+    val containerColor = when (kind) {
+        FeatureKind.Split -> MaterialTheme.colorScheme.tertiaryContainer
+        FeatureKind.System -> MaterialTheme.colorScheme.primaryContainer
+        FeatureKind.SslPinning -> MaterialTheme.colorScheme.secondaryContainer
+    }
+    val contentColor = when (kind) {
+        FeatureKind.Split -> MaterialTheme.colorScheme.onTertiaryContainer
+        FeatureKind.System -> MaterialTheme.colorScheme.onPrimaryContainer
+        FeatureKind.SslPinning -> MaterialTheme.colorScheme.onSecondaryContainer
+    }
+
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = containerColor,
+        contentColor = contentColor
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            maxLines = 1
+        )
     }
 }

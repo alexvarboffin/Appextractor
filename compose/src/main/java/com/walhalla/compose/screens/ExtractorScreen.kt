@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.walhalla.compose.components.AppListItem
@@ -63,7 +65,6 @@ import com.walhalla.compose.viewmodel.ExtractorViewModel
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.HorizontalDivider
 import com.walhalla.appextractor.model.PackageMeta
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarDuration
@@ -73,6 +74,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.ImeAction
 import com.walhalla.compose.R
+import com.walhalla.extractor.R as ExtR
 
 
 // Sort options
@@ -234,7 +236,6 @@ fun ExtractorScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var isSearchActive by remember { mutableStateOf(false) }
 
-    val successMessage by viewModel.successMessage.collectAsState()
     val showAboutDialog by viewModel.showAboutDialog.collectAsState()
 
     var currentSort by remember { mutableStateOf(SortOption.NAME_ASC) }
@@ -261,9 +262,12 @@ fun ExtractorScreen(
         println("DEBUG: Extraction file count: $extractionFileCount")
     }
 
-    // Show success message
-    LaunchedEffect(successMessage) {
-        successMessage?.let { message ->
+    // Collect from Flow (key = Unit): clearing message must NOT cancel showSnackbar.
+    // Previous LaunchedEffect(successMessage) restarted on clear and dropped the snackbar.
+    LaunchedEffect(Unit) {
+        viewModel.successMessage.collect { message ->
+            if (message.isNullOrEmpty()) return@collect
+            viewModel.clearSuccessMessage()
             snackbarHostState.showSnackbar(
                 message = message,
                 duration = SnackbarDuration.Short
@@ -339,25 +343,34 @@ fun ExtractorScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(stringResource(com.walhalla.extractor.R.string.app_name))
-                    },
-                    actions = {
-                        SortMenu(currentSort = {
-                            currentSort = it
-                        })
-                        MainMenu(viewModel = viewModel)
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)
-            ) {
-                // Поисковая строка
+    // Outer MainActivity Scaffold already applies bottom nav + system insets.
+    // Zero insets here so we don't reserve an empty "banner" strip at the bottom.
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(stringResource(com.walhalla.extractor.R.string.app_name))
+                },
+                actions = {
+                    SortMenu(currentSort = {
+                        currentSort = it
+                    })
+                    MainMenu(viewModel = viewModel)
+                },
+                windowInsets = WindowInsets(0, 0, 0, 0)
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+                // РџРѕРёСЃРєРѕРІР°СЏ СЃС‚СЂРѕРєР°
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { viewModel.setSearchQuery(it) },
@@ -381,58 +394,67 @@ fun ExtractorScreen(
                     },
 
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { /* Действие при нажатии на Done */ }),
+                    keyboardActions = KeyboardActions(onDone = { /* Р”РµР№СЃС‚РІРёРµ РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° Done */ }),
                 )
 
-                // Selection header
-                val currentSelectedSize = selectedApps.size
-                println("DEBUG: Current selected size: $currentSelectedSize")
-                if (selectedApps.isNotEmpty()) {
-                    Surface(
+                // Selection bar (full-width, like legacy fragment_main)
+                val selectedCount = selectedApps.size
+                val hasSelection = selectedCount > 0
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ) {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = MaterialTheme.shapes.small
+                            .padding(horizontal = 2.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = stringResource(
-                                    com.walhalla.extractor.R.string.action_selected,
-                                    currentSelectedSize
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                text = stringResource(ExtR.string.action_selected),
+                                style = MaterialTheme.typography.labelMedium,
+                                textAlign = TextAlign.Center
                             )
+                            Text(
+                                text = selectedCount.toString(),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        }
 
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                TextButton(
-                                    onClick = { viewModel.clearSelection() }
-                                ) {
-                                    Text(
-                                        text = "Deselect",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
+                        TextButton(
+                            onClick = { viewModel.clearSelection() },
+                            enabled = hasSelection,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(ExtR.string.action_deselect),
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2
+                            )
+                        }
 
-                                TextButton(
-                                    onClick = { viewModel.selectExtractedApps() }
-                                ) {
-                                    Text(
-                                        text = "Select extracted",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                            }
+                        TextButton(
+                            onClick = {
+                                permissionLauncher.launch(permissions)
+                                viewModel.extractSelectedApps()
+                            },
+                            enabled = hasSelection,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(ExtR.string.action_extract_btn),
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2
+                            )
                         }
                     }
                 }
@@ -483,32 +505,16 @@ fun ExtractorScreen(
                                     if (packageName == app.packageName) {
                                         LinearProgressIndicator(
                                             progress = progress / 100f,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 16.dp)
+                                            modifier = Modifier.fillMaxWidth()
                                         )
                                     }
                                 }
-
-                                HorizontalDivider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                    thickness = 1.dp,
-                                    color = MaterialTheme.colorScheme.outlineVariant
-                                )
                             }
                         }
                     }
                 }
             }
-
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
         }
-    }
 }
 
 @Composable

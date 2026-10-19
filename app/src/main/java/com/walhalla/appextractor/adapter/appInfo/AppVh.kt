@@ -116,7 +116,9 @@ class AppVh(
         }
 
         if (packageMeta.hasPinning) {
-            features.add(SimpleAppFeature("SSL Pinning"))
+            features.add(
+                SimpleAppFeature(res.getString(com.walhalla.extractor.R.string.backup_app_feature_ssl_pinning))
+            )
         }
         return features
     }

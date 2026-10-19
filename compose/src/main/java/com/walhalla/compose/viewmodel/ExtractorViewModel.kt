@@ -56,6 +56,10 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
+    fun clearSuccessMessage() {
+        _successMessage.value = null
+    }
+
     private val _selectedApps = MutableStateFlow<Set<PackageMeta>>(emptySet())
     val selectedApps: StateFlow<Set<PackageMeta>> = _selectedApps.asStateFlow()
 
@@ -144,6 +148,14 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     fun extractApkRequest(app: PackageMeta) {
         viewModelScope.launch(Dispatchers.Default) {
             extractApk(app)
+        }
+    }
+
+    fun extractSelectedApps() {
+        val selected = _selectedApps.value.toList()
+        if (selected.isEmpty()) return
+        viewModelScope.launch(Dispatchers.Default) {
+            selected.forEach { extractApk(it) }
         }
     }
 

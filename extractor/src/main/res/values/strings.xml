@@ -78,6 +78,7 @@
     <string name="app_info_sharedlibraryfiles">SharedLibraryFiles</string>
     <string name="backup_app_feature_split">Split APK</string>
     <string name="backup_app_feature_system_app">System app</string>
+    <string name="backup_app_feature_ssl_pinning" translatable="false">SSL Pinning</string>
     <string name="backup_app_feature_install_date">Installed: %s</string>
     <string name="backup_app_feature_update_date">Updated: %s</string>
     <string name="action_accessibility">Accessibility</string>
