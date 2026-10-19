@@ -25,4 +25,4 @@ enum class LogType(val id: Int) {
     Warning(2),
     Error(3),
     Success(4)
-} 
+}

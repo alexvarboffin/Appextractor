@@ -34,6 +34,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.compose.ui.res.stringResource
 import com.walhalla.compose.R
+import com.walhalla.compose.log.AppLogBus
 import com.walhalla.ui.plugins.Launcher
 import com.walhalla.ui.plugins.Module_U
 
@@ -226,8 +227,10 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                 val fileSize = FileUtil.getFileSizeMegaBytes(file)
                 val message = "APK extracted to:\n${file.path}\n$fileSize"
                 _successMessage.value = message
+                AppLogBus.success(message)
                 return file
             }
+            AppLogBus.error("Failed to extract APK: ${app.packageName}")
             return null
         } catch (e: IOException) {
             println("DEBUG: Error extracting APK: ${e.message}")
@@ -235,6 +238,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
             _extractionProgress.value = null
             _extractionFileCount.value = null
             _successMessage.value = null
+            AppLogBus.error("Extract error: ${e.message}")
             return null
         }
     }
