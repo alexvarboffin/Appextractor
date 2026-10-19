@@ -60,10 +60,12 @@
 - [x] App detail opened with `PackageMeta` in `savedStateHandle` (`detail_app`).
 - [x] Manifest opened with `app` + optional `xml_file` in `savedStateHandle`.
 - [x] Hide bottom bar on `app_detail*`.
+- [x] **Adaptive nav (skill Step 2):** `NavigationSuiteScaffold` — NavigationBar on compact, NavigationRail on medium/expanded (landscape/tablet); hidden via `NavigationSuiteType.None` on `app_detail*`. Still Nav Compose 2.x (Nav3 list-detail deferred).
 
 Key files:
 - `compose/.../MainActivity.kt`
 - `compose/.../screens/AppDetailScreen.kt`
+- dep: `material3-adaptive-navigation-suite:1.3.2`
 
 ---
 
@@ -78,6 +80,7 @@ Key files:
 - [x] Selection bar / progress / success snackbar (top-friendly; file count messaging).
 - [x] Main overflow: share app, discover more, rate, about, privacy, contact, accessibility, **Google Play categories**.
 - [x] About via Compose `AboutDialog` (neptune `DialogAbout` not assumed available to `:compose`).
+- [x] **Adaptive list (skill Step 4):** `LazyVerticalGrid` + `GridCells.Adaptive(360.dp)` (multi-column on landscape/tablet).
 
 Key files:
 - `compose/.../screens/ExtractorScreen.kt`
@@ -175,6 +178,8 @@ Key file: `compose/.../screens/MetaScreen.kt`
 - [x] XML tab: View XML → Manifest route with `xml_file`.
 - [x] ASSETS tree: read/save/export/copy/zip; View XML for `.xml` → `assets/{path}`.
 - [x] Assets success/error toasts wired (`AssetsViewModel.toastMessage`).
+- [x] **Assets UI polish:** flat `LazyColumn` tree (indent + chevron + folder/file/preview icons), expand/collapse all, no nested Cards. **Not** adrielcafe/bonsai (Kotlin 1.6 / stale) nor vooft/compose-treeview (JetBrains CMP clashes with AndroidX Compose here) — same Bonsai-style UX in-house.
+- [x] Assets listing skips `dexopt` and `webkit` (same as zip filter in `AssetsPresenter`).
 - [x] `ManifestViewModel.loadManifests` (APK manifests) + `loadXmlResource` (arbitrary XML inside APK).
 - [x] `ManifestScreen(xmlFileName: String?)`.
 
@@ -253,6 +258,9 @@ Record of corrections that changed implementation:
 13. [x] META broken rendering → fix `V2Line`.
 14. [x] Full remaining-parity column list → execute without duplicating code.
 15. [x] This checklist: AI review + empty-folder rebuild source of truth; update on new user info and on feature close.
+16. [x] Landscape/tablet: stretchy bottom nav + single-column list → NavigationSuiteScaffold rail + Adaptive grid (Nav3 multi-pane still deferred).
+17. [x] Assets tree UI looked poor → rewrite flat Material3 tree; skip Bonsai dep (too old / wrong Compose stack).
+18. [x] Assets tree must exclude `dexopt` / `webkit` (was only in zip path).
 
 ---
 

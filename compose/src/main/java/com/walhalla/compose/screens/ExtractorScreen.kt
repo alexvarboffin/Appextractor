@@ -15,8 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -547,44 +548,48 @@ fun ExtractorScreen(
                             }
                         }
                         else -> {
-                            LazyColumn(
+                            // Adaptive columns: phone portrait = 1; landscape / tablet = 2+
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(minSize = 360.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                items(sortedApps) { app ->
-                                    AppListItem(
-                                        app = app,
-                                        isSelected = app in selectedApps,
-                                        highlightQuery = searchQuery,
-                                        onSelect = {
-                                            viewModel.toggleAppSelection(app)
-                                        },
-                                        onExtractClick = {
-                                            permissionLauncher.launch(permissions)
-                                            viewModel.extractApkRequest(app)
-                                        },
-                                        onShareClick = {
-                                            viewModel.shareApk(app)
-                                        },
-                                        onInfoClick = {
-                                            onNavigateToAppDetail(app)
-                                        },
-                                        onOpenPlayStoreClick = { viewModel.openPlayStore(app) },
-                                        onLaunchClick = { viewModel.launchApp(app) },
-                                        onUninstallClick = { viewModel.uninstallApp(app) },
-                                        onCopyPackageNameClick = {
-                                            viewModel.copyPackageName(app)
-                                        },
-                                        onManifestClick = { viewManifest(app) },
-                                        onSaveIconClick = { viewModel.saveIcon(app) },
-                                        onShareIconClick = { viewModel.shareIcon(app) }
-                                    )
+                                items(sortedApps, key = { it.packageName }) { app ->
+                                    Column {
+                                        AppListItem(
+                                            app = app,
+                                            isSelected = app in selectedApps,
+                                            highlightQuery = searchQuery,
+                                            onSelect = {
+                                                viewModel.toggleAppSelection(app)
+                                            },
+                                            onExtractClick = {
+                                                permissionLauncher.launch(permissions)
+                                                viewModel.extractApkRequest(app)
+                                            },
+                                            onShareClick = {
+                                                viewModel.shareApk(app)
+                                            },
+                                            onInfoClick = {
+                                                onNavigateToAppDetail(app)
+                                            },
+                                            onOpenPlayStoreClick = { viewModel.openPlayStore(app) },
+                                            onLaunchClick = { viewModel.launchApp(app) },
+                                            onUninstallClick = { viewModel.uninstallApp(app) },
+                                            onCopyPackageNameClick = {
+                                                viewModel.copyPackageName(app)
+                                            },
+                                            onManifestClick = { viewManifest(app) },
+                                            onSaveIconClick = { viewModel.saveIcon(app) },
+                                            onShareIconClick = { viewModel.shareIcon(app) }
+                                        )
 
-                                    extractionProgress?.let { (packageName, progress) ->
-                                        if (packageName == app.packageName) {
-                                            LinearProgressIndicator(
-                                                progress = progress / 100f,
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
+                                        extractionProgress?.let { (packageName, progress) ->
+                                            if (packageName == app.packageName) {
+                                                LinearProgressIndicator(
+                                                    progress = progress / 100f,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                            }
                                         }
                                     }
                                 }

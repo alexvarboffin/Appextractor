@@ -8,11 +8,11 @@ import com.walhalla.appextractor.activity.assets.AssetsPresenter
 import com.walhalla.appextractor.activity.assets.MvpContract
 import com.walhalla.appextractor.activity.assets.ResItem
 import com.walhalla.compose.model.AssetTreeNode
+import com.walhalla.compose.model.allBranchPaths
 import com.walhalla.compose.model.buildAssetTree
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class AssetsViewModel(application: Application) : AndroidViewModel(application) {
     private val _assetTree = MutableStateFlow<List<AssetTreeNode>>(emptyList())
@@ -37,6 +37,7 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun loadAssets(packageName: String) {
+        _error.value = null
         presenter = AssetsPresenter(getApplication(), object : MvpContract.View {
             override fun showResourceRawText(resource: ResItem, content: String) {
                 _selectedAsset.value = resource to content
@@ -47,7 +48,13 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             override fun showSuccess(list: List<ResItem>) {
-                _assetTree.value = buildAssetTree(list)
+                val tree = buildAssetTree(list)
+                _assetTree.value = tree
+                // Expand top-level folders so the tree is usable immediately
+                _expandedNodes.value = tree
+                    .filter { it.isBranch }
+                    .map { it.asset.fullPath }
+                    .toSet()
             }
 
             override fun successToast(res: Int, aaa: String) {
@@ -67,16 +74,18 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
 
     fun toggleNodeExpansion(nodePath: String) {
         val currentExpanded = _expandedNodes.value.toMutableSet()
-        if (currentExpanded.contains(nodePath)) {
+        if (!currentExpanded.add(nodePath)) {
             currentExpanded.remove(nodePath)
-        } else {
-            currentExpanded.add(nodePath)
         }
         _expandedNodes.value = currentExpanded
     }
 
-    fun isNodeExpanded(nodePath: String): Boolean {
-        return _expandedNodes.value.contains(nodePath)
+    fun expandAll() {
+        _expandedNodes.value = _assetTree.value.allBranchPaths()
+    }
+
+    fun collapseAll() {
+        _expandedNodes.value = emptySet()
     }
 
     fun readAsset(context: Context, asset: ResItem) {

@@ -129,6 +129,9 @@ class AssetsPresenter(private val context: Context, private val view: MvpContrac
         val resourceFiles =
             am.list(rootPath) // Получение списка всех ресурсов в корневом каталоге assets
         for (resourceFile in resourceFiles!!) {
+            // Same skip as zipAssetsFolder: system noise folders, not real app assets
+            if (resourceFile == "dexopt" || resourceFile == "webkit") continue
+
             val fullPath = if (("" == rootPath)) resourceFile else "$rootPath/$resourceFile"
 
             if (!fullPath.isEmpty()) {
