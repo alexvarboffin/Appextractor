@@ -83,13 +83,21 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
     }
 
     fun doStuff(context: Context) {
-        try {
-            val applicationInfo = packageManager.getApplicationInfo(meta.packageName, 0)
-            val data: MutableList<BaseViewModel> =
-                mmmm(context, applicationInfo, targetPackageInfo!!)
+        val data = buildInfoList(context)
+        if (data.isNotEmpty()) {
             view.swap(data)
+        }
+    }
+
+    /** Same INFO rows as the legacy detail screen — shared by `:app` and `:compose`. */
+    fun buildInfoList(context: Context): List<BaseViewModel> {
+        return try {
+            val applicationInfo = packageManager.getApplicationInfo(meta.packageName, 0)
+            val pi = targetPackageInfo ?: return emptyList()
+            mmmm(context, applicationInfo, pi)
         } catch (e: PackageManager.NameNotFoundException) {
             handleException(e)
+            emptyList()
         }
     }
 

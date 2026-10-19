@@ -1,6 +1,7 @@
 package com.walhalla.compose.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -114,7 +116,8 @@ fun AppDetailScreen(
             ) { page ->
                 when (page) {
                     // Basic info from PackageMeta is immediate; permissions/components fill in
-                    0 -> InformationScreen(paddingValues, app, appDetails)
+                    // Scaffold already applied paddingValues to the parent Column
+                    0 -> InformationScreen(PaddingValues(0.dp), app, appDetails)
                     1 -> MetaScreen(app)
                     2 -> StringScreen(app, ResourcesToolForPlugin.STRING)
                     3 -> StringScreen(app, ResourcesToolForPlugin.XML)

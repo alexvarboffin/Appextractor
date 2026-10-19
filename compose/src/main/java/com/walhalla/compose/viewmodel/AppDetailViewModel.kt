@@ -2,37 +2,23 @@ package com.walhalla.compose.viewmodel
 
 import android.app.Application
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.provider.Settings
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.walhalla.appextractor.activity.detail.DetailsF0
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.BaseViewModel
-import com.walhalla.appextractor.sdk.GetServicesUseCase
-
-import com.walhalla.compose.model.*
+import com.walhalla.appextractor.sdk.F0Presenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
-import androidx.core.net.toUri
-
-data class AppComponent(
-    val name: String,
-    val exported: Boolean
-)
 
 data class AppDetails(
-    val permissions: Map<PermissionCategory, List<PermissionInfo>>,
-    val activities: List<AppComponent>,
-    val services: List<BaseViewModel>,
-    val receivers: List<AppComponent>,
-    val providers: List<AppComponent>
+    val infoLines: List<BaseViewModel>
 )
 
 class AppDetailViewModel(application: Application) : AndroidViewModel(application) {
@@ -49,77 +35,17 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
             _isLoading.value = true
             _appDetails.value = null
             try {
-                val pm = getApplication<Application>().packageManager
-                val packageInfo = pm.getPackageInfo(
-                    app.packageName,
-                    PackageManager.GET_PERMISSIONS or
-                            PackageManager.GET_ACTIVITIES or
-                            PackageManager.GET_SERVICES or
-                            PackageManager.GET_RECEIVERS or
-                            PackageManager.GET_PROVIDERS
-                )
-
-                val permissions = packageInfo.requestedPermissions?.mapNotNull { permissionName ->
-                    try {
-                        val permissionInfo = pm.getPermissionInfo(permissionName, 0)
-                        val isGranted = pm.checkPermission(
-                            permissionName,
-                            app.packageName
-                        ) == PackageManager.PERMISSION_GRANTED
-                        val category = getPermissionCategory(permissionName)
-
-                        PermissionInfo(
-                            name = permissionName,
-                            simpleName = permissionName.substringAfterLast('.'),
-                            description = permissionInfo.loadDescription(pm)?.toString()
-                                ?: getPermissionDescription(permissionName),
-                            category = category,
-                            protectionLevel = permissionInfo.protectionLevel,
-                            isGranted = isGranted,
-                            recommendation = getSecurityRecommendation(
-                                category,
-                                permissionInfo.protectionLevel
-                            )
-                        )
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        null
+                val ctx = getApplication<Application>()
+                val presenter = F0Presenter(
+                    ctx,
+                    app,
+                    object : DetailsF0.View {
+                        override fun snack() {}
+                        override fun swap(data: List<BaseViewModel>) {}
                     }
-                }?.groupBy { it.category } ?: emptyMap()
-
-                val activities = packageInfo.activities?.map { activityInfo ->
-                    AppComponent(
-                        name = activityInfo.name,
-                        exported = activityInfo.exported
-                    )
-                } ?: emptyList()
-
-                val getServicesUseCase = GetServicesUseCase(
-                    getApplication<Application>().packageManager,
-                    getApplication()
                 )
-                val services = getServicesUseCase.execute(packageInfo, icons)
-
-                val receivers = packageInfo.receivers?.map { receiverInfo ->
-                    AppComponent(
-                        name = receiverInfo.name,
-                        exported = receiverInfo.exported
-                    )
-                } ?: emptyList()
-
-                val providers = packageInfo.providers?.map { providerInfo ->
-                    AppComponent(
-                        name = providerInfo.name,
-                        exported = providerInfo.exported
-                    )
-                } ?: emptyList()
-
-                _appDetails.value = AppDetails(
-                    permissions = permissions,
-                    activities = activities,
-                    services = services,
-                    receivers = receivers,
-                    providers = providers
-                )
+                icons = presenter.icons
+                _appDetails.value = AppDetails(infoLines = presenter.buildInfoList(ctx))
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -127,8 +53,6 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
     }
-
-
 
     fun openInSettings(app: PackageMeta) {
         val context = getApplication<Application>()
@@ -138,9 +62,4 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
         }
         context.startActivity(intent)
     }
-
-    fun formatDate(timestamp: Long): String {
-        return SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-            .format(Date(timestamp))
-    }
-} 
+}
