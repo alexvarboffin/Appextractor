@@ -29,10 +29,11 @@
 | `:extractor` | Core library: extract, PackageMeta, presenters (`F0Presenter`, `MetaPresenter`), cloud backup, utils, receivers, strings/drawables for core UI |
 | `:shared` | Shared Kotlin bits used by modules |
 | `:app` | Legacy Views/Fragments production app (`ApkChief` / Appextractor) |
-| `:compose` | Compose single-activity app (`applicationId` `com.walhalla.compose`) |
+| `:compose` | Compose single-activity app — `applicationId` **`com.walhalla.appextractor`** (same as `:app` for in-place replace); Kotlin namespace `com.walhalla.compose` |
 
 - [x] Compose depends on `:extractor` + `:shared` only for product logic (no copy of extract pipeline).
 - [x] Legacy `:app` also uses `:extractor`.
+- [x] Compose release/debug signed with legacy keystore (`compose/keystore/w.jks`, alias `app-extractor`); launcher icons copied from `:app`; `versionCode`/`versionName` date scheme aligned (`1.4.yyMMdd`) so Compose APK can replace Play/legacy install.
 
 ### Build / run (agent)
 
@@ -50,6 +51,7 @@
 - [x] Snackbars: collect + clear message carefully so UI is not cancelled by state clear races.
 - [x] App detail must not create a fresh `ExtractorViewModel` / block Main thread on heavy PM work — load on `Dispatchers.Default` / `IO`, pass `PackageMeta` via `savedStateHandle`.
 - [x] Nested Scaffold: avoid double system/inset padding (empty bottom strip).
+- [x] Compose visual identity: **no** Material template purple / wallpaper dynamic color — brand blue from legacy (`#5C8FED`), dense utility typography, quiet chrome (selection bar / chips).
 
 ---
 
@@ -261,6 +263,9 @@ Record of corrections that changed implementation:
 16. [x] Landscape/tablet: stretchy bottom nav + single-column list → NavigationSuiteScaffold rail + Adaptive grid (Nav3 multi-pane still deferred).
 17. [x] Assets tree UI looked poor → rewrite flat Material3 tree; skip Bonsai dep (too old / wrong Compose stack).
 18. [x] Assets tree must exclude `dexopt` / `webkit` (was only in zip path).
+19. [x] UI felt “нейро-шаблонно” → drop purple/dynamic Material defaults; ApkChief blue + denser list chrome.
+20. [x] META section title showed `(2)(2)` — count already in `HeaderObject.title`; Compose must not append `items.size` again.
+21. [x] Compose must use legacy `applicationId` + signing keystore + launcher icon to replace `:app` install.
 
 ---
 

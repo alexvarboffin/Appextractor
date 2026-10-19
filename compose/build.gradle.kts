@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,27 +8,49 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
 }
 
+fun versionCodeDate(): Int {
+    return SimpleDateFormat("yyMMdd").format(Date()).toInt()
+}
+
 android {
+    // Kotlin/R package stays compose; install id matches legacy for in-place updates
     namespace = "com.walhalla.compose"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.walhalla.compose"
+        multiDexEnabled = true
+        applicationId = "com.walhalla.appextractor"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-
+        val code = versionCodeDate()
+        versionCode = code
+        versionName = "1.4.$code"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        setProperty("archivesBaseName", "ApkChief")
+    }
+
+    signingConfigs {
+        create("x") {
+            keyAlias = "app-extractor"
+            keyPassword = "@!sfuQ123zpc"
+            storeFile = file("keystore/w.jks")
+            storePassword = "@!sfuQ123zpc"
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("x")
+            versionNameSuffix = "-DEMO"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("x")
+            versionNameSuffix = ".release"
         }
     }
     compileOptions {

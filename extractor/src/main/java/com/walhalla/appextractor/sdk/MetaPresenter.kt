@@ -22,8 +22,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.net.toUri
-
-class MetaPresenter @SuppressLint("PackageManagerGetSignatures") constructor(
+@SuppressLint("PackageManagerGetSignatures")
+class MetaPresenter  constructor(
     context: Context,
     meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta,
     view: DetailsF0.View

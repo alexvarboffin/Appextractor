@@ -190,7 +190,8 @@ private fun MetaSectionCard(section: MetaSection) {
                         )
                     }
                     Text(
-                        text = "${section.title} (${section.items.size})",
+                        // Title already includes count from MetaPresenter, e.g. "Application MetaData (2)"
+                        text = section.title,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis

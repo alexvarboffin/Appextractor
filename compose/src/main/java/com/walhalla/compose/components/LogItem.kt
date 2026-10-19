@@ -254,7 +254,7 @@ private fun shareApk(context: android.content.Context, file: File) {
     try {
         val uri = FileProvider.getUriForFile(
             context,
-            "${context.packageName}.provider",
+            "${context.packageName}.fileprovider",
             file
         )
         val intent = Intent(Intent.ACTION_SEND).apply {

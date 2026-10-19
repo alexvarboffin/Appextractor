@@ -1,5 +1,6 @@
 package com.walhalla.compose.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -330,7 +331,7 @@ fun AppListItem(
             }
 
             HorizontalDivider(
-                thickness = 1.dp,
+                thickness = 0.5.dp,
                 color = MaterialTheme.colorScheme.outlineVariant
             )
         }
@@ -403,14 +404,18 @@ private fun FeatureBadge(kind: FeatureKind) {
     }
 
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(4.dp),
         color = containerColor,
-        contentColor = contentColor
+        contentColor = contentColor,
+        border = BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+        )
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             maxLines = 1
         )
     }

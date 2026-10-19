@@ -267,7 +267,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         }
         val uri = FileProvider.getUriForFile(
             context,
-            "${context.packageName}.provider",
+            "${context.packageName}.fileprovider",
             src
         )
         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -356,7 +356,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
                 val uri = FileProvider.getUriForFile(
                     context,
-                    "${context.packageName}.provider",
+                    "${context.packageName}.fileprovider",
                     iconFile
                 )
 
