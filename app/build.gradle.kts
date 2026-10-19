@@ -108,7 +108,7 @@ android {
     lint {
         abortOnError = false
         disable.add("InvalidPackage")
-        
+
         baseline = file("lint-baseline.xml")
     }
 }
