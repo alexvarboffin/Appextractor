@@ -40,9 +40,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.walhalla.appextractor.model.PackageMeta
@@ -50,6 +55,7 @@ import com.walhalla.appextractor.utils.prettyFileSize
 import com.walhalla.extractor.R as ExtR
 import java.text.DateFormat
 import java.util.Date
+import java.util.Locale
 
 private val IconSize = 40.dp
 private val ContentStart = 12.dp
@@ -61,6 +67,7 @@ private val FeaturesStart = ContentStart + IconSize + IconTextGap
 fun AppListItem(
     app: PackageMeta,
     isSelected: Boolean = false,
+    highlightQuery: String = "",
     onSelect: () -> Unit = {},
     onExtractClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
@@ -94,6 +101,15 @@ fun AppListItem(
             if (app.isSystemApp) add(FeatureKind.System)
             if (app.hasPinning) add(FeatureKind.SslPinning)
         }
+    }
+
+    val highlightColor = MaterialTheme.colorScheme.primary
+    val query = highlightQuery.trim()
+    val highlightedLabel = remember(app.label, query, highlightColor) {
+        highlightAnnotated(app.label, query, highlightColor)
+    }
+    val highlightedPackage = remember(app.packageName, query, highlightColor) {
+        highlightAnnotated(app.packageName, query, highlightColor)
     }
 
     Surface(
@@ -137,14 +153,14 @@ fun AppListItem(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = app.label,
+                        text = highlightedLabel,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
                     Text(
-                        text = app.packageName,
+                        text = highlightedPackage,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -331,6 +347,47 @@ fun AppListItem(
                 thickness = 1.dp,
                 color = MaterialTheme.colorScheme.outlineVariant
             )
+        }
+    }
+}
+
+/**
+ * Case-insensitive highlight of all [query] occurrences (legacy AppVh.setAndHighlight).
+ * Cheap: only visible LazyColumn items + remember(text, query).
+ */
+private fun highlightAnnotated(
+    text: String,
+    query: String,
+    highlightColor: Color
+): AnnotatedString {
+    if (query.isEmpty()) {
+        return AnnotatedString(text)
+    }
+    val lowerText = text.lowercase(Locale.getDefault())
+    val lowerQuery = query.lowercase(Locale.getDefault())
+    if (!lowerText.contains(lowerQuery)) {
+        return AnnotatedString(text)
+    }
+    return buildAnnotatedString {
+        var start = 0
+        while (start < text.length) {
+            val index = lowerText.indexOf(lowerQuery, start)
+            if (index < 0) {
+                append(text.substring(start))
+                break
+            }
+            if (index > start) {
+                append(text.substring(start, index))
+            }
+            withStyle(
+                SpanStyle(
+                    color = highlightColor,
+                    fontWeight = FontWeight.Bold
+                )
+            ) {
+                append(text.substring(index, index + lowerQuery.length))
+            }
+            start = index + lowerQuery.length
         }
     }
 }

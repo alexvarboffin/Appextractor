@@ -511,6 +511,7 @@ fun ExtractorScreen(
                                     AppListItem(
                                         app = app,
                                         isSelected = app in selectedApps,
+                                        highlightQuery = searchQuery,
                                         onSelect = {
                                             viewModel.toggleAppSelection(app)
                                         },
