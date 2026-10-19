@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Security
@@ -480,7 +479,7 @@ fun ExtractorScreen(
                             ) {
                                 Icon(
                                     imageVector = if (searchQuery.isBlank()) {
-                                        Icons.Default.Inbox
+                                        Icons.Default.Apps
                                     } else {
                                         Icons.Default.SearchOff
                                     },
