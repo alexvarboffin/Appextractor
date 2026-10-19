@@ -22,10 +22,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.net.toUri
+import com.walhalla.appextractor.model.PackageMeta
+
 @SuppressLint("PackageManagerGetSignatures")
 class MetaPresenter  constructor(
     context: Context,
-    meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta,
+    meta: PackageMeta,
     view: DetailsF0.View
 ) :
     DetailsF0.Presenter {
@@ -35,7 +37,7 @@ class MetaPresenter  constructor(
 
     private val context: Context
     private val packageManager: PackageManager
-    private val meta: _root_ide_package_.com.walhalla.appextractor.model.PackageMeta
+    private val meta: PackageMeta
     private var packageInfo: PackageInfo? = null
 
     fun doStuff(context: Context) {
@@ -241,8 +243,7 @@ class MetaPresenter  constructor(
 
         if (!map.isEmpty()) {
             data.add(
-                HeaderObject(
-                    "Receivers MetaData" + DEVIDER_START + map.size + DEVIDER_END,
+                HeaderObject("Receivers MetaData" + DEVIDER_START + map.size + DEVIDER_END,
                     com.walhalla.extractor.R.drawable.ic_category_receiver
                 )
             )
