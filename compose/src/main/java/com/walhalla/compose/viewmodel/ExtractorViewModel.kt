@@ -28,7 +28,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import androidx.core.net.toUri
 import com.walhalla.appextractor.utils.ExtractorUtils
-import com.walhalla.appextractor.utils.FileUtil
 import kotlinx.coroutines.Dispatchers
 import android.net.Uri
 import android.provider.Settings
@@ -224,12 +223,21 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
             _extractionFileCount.value = null
 
             if (extractedFiles.isNotEmpty()) {
-                val file = extractedFiles[0]
-                val fileSize = FileUtil.getFileSizeMegaBytes(file)
-                val message = "APK extracted to:\n${file.path}\n$fileSize"
+                val count = extractedFiles.size
+                val totalBytes = extractedFiles.sumOf { it.length() }
+                val totalSize = String.format(
+                    java.util.Locale.CANADA,
+                    "%.2f MB",
+                    totalBytes.toDouble() / (1024 * 1024)
+                )
+                val message = if (count == 1) {
+                    "APK extracted to:\n${extractedFiles[0].path}\n$totalSize"
+                } else {
+                    "Extracted $count files to:\n${packageDir.path}\n$totalSize"
+                }
                 _successMessage.value = message
                 AppLogBus.success(message)
-                return file
+                return extractedFiles[0]
             }
             AppLogBus.error("Failed to extract APK: ${app.packageName}")
             return null
