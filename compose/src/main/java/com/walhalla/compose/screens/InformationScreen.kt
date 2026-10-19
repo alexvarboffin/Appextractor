@@ -3,6 +3,7 @@ package com.walhalla.compose.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -42,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -66,6 +68,7 @@ import com.walhalla.appextractor.sdk.V2Line
 import com.walhalla.appextractor.utils.ApplicationFlags
 import com.walhalla.appextractor.utils.LauncherUtils
 import com.walhalla.appextractor.utils.prettyFileSize
+import com.walhalla.compose.model.getPermissionDescription
 import com.walhalla.compose.viewmodel.AppDetails
 import com.walhalla.extractor.R as ExtR
 
@@ -292,8 +295,16 @@ private fun CollapsedHeader(header: HeaderCollapsedObject, packageName: String) 
     }
 }
 
+private val PermissionGrantedGreen = Color(0xFF2E7D32)
+private val PermissionDeniedRed = Color(0xFFC62828)
+
 @Composable
 private fun PermissionRow(line: PermissionLine) {
+    val context = LocalContext.current
+    val statusColor = if (line.isGranted) PermissionGrantedGreen else PermissionDeniedRed
+    val description = remember(line.res0) {
+        resolvePermissionDescription(context, line.res0)
+    }
     val level = when (line.protectionLevel and PermissionInfo.PROTECTION_MASK_BASE) {
         PermissionInfo.PROTECTION_DANGEROUS -> "dangerous"
         PermissionInfo.PROTECTION_NORMAL -> "normal"
@@ -304,32 +315,56 @@ private fun PermissionRow(line: PermissionLine) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Icon(
             imageVector = if (line.isGranted) Icons.Default.CheckCircle else Icons.Default.Cancel,
             contentDescription = null,
-            tint = if (line.isGranted) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.outline
-            }
+            tint = statusColor,
+            modifier = Modifier.padding(top = 2.dp)
         )
         Column(modifier = Modifier.weight(1f)) {
             Text(text = line.res0, style = MaterialTheme.typography.bodyMedium)
             Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
                 text = level,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
         Text(
             text = if (line.isGranted) "granted" else "denied",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = statusColor,
+            modifier = Modifier.padding(top = 2.dp)
         )
     }
+}
+
+private fun resolvePermissionDescription(context: Context, shortOrFull: String): String {
+    val pm = context.packageManager
+    val candidates = buildList {
+        add(shortOrFull)
+        if (!shortOrFull.startsWith("android.permission.")) {
+            add("android.permission.$shortOrFull")
+        }
+    }
+    for (name in candidates) {
+        try {
+            val info = pm.getPermissionInfo(name, 0)
+            val desc = info.loadDescription(pm)?.toString()
+            if (!desc.isNullOrBlank()) return desc
+        } catch (_: PackageManager.NameNotFoundException) {
+            // try next candidate / fallback
+        }
+    }
+    return getPermissionDescription(shortOrFull)
 }
 
 @Composable
