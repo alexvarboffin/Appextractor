@@ -266,6 +266,7 @@ Record of corrections that changed implementation:
 19. [x] UI felt “нейро-шаблонно” → drop purple/dynamic Material defaults; ApkChief blue + denser list chrome.
 20. [x] META section title showed `(2)(2)` — count already in `HeaderObject.title`; Compose must not append `items.size` again.
 21. [x] Compose must use legacy `applicationId` + signing keystore + launcher icon to replace `:app` install.
+22. [ ] Compose phone+TV (2-in-1): task described in `Documentation/TASKS/compose-phone-tv.md`; FireTv as reference — **code not started**.
 
 ---
 
@@ -297,3 +298,17 @@ For each section 0–14:
 - `FEATURES.md` — older aspirational notes (`:domain` / `:data` layers); **this checklist wins** when they conflict.
 - `android-prepublish-refresh` skill — Play publish / edge-to-edge / SDK 37 checklist; separate from product parity.
 - Monetization / debug / scanner (items 18–20) until explicitly requested.
+
+---
+
+## 18. Compose phone + TV (planned — description only)
+
+> Full task write-up: [`Documentation/TASKS/compose-phone-tv.md`](Documentation/TASKS/compose-phone-tv.md).  
+> Reference implementation: `C:\Synced\FireTv` + skill `compose-tv-from-mobile`.
+
+- [ ] **Launcher** detects TV via `UI_MODE_TYPE_TELEVISION` → `phone.MainActivity` **or** `tv.MainActivity` (no single `setContent { if (isTv) }` tree).
+- [ ] Packages: `ui.mobile.*` (Material3) ↔ `ui.tv.*` (`androidx.tv.material3`); same screen names allowed; shared ViewModels / `:extractor`.
+- [ ] TV shell: drawer + D-pad focus rules from FireTv / `compose-tv-from-mobile` (no FAB; focus restore; dialogs; text fields).
+- [ ] Phone path keeps current adaptive list/nav parity; TV ports critical path (Extractor → detail → logs/settings).
+
+---
