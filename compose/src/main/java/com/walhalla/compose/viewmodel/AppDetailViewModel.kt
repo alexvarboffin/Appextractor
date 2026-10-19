@@ -13,6 +13,7 @@ import com.walhalla.appextractor.sdk.BaseViewModel
 import com.walhalla.appextractor.sdk.GetServicesUseCase
 
 import com.walhalla.compose.model.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,11 +38,16 @@ data class AppDetails(
 class AppDetailViewModel(application: Application) : AndroidViewModel(application) {
     private val _appDetails = MutableStateFlow<AppDetails?>(null)
     val appDetails: StateFlow<AppDetails?> = _appDetails.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     var icons: MutableMap<Int, Drawable?> = HashMap()
 
-
     fun loadAppDetails(app: PackageMeta) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
+            _isLoading.value = true
+            _appDetails.value = null
             try {
                 val pm = getApplication<Application>().packageManager
                 val packageInfo = pm.getPackageInfo(
@@ -87,10 +93,11 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                     )
                 } ?: emptyList()
 
-
-                val getServicesUseCase = GetServicesUseCase(getApplication<Application>().packageManager, getApplication<Application>())
+                val getServicesUseCase = GetServicesUseCase(
+                    getApplication<Application>().packageManager,
+                    getApplication()
+                )
                 val services = getServicesUseCase.execute(packageInfo, icons)
-
 
                 val receivers = packageInfo.receivers?.map { receiverInfo ->
                     AppComponent(
@@ -115,6 +122,8 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                _isLoading.value = false
             }
         }
     }

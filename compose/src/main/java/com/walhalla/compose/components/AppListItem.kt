@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,8 @@ import com.walhalla.extractor.R as ExtR
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 private val IconSize = 40.dp
 private val ContentStart = 12.dp
@@ -81,6 +84,16 @@ fun AppListItem(
     onShareIconClick: () -> Unit = {}
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    val menuScope = rememberCoroutineScope()
+
+    /** Close dropdown first, then run action so navigation isn't blocked by open menu. */
+    fun runAfterMenuClose(action: () -> Unit) {
+        showMenu = false
+        menuScope.launch {
+            yield()
+            action()
+        }
+    }
 
     val dateTimeFormat = remember {
         DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
@@ -240,90 +253,63 @@ fun AppListItem(
                             leadingIcon = {
                                 Icon(Icons.Default.SaveAlt, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onExtractClick()
-                            }
+                            onClick = { runAfterMenuClose(onExtractClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.open_on_google_play)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Shop, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onOpenPlayStoreClick()
-                            }
+                            onClick = { runAfterMenuClose(onOpenPlayStoreClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_launch_app)) },
                             leadingIcon = {
                                 Icon(Icons.Default.PlayArrow, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onLaunchClick()
-                            }
+                            onClick = { runAfterMenuClose(onLaunchClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_uninstall_app)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Delete, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onUninstallClick()
-                            }
+                            onClick = { runAfterMenuClose(onUninstallClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_copy_package_name)) },
                             leadingIcon = {
                                 Icon(Icons.Default.ContentCopy, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onCopyPackageNameClick()
-                            }
+                            onClick = { runAfterMenuClose(onCopyPackageNameClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_app_info)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Info, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onInfoClick()
-                            }
+                            onClick = { runAfterMenuClose(onInfoClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_app_manifest)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Description, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onManifestClick()
-                            }
+                            onClick = { runAfterMenuClose(onManifestClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_save_icon)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Download, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onSaveIconClick()
-                            }
+                            onClick = { runAfterMenuClose(onSaveIconClick) }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.action_export_icon)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Share, contentDescription = null)
                             },
-                            onClick = {
-                                showMenu = false
-                                onShareIconClick()
-                            }
+                            onClick = { runAfterMenuClose(onShareIconClick) }
                         )
                     }
                 }

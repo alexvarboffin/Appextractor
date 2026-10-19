@@ -225,7 +225,7 @@ fun AboutDialog(
 @Composable
 fun ExtractorScreen(
     viewModel: ExtractorViewModel = viewModel(),
-    onNavigateToAppDetail: (String) -> Unit,
+    onNavigateToAppDetail: (PackageMeta) -> Unit,
     viewManifest: (app: PackageMeta) -> Unit
 ) {
     val context = LocalContext.current
@@ -522,7 +522,7 @@ fun ExtractorScreen(
                                             viewModel.shareApk(app)
                                         },
                                         onInfoClick = {
-                                            onNavigateToAppDetail(app.packageName)
+                                            onNavigateToAppDetail(app)
                                         },
                                         onOpenPlayStoreClick = { viewModel.openPlayStore(app) },
                                         onLaunchClick = { viewModel.launchApp(app) },

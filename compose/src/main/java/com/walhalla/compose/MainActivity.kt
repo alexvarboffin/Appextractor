@@ -12,10 +12,11 @@ import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -23,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
 import androidx.navigation.navArgument
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.compose.screens.LogScreen
@@ -31,9 +31,7 @@ import com.walhalla.compose.screens.ManifestScreen
 import com.walhalla.compose.screens.SettingsScreen
 import com.walhalla.compose.screens.AppDetailScreen
 import com.walhalla.compose.screens.ExtractorScreen
-import com.walhalla.compose.screens.SearchScreen
 import com.walhalla.compose.ui.theme.AppextractorTheme
-import com.walhalla.compose.viewmodel.ExtractorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -90,11 +88,14 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(Screen.Extractor.route) {
                                 ExtractorScreen(
-                                    onNavigateToAppDetail = { packageName ->
-                                        navController.navigate("app_detail/$packageName")
+                                    onNavigateToAppDetail = { app ->
+                                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                                            "detail_app",
+                                            app
+                                        )
+                                        navController.navigate("app_detail/${app.packageName}")
                                     },
                                     viewManifest = {
-                                        println("{}{}{}" + it)
                                         navController.currentBackStackEntry?.savedStateHandle?.set(
                                             "app",
                                             it
@@ -102,8 +103,6 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate("manifest")
                                     }
                                 )
-
-
                             }
                             composable(Screen.Logs.route) { LogScreen() }
                             composable(Screen.Settings.route) { SettingsScreen() }
@@ -125,15 +124,18 @@ class MainActivity : ComponentActivity() {
                                 arguments = listOf(
                                     navArgument("packageName") { type = NavType.StringType }
                                 )
-                            ) { backStackEntry ->
-                                val packageName = backStackEntry.arguments?.getString("packageName")
-                                val viewModel: ExtractorViewModel = viewModel()
-                                val app = viewModel.getAppByPackageName(packageName)
+                            ) {
+                                val app = navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.get<PackageMeta>("detail_app")
                                 if (app != null) {
                                     AppDetailScreen(
                                         app = app,
                                         onBackClick = { navController.navigateUp() }
                                     )
+                                } else {
+                                    // No meta passed — leave immediately (should not happen)
+                                    LaunchedEffect(Unit) { navController.navigateUp() }
                                 }
                             }
                         }
