@@ -23,14 +23,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,6 +64,7 @@ import com.walhalla.appextractor.sdk.ServiceLine
 import com.walhalla.appextractor.sdk.SimpleLine
 import com.walhalla.appextractor.sdk.V2Line
 import com.walhalla.appextractor.utils.ApplicationFlags
+import com.walhalla.appextractor.utils.LauncherUtils
 import com.walhalla.appextractor.utils.prettyFileSize
 import com.walhalla.compose.viewmodel.AppDetails
 import com.walhalla.extractor.R as ExtR
@@ -119,7 +122,7 @@ fun InformationScreen(
                 ) {
                     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                         section.items.forEach { line ->
-                            InfoLineItem(line)
+                            InfoLineItem(line, app.packageName)
                         }
                     }
                 }
@@ -174,7 +177,7 @@ private fun groupIntoSections(
 }
 
 @Composable
-private fun InfoLineItem(line: BaseViewModel) {
+private fun InfoLineItem(line: BaseViewModel, packageName: String) {
     when (line) {
         is SimpleLine -> {
             val ctx = LocalContext.current
@@ -186,12 +189,8 @@ private fun InfoLineItem(line: BaseViewModel) {
         is InfoApkLine -> DetailRow(line.name, line.value, copyable = true)
         is PermissionLine -> PermissionRow(line)
         is FlagzObject -> FlagsRow(line.flags)
-        is HeaderCollapsedObject -> CollapsedHeader(line)
-        is ActivityLine -> ComponentRow(
-            label = line.label.ifBlank { line.className.substringAfterLast('.') },
-            className = line.className,
-            exported = line.exported
-        )
+        is HeaderCollapsedObject -> CollapsedHeader(line, packageName)
+        is ActivityLine -> ActivityRow(line, packageName)
         is ServiceLine -> ComponentRow(
             label = line.label.ifBlank { line.className.substringAfterLast('.') },
             className = line.className,
@@ -244,7 +243,7 @@ private fun FlagsRow(flags: Int) {
 }
 
 @Composable
-private fun CollapsedHeader(header: HeaderCollapsedObject) {
+private fun CollapsedHeader(header: HeaderCollapsedObject, packageName: String) {
     var expanded by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -286,7 +285,7 @@ private fun CollapsedHeader(header: HeaderCollapsedObject) {
         ) {
             Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
                 header.list.forEach { child ->
-                    InfoLineItem(child)
+                    InfoLineItem(child, packageName)
                 }
             }
         }
@@ -330,6 +329,56 @@ private fun PermissionRow(line: PermissionLine) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+private fun ActivityRow(line: ActivityLine, packageName: String) {
+    val context = LocalContext.current
+    val label = line.label.ifBlank { line.className.substringAfterLast('.') }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = line.className,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = if (line.exported) "Exported" else "Not exported",
+                style = MaterialTheme.typography.labelSmall,
+                color = if (line.exported) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
+        }
+        if (line.exported) {
+            IconButton(
+                onClick = {
+                    LauncherUtils.onLaunchExportedActivity(
+                        context,
+                        packageName,
+                        line.className
+                    )
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Launch",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }
 
