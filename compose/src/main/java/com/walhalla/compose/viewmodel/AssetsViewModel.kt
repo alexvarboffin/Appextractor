@@ -59,13 +59,17 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
 
             override fun successToast(res: Int, aaa: String) {
                 val ctx = getApplication<Application>()
-                _toastMessage.value = ctx.getString(res) + " " + aaa
+                val msg = ctx.getString(res) + " " + aaa
+                _toastMessage.value = msg
+                com.walhalla.compose.log.AppLogBus.success(msg)
             }
 
             override fun errorToast(res: Int, aaa: String) {
                 val ctx = getApplication<Application>()
-                _toastMessage.value = ctx.getString(res) + " " + aaa
+                val msg = ctx.getString(res) + " " + aaa
+                _toastMessage.value = msg
                 _error.value = aaa
+                com.walhalla.compose.log.AppLogBus.error(msg)
             }
         })
 

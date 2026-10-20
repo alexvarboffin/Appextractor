@@ -15,12 +15,14 @@ fun versionCodeDate(): Int {
 android {
     // Kotlin/R package stays compose; install id matches legacy for in-place updates
     namespace = "com.walhalla.compose"
-    compileSdk = 35
+    // 36: needed by dokar3/sonner (TV toasts); targetSdk can stay lower
+    compileSdk = 36
 
     defaultConfig {
         multiDexEnabled = true
         applicationId = "com.walhalla.appextractor"
-        minSdk = 21
+        // sonner (TV toasts) requires 24+
+        minSdk = 24
         targetSdk = 35
         val code = versionCodeDate()
         versionCode = code
@@ -80,6 +82,9 @@ dependencies {
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.2")
     // Android TV Material3 (tv shell) — see compose-tv-from-mobile / FireTv
     implementation("androidx.tv:tv-material:1.0.1")
+    // TV toasts (top-center) instead of android.widget.Toast
+    // Prefer API-compatible release; force kotlin-stdlib to project Kotlin (sonner 0.4 pulls 2.4.x)
+    implementation("io.github.dokar3:sonner:0.3.8")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -270,10 +270,21 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                ShareUtils.shareApkFile(context, app, app.sourceDir)
+                val ok = ShareUtils.shareApkFile(context, app, app.sourceDir)
+                if (ok) {
+                    AppLogBus.success(
+                        context.getString(com.walhalla.extractor.R.string.action_share_app)
+                    )
+                } else {
+                    AppLogBus.error(
+                        context.getString(com.walhalla.extractor.R.string.no_app_available_to_share)
+                    )
+                }
             } catch (e: Exception) {
                 DLog.handleException(e)
-                AppLogBus.error("Share APK failed: ${e.message}")
+                AppLogBus.error(
+                    context.getString(com.walhalla.extractor.R.string.no_app_available_to_share)
+                )
             }
         }
     }
@@ -302,6 +313,9 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         if (intent != null) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
+            AppLogBus.info(context.getString(com.walhalla.extractor.R.string.action_launch_app))
+        } else {
+            AppLogBus.error(context.getString(com.walhalla.extractor.R.string.no_app_available_to_share))
         }
     }
 
@@ -319,6 +333,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Package Name", app.packageName)
         clipboard.setPrimaryClip(clip)
+        AppLogBus.success(context.getString(com.walhalla.extractor.R.string.copied_to_clipboard))
     }
 
 

@@ -6,18 +6,28 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,7 +44,9 @@ import com.walhalla.compose.detail.InfoLineStatus
 import com.walhalla.compose.detail.InfoLineUi
 import com.walhalla.compose.detail.groupIntoSections
 import com.walhalla.compose.detail.mapInfoLine
+import com.walhalla.compose.ui.tv.components.TvActionHintIcon
 import com.walhalla.compose.viewmodel.AppDetails
+import com.walhalla.extractor.R as ExtR
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -139,8 +151,10 @@ private fun TvInfoLineRow(
 ) {
     val context = LocalContext.current
     var childrenOpen by remember { mutableStateOf(ui.children.isNotEmpty()) }
+    var focused by remember { mutableStateOf(false) }
 
     val clickable = ui.action != InfoLineAction.None || ui.children.isNotEmpty()
+    val hint = infoActionHint(ui)
     if (clickable) {
         Surface(
             onClick = {
@@ -153,22 +167,37 @@ private fun TvInfoLineRow(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 2.dp),
+                .padding(vertical = 2.dp)
+                .onFocusChanged { focused = it.isFocused },
             colors = ClickableSurfaceDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 focusedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
             )
         ) {
-            InfoLineContent(ui)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                InfoLineContent(ui, Modifier.weight(1f))
+                if (hint != null) {
+                    TvActionHintIcon(
+                        icon = hint.icon,
+                        focused = focused,
+                        contentDescription = hint.labelRes?.let { stringResource(it) },
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
         }
     } else {
-        Column(
-            modifier = Modifier
+        InfoLineContent(
+            ui,
+            Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 6.dp)
-        ) {
-            InfoLineContent(ui)
-        }
+        )
     }
 
     if (childrenOpen && ui.children.isNotEmpty()) {
@@ -186,14 +215,29 @@ private fun TvInfoLineRow(
     }
 }
 
+private data class ActionHint(
+    val icon: ImageVector,
+    @androidx.annotation.StringRes val labelRes: Int? = null
+)
+
+private fun infoActionHint(ui: InfoLineUi): ActionHint? = when {
+    ui.children.isNotEmpty() -> ActionHint(Icons.Default.ExpandMore)
+    ui.action == InfoLineAction.Copy -> ActionHint(Icons.Default.ContentCopy, ExtR.string.menu_popup_copy)
+    ui.action == InfoLineAction.LaunchActivity ||
+        ui.action == InfoLineAction.LaunchService ||
+        ui.action == InfoLineAction.LaunchProvider ->
+        ActionHint(Icons.Default.PlayArrow, ExtR.string.action_launch_app)
+    ui.action == InfoLineAction.OpenSettings ->
+        ActionHint(Icons.Default.Settings, ExtR.string.action_settings)
+    ui.action == InfoLineAction.ViewXml ->
+        ActionHint(Icons.Default.Description, ExtR.string.action_xml_viewer)
+    else -> null
+}
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun InfoLineContent(ui: InfoLineUi) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
+private fun InfoLineContent(ui: InfoLineUi, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
         Text(ui.title, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
         if (ui.value.isNotBlank()) {
             Text(
@@ -221,21 +265,6 @@ private fun InfoLineContent(ui: InfoLineUi) {
                 InfoLineStatus.NotExported -> "Not exported" to scheme.onSurfaceVariant
             }
             Text(label, style = MaterialTheme.typography.labelSmall, color = color)
-        }
-        if (ui.action != InfoLineAction.None) {
-            Text(
-                text = when (ui.action) {
-                    InfoLineAction.LaunchActivity, InfoLineAction.LaunchService,
-                    InfoLineAction.LaunchProvider -> "OK · Launch"
-                    InfoLineAction.OpenSettings -> "OK · App settings"
-                    InfoLineAction.ViewXml -> "OK · XML"
-                    InfoLineAction.Copy -> "OK · Copy"
-                    else -> ""
-                },
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 2.dp)
-            )
         }
     }
 }
@@ -273,6 +302,9 @@ private fun dispatchInfoAction(
         InfoLineAction.Copy -> {
             val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.setPrimaryClip(ClipData.newPlainText(ui.title, ui.actionPayload.ifBlank { ui.value }))
+            com.walhalla.compose.log.AppLogBus.info(
+                context.getString(com.walhalla.extractor.R.string.copied_to_clipboard)
+            )
         }
         InfoLineAction.LaunchActivity ->
             LauncherUtils.onLaunchExportedActivity(context, packageName, ui.actionPayload)
@@ -283,7 +315,9 @@ private fun dispatchInfoAction(
                 context,
                 provider,
                 object : LauncherUtils.LauCallback {
-                    override fun showError(s: String) { /* snack / log on TV later */ }
+                    override fun showError(s: String) {
+                        com.walhalla.compose.log.AppLogBus.error(s)
+                    }
                 }
             )
         }

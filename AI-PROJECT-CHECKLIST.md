@@ -274,6 +274,7 @@ Record of corrections that changed implementation:
 26. [x] Phone↔TV App Detail functional parity (tabs + INFO rows + Manifest); shared mappers/VMs, TV-only chrome (`PHONE_TV_REUSE.md`).
 27. [x] TV list long-press → actions dialog with thematic icons (`appMenuActions` / `TvAppActionsDialog`; FireTv KeyUp long-press).
 28. [x] UI colors via `MaterialTheme.colorScheme` (no ad-hoc `Color(0x…)` in screens); brand hex only in `ui.theme.Color` / theme schemes.
+29. [x] TV toasts: `dokar3/compose-sonner` top-center (`TvToasterHost` + `AppLogBus.toasts`); not `android.widget.Toast` on TV.
 
 ---
 
@@ -323,6 +324,7 @@ For each section 0–14:
 - [x] TV shell: `NavigationDrawer` + focusRestorer; Extractor → AppDetail (action LazyRow) → Logs → Settings on `tv.material3` only. Debug: `FORCE_TV_IN_DEBUG` in `LauncherActivity`.
 - [x] **Share APK:** `ExtractorViewModel.shareApk` → `ShareUtils.shareApkFile` (copy to app storage first). Direct `FileProvider` on `/system/...` sourceDir crashes (2026-10-20).
 - [x] **TV App Detail parity (2026-10-20):** same tabs INFO|META|STRING|XML|ASSETS as phone (`AppDetailTabs`); shared `groupIntoSections` / `loadMetaSections` / `mapInfoLine`; TV chrome via `tv.material3` (`TvInformationTab`, `TvMetaTab`, `TvStringTab`, `TvAssetsTab`, `TvFocusTabRow`); Manifest route + action; overflow actions + App settings. No Material3 in `ui.tv`.
+- [x] **TV Sonner toasts:** `io.github.dokar3:sonner` via `TvToasterHost` (`Alignment.TopCenter`, dark+richColors); events from `AppLogBus.toasts`.
 
 Key files:
 - `compose/.../launcher/LauncherActivity.kt`
@@ -333,6 +335,8 @@ Key files:
 - `compose/.../ui/tv/detail/AppDetailScreen.kt`, `TvInformationTab.kt`, `TvMetaTab.kt`, `TvStringTab.kt`, `TvAssetsTab.kt`, `TvManifestScreen.kt`
 - `compose/.../detail/AppDetailTabs.kt`, `InfoSections.kt`, `MetaSections.kt`, `InfoLineMapping.kt`
 - `compose/.../ui/tv/logs/LogScreen.kt`, `…/settings/SettingsScreen.kt`
+- `compose/.../ui/tv/components/TvToasterHost.kt` (`dokar3:sonner`)
+- `compose/.../log/AppLogBus.kt` (`toasts` SharedFlow)
 - `compose/src/main/AndroidManifest.xml`
 
 ---

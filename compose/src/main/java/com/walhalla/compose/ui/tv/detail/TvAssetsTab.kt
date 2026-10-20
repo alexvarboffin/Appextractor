@@ -79,11 +79,6 @@ fun TvAssetsTab(
                             maxLines = 12,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Text(
-                            stringResource(android.R.string.ok) + " · dismiss",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
                     }
                 }
             }
