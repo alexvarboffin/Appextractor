@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -72,15 +73,11 @@ import com.walhalla.appextractor.sdk.V2Line
 import com.walhalla.appextractor.utils.ApplicationFlags
 import com.walhalla.appextractor.utils.LauncherUtils
 import com.walhalla.appextractor.utils.prettyFileSize
-import com.walhalla.compose.model.getPermissionDescription
+import com.walhalla.compose.detail.InfoSection
+import com.walhalla.compose.detail.groupIntoSections
+import com.walhalla.compose.detail.resolvePermissionDescription
 import com.walhalla.compose.viewmodel.AppDetails
 import com.walhalla.extractor.R as ExtR
-
-private data class InfoSection(
-    val title: String,
-    val iconRes: Int,
-    val items: List<BaseViewModel>
-)
 
 @Composable
 fun InformationScreen(
@@ -145,51 +142,6 @@ fun InformationScreen(
             }
         }
     }
-}
-
-private fun groupIntoSections(
-    lines: List<BaseViewModel>,
-    app: PackageMeta
-): List<InfoSection> {
-    val sections = mutableListOf<InfoSection>()
-    var title = ""
-    var icon = 0
-    var bucket = mutableListOf<BaseViewModel>()
-
-    fun flush() {
-        if (title.isNotEmpty() || bucket.isNotEmpty()) {
-            sections.add(InfoSection(title, icon, bucket.toList()))
-        }
-        bucket = mutableListOf()
-    }
-
-    // PackageMeta-only fields that F0Presenter does not always expose
-    val extras = mutableListOf<BaseViewModel>()
-    if (app.fileSize > 0) {
-        extras.add(V2Line("Size", prettyFileSize(app.fileSize)))
-    }
-    extras.add(V2Line("Has splits", if (app.hasSplits) "Yes" else "No"))
-    extras.add(V2Line("Certificate pinning", if (app.hasPinning) "Yes" else "No"))
-
-    for (line in lines) {
-        when (line) {
-            is HeaderObject -> {
-                flush()
-                title = line.title
-                icon = line.icon
-                if (title.contains("Basic", ignoreCase = true)) {
-                    bucket.addAll(extras)
-                }
-            }
-            else -> bucket.add(line)
-        }
-    }
-    flush()
-
-    if (sections.isEmpty() && extras.isNotEmpty()) {
-        sections.add(InfoSection("Basic Information", 0, extras))
-    }
-    return sections
 }
 
 @Composable
@@ -373,26 +325,6 @@ private fun PermissionRow(line: PermissionLine, onOpenAppSettings: () -> Unit = 
     }
 }
 
-private fun resolvePermissionDescription(context: Context, shortOrFull: String): String {
-    val pm = context.packageManager
-    val candidates = buildList {
-        add(shortOrFull)
-        if (!shortOrFull.startsWith("android.permission.")) {
-            add("android.permission.$shortOrFull")
-        }
-    }
-    for (name in candidates) {
-        try {
-            val info = pm.getPermissionInfo(name, 0)
-            val desc = info.loadDescription(pm)?.toString()
-            if (!desc.isNullOrBlank()) return desc
-        } catch (_: PackageManager.NameNotFoundException) {
-            // try next candidate / fallback
-        }
-    }
-    return getPermissionDescription(shortOrFull)
-}
-
 @Composable
 private fun ActivityRow(line: ActivityLine, packageName: String) {
     val context = LocalContext.current
@@ -533,7 +465,7 @@ private fun InfoApkRow(line: InfoApkLine, onViewXml: (String) -> Unit) {
                 onDismissRequest = { showMenu = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("View as XML path") },
+                    text = { Text(stringResource(com.walhalla.extractor.R.string.action_xml_viewer)) },
                     onClick = {
                         showMenu = false
                         onViewXml(line.value)

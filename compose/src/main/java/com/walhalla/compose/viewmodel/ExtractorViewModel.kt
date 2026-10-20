@@ -27,7 +27,9 @@ import com.walhalla.appextractor.model.ViewModel as ExtractorLineViewModel
 import com.walhalla.appextractor.utils.ApkUtils
 import com.walhalla.appextractor.utils.IconSaver
 import com.walhalla.appextractor.utils.MarketUtils
+import com.walhalla.appextractor.utils.ShareUtils
 import com.walhalla.appextractor.utils.XmlUtils
+import com.walhalla.ui.DLog
 import com.walhalla.compose.R
 import com.walhalla.compose.log.AppLogBus
 import com.walhalla.ui.plugins.Launcher
@@ -258,26 +260,22 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun shareApk(app: PackageMeta) {
-        // Extract first (via helper); share when snack reports the file — use source APK for share
+        // System APKs live under /system/... — FileProvider cannot expose them.
+        // ShareUtils copies into app storage (defLocation) then shares that file.
         val context = getApplication<Application>()
         val src = File(app.sourceDir)
         if (!src.exists()) {
             extractApkRequest(app)
             return
         }
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            src
-        )
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/vnd.android.package-archive"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                ShareUtils.shareApkFile(context, app, app.sourceDir)
+            } catch (e: Exception) {
+                DLog.handleException(e)
+                AppLogBus.error("Share APK failed: ${e.message}")
+            }
         }
-        context.startActivity(Intent.createChooser(intent, "Share APK").apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
     }
 
     fun openPlayStore(app: PackageMeta) {

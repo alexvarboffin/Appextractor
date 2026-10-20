@@ -96,6 +96,7 @@
     <string name="action_save_file">Save File</string>
     <string name="action_share_file">Export File</string>
     <string name="action_read_file">Read File</string>
+    <string name="action_zip_all_assets">ZIP All Assets</string>
     <string name="actionCopyName">Copy Name</string>
     <string name="actionCopyValue">Copy Value</string>
     <string name="action_xml_viewer">XML Viewer</string>

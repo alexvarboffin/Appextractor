@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -76,6 +77,7 @@ import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.compose.model.AssetTreeNode
 import com.walhalla.compose.model.flattenVisible
 import com.walhalla.compose.viewmodel.AssetsViewModel
+import com.walhalla.extractor.R as ExtR
 
 private enum class AssetAction {
     Read, ViewXml, Save, Export, Copy, Zip
@@ -182,7 +184,7 @@ fun AssetsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearSelectedAsset() }) {
-                    Text("OK")
+                    Text(stringResource(android.R.string.ok))
                 }
             }
         )
@@ -401,13 +403,13 @@ private fun AssetActionsMenu(
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
         if (!isBranch && !ResItem.isImages(asset)) {
             DropdownMenuItem(
-                text = { Text("Read file") },
+                text = { Text(stringResource(ExtR.string.action_read_file)) },
                 leadingIcon = { Icon(Icons.Default.Description, null) },
                 onClick = { onAction(AssetAction.Read) }
             )
             if (asset.fullPath.endsWith(".xml", ignoreCase = true)) {
                 DropdownMenuItem(
-                    text = { Text("View XML") },
+                    text = { Text(stringResource(ExtR.string.action_xml_viewer)) },
                     leadingIcon = { Icon(Icons.Default.Code, null) },
                     onClick = { onAction(AssetAction.ViewXml) }
                 )
@@ -415,23 +417,23 @@ private fun AssetActionsMenu(
         }
         if (asset.drawable != null) {
             DropdownMenuItem(
-                text = { Text("Save icon") },
+                text = { Text(stringResource(ExtR.string.action_save_icon)) },
                 leadingIcon = { Icon(Icons.Default.Save, null) },
                 onClick = { onAction(AssetAction.Save) }
             )
             DropdownMenuItem(
-                text = { Text("Share icon") },
+                text = { Text(stringResource(ExtR.string.action_export_icon)) },
                 leadingIcon = { Icon(Icons.Default.Share, null) },
                 onClick = { onAction(AssetAction.Export) }
             )
         }
         DropdownMenuItem(
-            text = { Text("Copy path") },
+            text = { Text(stringResource(ExtR.string.menu_popup_copy)) },
             leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
             onClick = { onAction(AssetAction.Copy) }
         )
         DropdownMenuItem(
-            text = { Text("Zip all assets") },
+            text = { Text(stringResource(ExtR.string.action_zip_all_assets)) },
             leadingIcon = { Icon(Icons.Default.Archive, null) },
             onClick = { onAction(AssetAction.Zip) }
         )

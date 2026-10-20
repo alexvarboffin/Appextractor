@@ -43,21 +43,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.walhalla.appextractor.activity.detail.DetailsF0
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.sdk.BaseViewModel
-import com.walhalla.appextractor.sdk.HeaderObject
-import com.walhalla.appextractor.sdk.MetaPresenter
 import com.walhalla.appextractor.sdk.V2Line
+import com.walhalla.compose.detail.MetaSection
+import com.walhalla.compose.detail.loadMetaSections
 import com.walhalla.extractor.R as ExtR
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
-private data class MetaSection(
-    val title: String,
-    val iconRes: Int,
-    val items: List<V2Line>
-)
 
 @Composable
 fun MetaScreen(app: PackageMeta) {
@@ -67,23 +57,7 @@ fun MetaScreen(app: PackageMeta) {
 
     LaunchedEffect(app.packageName) {
         isLoading = true
-        val lines = withContext(Dispatchers.Default) {
-            var result: List<BaseViewModel> = emptyList()
-            val presenter = MetaPresenter(
-                context.applicationContext,
-                app,
-                object : DetailsF0.View {
-                    override fun swap(data: List<BaseViewModel>) {
-                        result = data
-                    }
-
-                    override fun snack() {}
-                }
-            )
-            presenter.doStuff(context.applicationContext)
-            result
-        }
-        sections = groupMetaSections(lines)
+        sections = loadMetaSections(context, app)
         isLoading = false
     }
 
@@ -123,34 +97,6 @@ fun MetaScreen(app: PackageMeta) {
             }
         }
     }
-}
-
-private fun groupMetaSections(lines: List<BaseViewModel>): List<MetaSection> {
-    val sections = mutableListOf<MetaSection>()
-    var title = ""
-    var icon = 0
-    var bucket = mutableListOf<V2Line>()
-
-    fun flush() {
-        if (title.isNotEmpty() || bucket.isNotEmpty()) {
-            sections.add(MetaSection(title.ifBlank { "Metadata" }, icon, bucket.toList()))
-        }
-        bucket = mutableListOf()
-    }
-
-    for (line in lines) {
-        when (line) {
-            is HeaderObject -> {
-                flush()
-                title = line.title
-                icon = line.icon
-            }
-            is V2Line -> bucket.add(line)
-            else -> Unit
-        }
-    }
-    flush()
-    return sections
 }
 
 @Composable

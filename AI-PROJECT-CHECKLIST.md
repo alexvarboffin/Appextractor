@@ -270,6 +270,8 @@ Record of corrections that changed implementation:
 22. [x] Compose phone+TV shell start: Launcher + phone move + TV stub (2026-10-20); full `ui.tv` port still open.
 23. [x] Phone/TV: max reuse outside UI; TV forbids phone Material3 / phone controls (`PHONE_TV_REUSE.md`).
 24. [x] TV shell: NavigationDrawer + Extractor/Logs/Settings + detail actions (2026-10-20). List rows: **no overflow menu** (D-pad); OK → detail for extract/share/….
+25. [x] No hardcoded UI action labels (`Text("Save icon")` etc.) — use existing `ExtR.string.*` / `stringResource` (phone+TV menus, Assets overflow).
+26. [x] Phone↔TV App Detail functional parity (tabs + INFO rows + Manifest); shared mappers/VMs, TV-only chrome (`PHONE_TV_REUSE.md`).
 
 ---
 
@@ -317,6 +319,8 @@ For each section 0–14:
 - [x] **TV Extractor search:** `TvEditableField` (FireTv D-pad/IME pattern) → shared `ExtractorViewModel.setSearchQuery` (2026-10-20).
 - [ ] Packages: phone screens still under `compose.screens` until full `ui.mobile.*` move (TV already under `ui.tv.*`).
 - [x] TV shell: `NavigationDrawer` + focusRestorer; Extractor → AppDetail (action LazyRow) → Logs → Settings on `tv.material3` only. Debug: `FORCE_TV_IN_DEBUG` in `LauncherActivity`.
+- [x] **Share APK:** `ExtractorViewModel.shareApk` → `ShareUtils.shareApkFile` (copy to app storage first). Direct `FileProvider` on `/system/...` sourceDir crashes (2026-10-20).
+- [x] **TV App Detail parity (2026-10-20):** same tabs INFO|META|STRING|XML|ASSETS as phone (`AppDetailTabs`); shared `groupIntoSections` / `loadMetaSections` / `mapInfoLine`; TV chrome via `tv.material3` (`TvInformationTab`, `TvMetaTab`, `TvStringTab`, `TvAssetsTab`, `TvFocusTabRow`); Manifest route + action; overflow actions + App settings. No Material3 in `ui.tv`.
 
 Key files:
 - `compose/.../launcher/LauncherActivity.kt`
@@ -324,7 +328,8 @@ Key files:
 - `compose/.../tv/MainActivity.kt`, `TvNavHost.kt`, `TvRoutes.kt`
 - `compose/.../ui/tv/shell/MainShellScreen.kt`
 - `compose/.../ui/tv/extractor/ExtractorScreen.kt`
-- `compose/.../ui/tv/detail/AppDetailScreen.kt`
+- `compose/.../ui/tv/detail/AppDetailScreen.kt`, `TvInformationTab.kt`, `TvMetaTab.kt`, `TvStringTab.kt`, `TvAssetsTab.kt`, `TvManifestScreen.kt`
+- `compose/.../detail/AppDetailTabs.kt`, `InfoSections.kt`, `MetaSections.kt`, `InfoLineMapping.kt`
 - `compose/.../ui/tv/logs/LogScreen.kt`, `…/settings/SettingsScreen.kt`
 - `compose/src/main/AndroidManifest.xml`
 

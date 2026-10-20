@@ -5,7 +5,7 @@
         android:id="@+id/action_zip_all_assets"
         android:icon="@drawable/ic_baseline_text_snippet_24"
         android:orderInCategory="104"
-        android:title="ZIP All Assets" />
+        android:title="@string/action_zip_all_assets" />
 
     <item
         android:id="@+id/action_read_file"

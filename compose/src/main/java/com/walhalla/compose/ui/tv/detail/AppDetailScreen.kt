@@ -2,6 +2,7 @@ package com.walhalla.compose.ui.tv.detail
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,54 +11,64 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Android
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.Button
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import com.walhalla.appextractor.model.PackageMeta
-import com.walhalla.appextractor.sdk.BaseViewModel
-import com.walhalla.appextractor.sdk.HeaderObject
-import com.walhalla.appextractor.sdk.V2Line
+import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 import com.walhalla.appextractor.utils.prettyFileSize
+import com.walhalla.compose.detail.AppDetailTabs
+import com.walhalla.compose.ui.tv.components.TvFocusTabRow
 import com.walhalla.compose.viewmodel.AppDetailViewModel
 import com.walhalla.compose.viewmodel.ExtractorViewModel
+import com.walhalla.extractor.R as ExtR
 
 /**
- * TV app detail: list overflow actions live here as a single-focus action row
- * (no nested menus on the extractor list — D-pad).
+ * TV app detail: phone overflow actions + full INFO/META/STRING/XML/ASSETS parity.
+ * Shared VMs / [AppDetailTabs] / info+meta mappers — UI is tv.material3 only.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AppDetailScreen(
     packageName: String,
     initialApp: PackageMeta?,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onViewManifest: (PackageMeta, xmlFileName: String?) -> Unit = { _, _ -> }
 ) {
     val activity = LocalContext.current as ComponentActivity
     val extractorViewModel: ExtractorViewModel = viewModel(viewModelStoreOwner = activity)
     val detailViewModel: AppDetailViewModel = viewModel()
     val app = remember(packageName, initialApp) {
-        initialApp
-            ?: extractorViewModel.getAppByPackageName(packageName)
+        initialApp ?: extractorViewModel.getAppByPackageName(packageName)
     }
     val appDetails by detailViewModel.appDetails.collectAsState()
     val isLoading by detailViewModel.isLoading.collectAsState()
+    val needsUsageAccess by detailViewModel.needsUsageAccess.collectAsState()
     val firstAction = remember { FocusRequester() }
+    val tabRowFallback = remember { FocusRequester() }
+    var selectedTab by remember { mutableIntStateOf(AppDetailTabs.INFO) }
 
     LaunchedEffect(Unit) {
         extractorViewModel.activityProvider = { activity }
@@ -78,7 +89,7 @@ fun AppDetailScreen(
         ) {
             Text("App not found: $packageName", color = MaterialTheme.colorScheme.onSurface)
             Button(onClick = onBack, modifier = Modifier.focusRequester(firstAction)) {
-                Text("Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         }
         LaunchedEffect(Unit) { runCatching { firstAction.requestFocus() } }
@@ -87,15 +98,16 @@ fun AppDetailScreen(
 
     val actions = remember(app.packageName) {
         listOf(
-            TvAction("Extract") { extractorViewModel.extractApkRequest(app) },
-            TvAction("Share APK") { extractorViewModel.shareApk(app) },
-            TvAction("Play Store") { extractorViewModel.openPlayStore(app) },
-            TvAction("Launch") { extractorViewModel.launchApp(app) },
-            TvAction("Uninstall") { extractorViewModel.uninstallApp(app) },
-            TvAction("Copy package") { extractorViewModel.copyPackageName(app) },
-            TvAction("Save icon") { extractorViewModel.saveIcon(app) },
-            TvAction("Share icon") { extractorViewModel.shareIcon(app) },
-            TvAction("Back", onBack)
+            TvAction(ExtR.string.action_extract) { extractorViewModel.extractApkRequest(app) },
+            TvAction(ExtR.string.action_share_app) { extractorViewModel.shareApk(app) },
+            TvAction(ExtR.string.open_on_google_play) { extractorViewModel.openPlayStore(app) },
+            TvAction(ExtR.string.action_launch_app) { extractorViewModel.launchApp(app) },
+            TvAction(ExtR.string.action_uninstall_app) { extractorViewModel.uninstallApp(app) },
+            TvAction(ExtR.string.action_copy_package_name) { extractorViewModel.copyPackageName(app) },
+            TvAction(ExtR.string.action_save_icon) { extractorViewModel.saveIcon(app) },
+            TvAction(ExtR.string.action_export_icon) { extractorViewModel.shareIcon(app) },
+            TvAction(ExtR.string.action_app_manifest) { onViewManifest(app, null) },
+            TvAction(ExtR.string.action_app_info) { detailViewModel.openInSettings(app) },
         )
     }
 
@@ -106,18 +118,25 @@ fun AppDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp, vertical = 24.dp)
+            .padding(horizontal = 28.dp, vertical = 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (app.icon != null) {
+            if (app.icon == null) {
+                Icon(
+                    imageVector = Icons.Default.Android,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
                 AsyncImage(
                     model = app.icon,
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(56.dp)
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
@@ -132,11 +151,10 @@ fun AppDetailScreen(
             }
         }
 
-        // Actions: one focusable control each — no PopupMenu / DropdownMenu on TV.
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(end = 8.dp)
         ) {
@@ -146,45 +164,65 @@ fun AppDetailScreen(
                     onClick = action.onClick,
                     modifier = if (index == 0) Modifier.focusRequester(firstAction) else Modifier
                 ) {
-                    Text(action.label)
+                    Text(stringResource(action.labelRes))
                 }
             }
         }
 
-        Text(
-            text = if (isLoading) "Loading details…" else "Info",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+        if (needsUsageAccess) {
+            Button(
+                onClick = { detailViewModel.openUsageAccessSettings() },
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Text("Usage access · SETTINGS")
+            }
+        }
+
+        if (isLoading) {
+            Text(
+                stringResource(ExtR.string.dlg_loading_title),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+
+        TvFocusTabRow(
+            tabs = AppDetailTabs.titles,
+            selectedIndex = selectedTab,
+            onSelectedIndexChange = { selectedTab = it },
+            tabRowFallback = tabRowFallback
         )
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            val lines = appDetails?.infoLines.orEmpty().take(80)
-            if (lines.isEmpty() && !isLoading) {
-                item {
-                    Text(
-                        "No detail rows",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            items(lines.size) { i ->
-                Text(
-                    text = formatInfoLine(lines[i]),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+        when (selectedTab) {
+            AppDetailTabs.INFO -> TvInformationTab(
+                app = app,
+                appDetails = appDetails,
+                onLaunchService = { detailViewModel.launchExportedService(it) },
+                onOpenAppSettings = { detailViewModel.openInSettings(app) },
+                onViewXml = { onViewManifest(app, it) },
+                modifier = Modifier.weight(1f)
+            )
+            AppDetailTabs.META -> TvMetaTab(app, Modifier.weight(1f))
+            AppDetailTabs.STRING -> TvStringTab(
+                app = app,
+                resourceType = ResourcesToolForPlugin.STRING,
+                onViewXml = { onViewManifest(app, it) },
+                modifier = Modifier.weight(1f)
+            )
+            AppDetailTabs.XML -> TvStringTab(
+                app = app,
+                resourceType = ResourcesToolForPlugin.XML,
+                onViewXml = { onViewManifest(app, it) },
+                modifier = Modifier.weight(1f)
+            )
+            AppDetailTabs.ASSETS -> TvAssetsTab(
+                app = app,
+                onViewXml = { path -> onViewManifest(app, "assets/$path") },
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
-private fun formatInfoLine(line: BaseViewModel): String = when (line) {
-    is HeaderObject -> "— ${line.title}"
-    is V2Line -> "${line.key}: ${line.value}"
-    else -> line.javaClass.simpleName
-}
-
-private data class TvAction(val label: String, val onClick: () -> Unit)
+private data class TvAction(@StringRes val labelRes: Int, val onClick: () -> Unit)

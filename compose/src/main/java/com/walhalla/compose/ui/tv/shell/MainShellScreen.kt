@@ -1,7 +1,7 @@
 package com.walhalla.compose.ui.tv.shell
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,16 +26,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.activity.ComponentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.Button
 import androidx.tv.material3.DrawerValue
@@ -63,7 +58,7 @@ private data class DrawerItem(
     val onClick: () -> Unit
 )
 
-@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun MainShellScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -71,7 +66,6 @@ fun MainShellScreen() {
     var showAbout by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     val drawerRestorer = rememberTvLazyFocusRestorer()
-    val screenFallback = remember { FocusRequester() }
     val activity = LocalContext.current as ComponentActivity
     val extractorVm: ExtractorViewModel = viewModel(viewModelStoreOwner = activity)
 
@@ -80,7 +74,8 @@ fun MainShellScreen() {
         if (initialFocusDone) return@LaunchedEffect
         initialFocusDone = true
         withFrameNanos { }
-        runCatching { drawerRestorer.child.requestFocus() }
+        // Enter drawer **group** — restorer picks the child (never requestFocus a raw item).
+        runCatching { drawerRestorer.group.requestFocus() }
     }
 
     val drawerItems = listOf(
@@ -136,13 +131,8 @@ fun MainShellScreen() {
                         NavigationDrawerItem(
                             selected = item.id != null && item.id == panel,
                             onClick = item.onClick,
-                            modifier = if (index == 0) {
-                                drawerRestorer.childModifier()
-                            } else {
-                                Modifier
-                            },
+                            modifier = drawerRestorer.itemModifier(index, drawerItems.size),
                             leadingContent = {
-                                // No explicit tint — LocalContentColor follows focus/selected.
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = null
@@ -155,13 +145,12 @@ fun MainShellScreen() {
                 }
             }
         ) {
+            // No nested focusRestorer here — Lazy lists own Case B restorers.
+            // Nesting + TextField Down→child caused LazyLayoutPinnableItem double-release.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(colors.background)
-                    .focusRequester(screenFallback)
-                    .focusRestorer { screenFallback }
-                    .focusGroup()
             ) {
                 when (panel) {
                     ShellPanel.Extractor -> ExtractorScreen(extractorViewModel = extractorVm)

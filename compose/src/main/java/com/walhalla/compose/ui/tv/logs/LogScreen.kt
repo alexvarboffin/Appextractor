@@ -59,9 +59,15 @@ fun LogScreen(viewModel: LogViewModel = viewModel()) {
     Column(modifier = Modifier.fillMaxSize()) {
         Button(
             onClick = { viewModel.refresh() },
+            // Down into list: enter Lazy **group** (not child FR) — avoids pin double-release.
             modifier = Modifier
                 .padding(16.dp)
                 .then(leftToDrawer)
+                .focusProperties {
+                    if (logs.isNotEmpty()) {
+                        down = listRestorer.group
+                    }
+                }
         ) {
             Text("Refresh")
         }

@@ -40,6 +40,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
+import com.walhalla.compose.detail.AppDetailTabs
 import com.walhalla.compose.viewmodel.AppDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -118,9 +119,9 @@ fun AppDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            val pagerState = rememberPagerState(initialPage = 0)
+            val pagerState = rememberPagerState(initialPage = AppDetailTabs.INFO)
             val coroutineScope = rememberCoroutineScope()
-            val tabs = listOf("INFO", "META", "STRING", "XML", "ASSETS")
+            val tabs = AppDetailTabs.titles
 
             ScrollableTabRow(selectedTabIndex = pagerState.currentPage) {
                 tabs.forEachIndexed { index, title ->
@@ -146,7 +147,7 @@ fun AppDetailScreen(
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
-                    0 -> InformationScreen(
+                    AppDetailTabs.INFO -> InformationScreen(
                         PaddingValues(0.dp),
                         app,
                         appDetails,
@@ -154,18 +155,18 @@ fun AppDetailScreen(
                         onOpenAppSettings = { viewModel.openInSettings(app) },
                         onViewXml = { onViewManifest(app, it) }
                     )
-                    1 -> MetaScreen(app)
-                    2 -> StringScreen(
+                    AppDetailTabs.META -> MetaScreen(app)
+                    AppDetailTabs.STRING -> StringScreen(
                         app,
                         ResourcesToolForPlugin.STRING,
                         onViewXml = { onViewManifest(app, it) }
                     )
-                    3 -> StringScreen(
+                    AppDetailTabs.XML -> StringScreen(
                         app,
                         ResourcesToolForPlugin.XML,
                         onViewXml = { onViewManifest(app, it) }
                     )
-                    4 -> AssetsScreen(
+                    AppDetailTabs.ASSETS -> AssetsScreen(
                         app,
                         onViewXml = { path -> onViewManifest(app, "assets/$path") }
                     )

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,7 +83,9 @@ fun ExtractorScreen(
             onValueChange = vm::setSearchQuery,
             hint = stringResource(ExtR.string.search_hint),
             leftFocus = drawerFocus,
-            downFocus = listRestorer.child.takeIf { apps.isNotEmpty() },
+            // Enter the Lazy **group** — focusRestorer restores the child.
+            // Never requestFocus(child): double pin release crash (LazyLayoutPinnableItem).
+            downFocus = listRestorer.group.takeIf { apps.isNotEmpty() },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
@@ -92,6 +95,7 @@ fun ExtractorScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
+                .then(leftToDrawer)
         )
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -166,14 +170,20 @@ private fun AppRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (app.icon != null) {
+            // Same as phone AppListItem: null icon (resId 0) → Android placeholder.
+            if (app.icon == null) {
+                Icon(
+                    imageVector = Icons.Default.Android,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
                 AsyncImage(
                     model = app.icon,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp)
                 )
-            } else {
-                Box(modifier = Modifier.size(48.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(

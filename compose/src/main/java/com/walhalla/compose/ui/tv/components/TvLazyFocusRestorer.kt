@@ -18,6 +18,10 @@ import androidx.compose.ui.focus.onFocusChanged
  * Put [tvLazyFocusGroup] on the Lazy* itself — not a nested focusGroup.
  *
  * Compose 1.7: [focusRestorer] takes `(() -> FocusRequester)?` (ExperimentalComposeUiApi).
+ *
+ * **Enter via [group]** (`requestFocus` / Left-from-content / Down-from-search).
+ * Never `requestFocus([child])` from outside — races with restorer onEnter and crashes
+ * (`LazyLayoutPinnableItem.release` / "Release should only be called once").
  */
 @Stable
 class TvLazyFocusRestorer internal constructor(

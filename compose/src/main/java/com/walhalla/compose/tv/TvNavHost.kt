@@ -15,6 +15,7 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.compose.ui.tv.detail.AppDetailScreen
+import com.walhalla.compose.ui.tv.detail.TvManifestScreen
 import com.walhalla.compose.ui.tv.shell.MainShellScreen
 import com.walhalla.compose.ui.tv.theme.AppextractorTvTheme
 
@@ -49,8 +50,33 @@ fun TvNavHost() {
                         AppDetailScreen(
                             packageName = packageName,
                             initialApp = app,
-                            onBack = { navController.navigateUp() }
+                            onBack = { navController.navigateUp() },
+                            onViewManifest = { meta, xml ->
+                                navController.currentBackStackEntry?.savedStateHandle?.set("manifest_app", meta)
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    "manifest_xml",
+                                    xml
+                                )
+                                navController.navigate(TvRoutes.Manifest)
+                            }
                         )
+                    }
+                    composable(TvRoutes.Manifest) {
+                        val app = navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.get<PackageMeta>("manifest_app")
+                        val xml = navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.get<String>("manifest_xml")
+                        if (app != null) {
+                            TvManifestScreen(
+                                app = app,
+                                xmlFileName = xml,
+                                onBack = { navController.navigateUp() }
+                            )
+                        } else {
+                            navController.navigateUp()
+                        }
                     }
                 }
             }
