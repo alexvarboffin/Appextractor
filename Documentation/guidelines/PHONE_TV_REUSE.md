@@ -55,7 +55,7 @@ viewmodel/FooViewModel.kt  → один на обе ветки
 | Shared `AppListItem` на material3, подключённый и в TV | `components` phone-only; TV — свой item на `tv.material3` |
 | `expect/actual` Composable с Material внутри common | Common = VM/models; UI только в mobile/tv |
 | Один `setContent { if (isTv) PhoneUi() else … }` | Launcher → phone **или** tv Activity |
-| Menu IconButton / Dropdown на каждом row LazyList | Row click → detail; actions в detail LazyRow |
+| Menu IconButton / Dropdown на каждом row LazyList | OK → detail; **long-press → actions Dialog** (иконки); actions также в detail |
 
 ---
 

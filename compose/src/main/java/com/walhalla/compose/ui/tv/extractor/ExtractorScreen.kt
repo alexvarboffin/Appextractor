@@ -19,9 +19,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,18 +44,21 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.prettyFileSize
+import com.walhalla.compose.detail.AppMenuActionId
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
 import com.walhalla.compose.tv.LocalTvNavController
 import com.walhalla.compose.tv.TvRoutes
+import com.walhalla.compose.ui.tv.components.TvAppActionsDialog
 import com.walhalla.compose.ui.tv.components.TvEditableField
 import com.walhalla.compose.ui.tv.components.rememberTvLazyFocusRestorer
 import com.walhalla.compose.ui.tv.components.tvLazyFocusGroup
 import com.walhalla.compose.viewmodel.ExtractorViewModel
 import com.walhalla.extractor.R as ExtR
+import kotlinx.coroutines.delay
 
 /**
- * TV extractor list: **one focus target per row** — no overflow menu (D-pad).
- * Search via [TvEditableField] (FireTv); OK on row → app detail for actions.
+ * TV extractor list: one focus target per row.
+ * OK / short press → detail; long-press → actions dialog (phone overflow parity).
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -62,6 +73,7 @@ fun ExtractorScreen(
     val nav = LocalTvNavController.current
     val drawerFocus = LocalTvDrawerFocusRequester.current
     val listRestorer = rememberTvLazyFocusRestorer()
+    var menuApp by remember { mutableStateOf<PackageMeta?>(null) }
 
     LaunchedEffect(activity) {
         vm.activityProvider = { activity }
@@ -71,6 +83,40 @@ fun ExtractorScreen(
         Modifier.focusProperties { left = drawerFocus }
     } else {
         Modifier
+    }
+
+    fun openDetail(app: PackageMeta) {
+        nav.currentBackStackEntry?.savedStateHandle?.set("detail_app", app)
+        nav.navigate(TvRoutes.appDetail(app.packageName))
+    }
+
+    fun openManifest(app: PackageMeta) {
+        nav.currentBackStackEntry?.savedStateHandle?.set("manifest_app", app)
+        nav.currentBackStackEntry?.savedStateHandle?.set("manifest_xml", null as String?)
+        nav.navigate(TvRoutes.Manifest)
+    }
+
+    fun onMenuAction(app: PackageMeta, id: AppMenuActionId) {
+        when (id) {
+            AppMenuActionId.Extract -> vm.extractApkRequest(app)
+            AppMenuActionId.ShareApk -> vm.shareApk(app)
+            AppMenuActionId.PlayStore -> vm.openPlayStore(app)
+            AppMenuActionId.Launch -> vm.launchApp(app)
+            AppMenuActionId.Uninstall -> vm.uninstallApp(app)
+            AppMenuActionId.CopyPackage -> vm.copyPackageName(app)
+            AppMenuActionId.AppInfo -> openDetail(app)
+            AppMenuActionId.Manifest -> openManifest(app)
+            AppMenuActionId.SaveIcon -> vm.saveIcon(app)
+            AppMenuActionId.ExportIcon -> vm.shareIcon(app)
+        }
+    }
+
+    menuApp?.let { app ->
+        TvAppActionsDialog(
+            appLabel = app.label,
+            onAction = { onMenuAction(app, it) },
+            onDismiss = { menuApp = null }
+        )
     }
 
     Column(
@@ -83,8 +129,6 @@ fun ExtractorScreen(
             onValueChange = vm::setSearchQuery,
             hint = stringResource(ExtR.string.search_hint),
             leftFocus = drawerFocus,
-            // Enter the Lazy **group** — focusRestorer restores the child.
-            // Never requestFocus(child): double pin release crash (LazyLayoutPinnableItem).
             downFocus = listRestorer.group.takeIf { apps.isNotEmpty() },
             leadingIcon = {
                 Icon(
@@ -102,7 +146,7 @@ fun ExtractorScreen(
             when {
                 isLoading && apps.isEmpty() && searchQuery.isBlank() -> {
                     Text(
-                        text = "Loading…",
+                        text = stringResource(ExtR.string.dlg_loading_title),
                         modifier = Modifier.align(Alignment.Center),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -110,7 +154,7 @@ fun ExtractorScreen(
                 apps.isEmpty() -> {
                     Text(
                         text = if (searchQuery.isBlank()) {
-                            "No apps"
+                            "—"
                         } else {
                             stringResource(ExtR.string.search_no_results, searchQuery)
                         },
@@ -131,13 +175,8 @@ fun ExtractorScreen(
                             AppRow(
                                 app = app,
                                 modifier = listRestorer.itemModifier(index, apps.size),
-                                onClick = {
-                                    nav.currentBackStackEntry?.savedStateHandle?.set(
-                                        "detail_app",
-                                        app
-                                    )
-                                    nav.navigate(TvRoutes.appDetail(app.packageName))
-                                }
+                                onClick = { openDetail(app) },
+                                onLongClick = { menuApp = app }
                             )
                         }
                     }
@@ -152,11 +191,58 @@ fun ExtractorScreen(
 private fun AppRow(
     app: PackageMeta,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // FireTv / Cinema: long-press arms a flag; invoke on KeyUp so dialog is not
+    // activated by the same KeyUp that opened it.
+    var isKeyDown by remember { mutableStateOf(false) }
+    var longPressTriggered by remember { mutableStateOf(false) }
+    val longPressThresholdMs = 500L
+
+    LaunchedEffect(isKeyDown) {
+        if (isKeyDown && !longPressTriggered) {
+            delay(longPressThresholdMs)
+            longPressTriggered = true
+        }
+    }
+
     Surface(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        onClick = {
+            if (!longPressTriggered) onClick()
+        },
+        onLongClick = onLongClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .onPreviewKeyEvent { event ->
+                when (event.key) {
+                    Key.Enter, Key.DirectionCenter -> {
+                        when (event.type) {
+                            KeyEventType.KeyDown -> {
+                                if (!isKeyDown) {
+                                    isKeyDown = true
+                                    longPressTriggered = false
+                                }
+                                true
+                            }
+                            KeyEventType.KeyUp -> {
+                                if (isKeyDown) {
+                                    if (longPressTriggered) {
+                                        onLongClick()
+                                    } else {
+                                        onClick()
+                                    }
+                                }
+                                isKeyDown = false
+                                longPressTriggered = false
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                    else -> false
+                }
+            },
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -170,7 +256,6 @@ private fun AppRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Same as phone AppListItem: null icon (resId 0) → Android placeholder.
             if (app.icon == null) {
                 Icon(
                     imageVector = Icons.Default.Android,

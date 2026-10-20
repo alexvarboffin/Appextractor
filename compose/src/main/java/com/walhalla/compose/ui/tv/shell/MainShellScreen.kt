@@ -103,7 +103,7 @@ fun MainShellScreen() {
             ) {
                 Text("ApkChief", style = MaterialTheme.typography.headlineSmall)
                 Text(
-                    "TV: list rows have no overflow menu — open the app for extract/share/…",
+                    "TV: OK → detail · long-press → actions menu",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Button(onClick = { showAbout = false }) {
