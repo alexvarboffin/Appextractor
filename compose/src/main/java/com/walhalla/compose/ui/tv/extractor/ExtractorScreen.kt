@@ -1,5 +1,6 @@
 package com.walhalla.compose.ui.tv.extractor
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,20 +12,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.activity.ComponentActivity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
@@ -34,13 +38,15 @@ import com.walhalla.appextractor.utils.prettyFileSize
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
 import com.walhalla.compose.tv.LocalTvNavController
 import com.walhalla.compose.tv.TvRoutes
+import com.walhalla.compose.ui.tv.components.TvEditableField
 import com.walhalla.compose.ui.tv.components.rememberTvLazyFocusRestorer
 import com.walhalla.compose.ui.tv.components.tvLazyFocusGroup
 import com.walhalla.compose.viewmodel.ExtractorViewModel
+import com.walhalla.extractor.R as ExtR
 
 /**
  * TV extractor list: **one focus target per row** — no overflow menu (D-pad).
- * Click / OK → app detail where extract/share/… live.
+ * Search via [TvEditableField] (FireTv); OK on row → app detail for actions.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -50,6 +56,7 @@ fun ExtractorScreen(
     val activity = LocalContext.current as ComponentActivity
     val vm = extractorViewModel ?: viewModel(viewModelStoreOwner = activity)
     val apps by vm.apps.collectAsState()
+    val searchQuery by vm.searchQuery.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
     val nav = LocalTvNavController.current
     val drawerFocus = LocalTvDrawerFocusRequester.current
@@ -65,43 +72,70 @@ fun ExtractorScreen(
         Modifier
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            isLoading && apps.isEmpty() -> {
-                Text(
-                    text = "Loading…",
-                    modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 16.dp)
+    ) {
+        TvEditableField(
+            value = searchQuery,
+            onValueChange = vm::setSearchQuery,
+            hint = stringResource(ExtR.string.search_hint),
+            leftFocus = drawerFocus,
+            downFocus = listRestorer.child.takeIf { apps.isNotEmpty() },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null
                 )
-            }
-            apps.isEmpty() -> {
-                Text(
-                    text = "No apps",
-                    modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .tvLazyFocusGroup(listRestorer)
-                        .then(leftToDrawer),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    itemsIndexed(apps, key = { _, app -> app.packageName }) { index, app ->
-                        AppRow(
-                            app = app,
-                            modifier = listRestorer.itemModifier(index, apps.size),
-                            onClick = {
-                                nav.currentBackStackEntry?.savedStateHandle?.set(
-                                    "detail_app",
-                                    app
-                                )
-                                nav.navigate(TvRoutes.appDetail(app.packageName))
-                            }
-                        )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp)
+        )
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                isLoading && apps.isEmpty() && searchQuery.isBlank() -> {
+                    Text(
+                        text = "Loading…",
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                apps.isEmpty() -> {
+                    Text(
+                        text = if (searchQuery.isBlank()) {
+                            "No apps"
+                        } else {
+                            stringResource(ExtR.string.search_no_results, searchQuery)
+                        },
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .tvLazyFocusGroup(listRestorer)
+                            .then(leftToDrawer),
+                        contentPadding = PaddingValues(bottom = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        itemsIndexed(apps, key = { _, app -> app.packageName }) { index, app ->
+                            AppRow(
+                                app = app,
+                                modifier = listRestorer.itemModifier(index, apps.size),
+                                onClick = {
+                                    nav.currentBackStackEntry?.savedStateHandle?.set(
+                                        "detail_app",
+                                        app
+                                    )
+                                    nav.navigate(TvRoutes.appDetail(app.packageName))
+                                }
+                            )
+                        }
                     }
                 }
             }

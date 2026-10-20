@@ -314,6 +314,7 @@ For each section 0–14:
 - [x] TV entry: `tv/MainActivity` landscape + `TvNavHost` + `AppextractorTvTheme` (`androidx.tv:tv-material:1.0.1`).
 - [x] **Reuse rule:** maximize shared ViewModels / `:extractor` / models; **TV UI must not use phone Material3 controls or phone composables** (D-pad) — see `Documentation/guidelines/PHONE_TV_REUSE.md`.
 - [x] **TV D-pad lists:** one focus target per row — **no** PopupMenu / DropdownMenu / IconButton overflow on list items; open app detail for extract/share/launch/….
+- [x] **TV Extractor search:** `TvEditableField` (FireTv D-pad/IME pattern) → shared `ExtractorViewModel.setSearchQuery` (2026-10-20).
 - [ ] Packages: phone screens still under `compose.screens` until full `ui.mobile.*` move (TV already under `ui.tv.*`).
 - [x] TV shell: `NavigationDrawer` + focusRestorer; Extractor → AppDetail (action LazyRow) → Logs → Settings on `tv.material3` only. Debug: `FORCE_TV_IN_DEBUG` in `LauncherActivity`.
 
