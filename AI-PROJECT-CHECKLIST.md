@@ -282,6 +282,7 @@ Record of corrections that changed implementation:
 34. [x] TV list focus = FireTv Case B adapted: pin-only `focusRestorer()`; enter via `rememberEnterListFocus` (scroll→child); never `focusProperties { down = group }` (uninit crash on our BOM) (2026-10-20).
 35. [x] TV extract “Need root”: shared `ExtractorHelper` — `get_out_filename` leading `/` made `File(parent,"/…")` absolute (TV MediaStore fail → bad fallback); `relativeOutName` + same storage gate as phone (`rememberExtractWithStoragePermission`) (2026-10-20).
 36. [x] TV search Down→list: clamp `lastFocused` on filter; `prepareEnterIndex` + 2 frames then child focus; clear TextField focus before enter (2026-10-20).
+37. [ ] TV INFO = catalog page, not a row/tile per field (`TvInformationTab.kt`): hero stat strip (version/build/size/SDK/type/splits); per section a header (icon + count) + one focusable spec sheet (3-col grid, OK = copy whole section) for plain/Copy lines; LazyRow cards only for lines with status or launch/settings/XML action. Data stays `groupIntoSections` + `mapInfoLine` (2026-10-20, built+installed, awaiting user check).
 
 ---
 
