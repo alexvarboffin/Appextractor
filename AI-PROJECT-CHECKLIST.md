@@ -273,6 +273,7 @@ Record of corrections that changed implementation:
 25. [x] No hardcoded UI action labels (`Text("Save icon")` etc.) — use existing `ExtR.string.*` / `stringResource` (phone+TV menus, Assets overflow).
 26. [x] Phone↔TV App Detail functional parity (tabs + INFO rows + Manifest); shared mappers/VMs, TV-only chrome (`PHONE_TV_REUSE.md`).
 27. [x] TV list long-press → actions dialog with thematic icons (`appMenuActions` / `TvAppActionsDialog`; FireTv KeyUp long-press).
+28. [x] UI colors via `MaterialTheme.colorScheme` (no ad-hoc `Color(0x…)` in screens); brand hex only in `ui.theme.Color` / theme schemes.
 
 ---
 

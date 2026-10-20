@@ -47,7 +47,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -272,13 +271,14 @@ private fun CollapsedHeader(
     }
 }
 
-private val PermissionGrantedGreen = Color(0xFF2E7D32)
-private val PermissionDeniedRed = Color(0xFFC62828)
-
 @Composable
 private fun PermissionRow(line: PermissionLine, onOpenAppSettings: () -> Unit = {}) {
     val context = LocalContext.current
-    val statusColor = if (line.isGranted) PermissionGrantedGreen else PermissionDeniedRed
+    val statusColor = if (line.isGranted) {
+        MaterialTheme.colorScheme.tertiary
+    } else {
+        MaterialTheme.colorScheme.error
+    }
     val description = remember(line.res0) {
         resolvePermissionDescription(context, line.res0)
     }

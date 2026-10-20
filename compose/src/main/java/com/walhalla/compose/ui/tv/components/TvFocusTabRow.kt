@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
@@ -56,8 +55,8 @@ fun TvFocusTabRow(
                 onClick = { onSelectedIndexChange(index) },
                 colors = TabDefaults.pillIndicatorTabColors(
                     selectedContentColor = accent,
-                    focusedContentColor = Color.White,
-                    focusedSelectedContentColor = Color.White
+                    focusedContentColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedSelectedContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = if (index == 0) {
                     Modifier.focusRequester(tabRowFallback)

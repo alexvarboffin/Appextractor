@@ -17,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,9 +35,6 @@ import com.walhalla.compose.detail.InfoLineUi
 import com.walhalla.compose.detail.groupIntoSections
 import com.walhalla.compose.detail.mapInfoLine
 import com.walhalla.compose.viewmodel.AppDetails
-
-private val GrantedGreen = Color(0xFF4CAF50)
-private val DeniedRed = Color(0xFFEF5350)
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -217,11 +213,12 @@ private fun InfoLineContent(ui: InfoLineUi) {
             )
         }
         ui.status?.let { status ->
+            val scheme = MaterialTheme.colorScheme
             val (label, color) = when (status) {
-                InfoLineStatus.Granted -> "granted" to GrantedGreen
-                InfoLineStatus.Denied -> "denied" to DeniedRed
-                InfoLineStatus.Exported -> "Exported" to MaterialTheme.colorScheme.error
-                InfoLineStatus.NotExported -> "Not exported" to MaterialTheme.colorScheme.onSurfaceVariant
+                InfoLineStatus.Granted -> "granted" to scheme.tertiary
+                InfoLineStatus.Denied -> "denied" to scheme.error
+                InfoLineStatus.Exported -> "Exported" to scheme.error
+                InfoLineStatus.NotExported -> "Not exported" to scheme.onSurfaceVariant
             }
             Text(label, style = MaterialTheme.typography.labelSmall, color = color)
         }

@@ -24,8 +24,9 @@ object ShareUtils {
 
     const val KEY_FILE_PROVIDER: String = ".fileprovider"
 
-    fun shareApkFile(context: Context, meta: PackageMeta, filePath: String) {
-        try {
+    /** @return true if the share chooser was started */
+    fun shareApkFile(context: Context, meta: PackageMeta, filePath: String): Boolean {
+        return try {
             val packageName0 = context.packageName
             val file0 = extractWithoutRoot(File(filePath))
             val path = FileProvider.getUriForFile(context, packageName0 + KEY_FILE_PROVIDER, file0)
@@ -33,9 +34,13 @@ object ShareUtils {
             if (path != null) {
                 val description = meta.packageName
                 shareFileApk(context, packageName0, description, path)
+                true
+            } else {
+                false
             }
         } catch (e: Exception) {
             handleException(e)
+            false
         }
     }
 
