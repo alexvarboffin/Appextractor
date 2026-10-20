@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -44,12 +48,20 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.prettyFileSize
+import com.walhalla.compose.R
 import com.walhalla.compose.detail.AppMenuActionId
+import com.walhalla.compose.detail.SortOption
+import com.walhalla.compose.detail.sortedByOption
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
 import com.walhalla.compose.tv.LocalTvNavController
 import com.walhalla.compose.tv.TvRoutes
 import com.walhalla.compose.ui.tv.components.TvAppActionsDialog
 import com.walhalla.compose.ui.tv.components.TvEditableField
+import com.walhalla.compose.ui.tv.components.TvSortDialog
+import com.walhalla.compose.storage.rememberExtractWithStoragePermission
+import com.walhalla.compose.ui.tv.components.RestoreFocusOnReturn
+import com.walhalla.compose.ui.tv.components.rememberClearFocusThen
+import com.walhalla.compose.ui.tv.components.rememberEnterListFocus
 import com.walhalla.compose.ui.tv.components.rememberTvLazyFocusRestorer
 import com.walhalla.compose.ui.tv.components.tvLazyFocusGroup
 import com.walhalla.compose.viewmodel.ExtractorViewModel
@@ -73,7 +85,23 @@ fun ExtractorScreen(
     val nav = LocalTvNavController.current
     val drawerFocus = LocalTvDrawerFocusRequester.current
     val listRestorer = rememberTvLazyFocusRestorer()
+    val listState = rememberLazyListState()
+    val sortFocus = remember { FocusRequester() }
+    val searchFocus = remember { FocusRequester() }
+    val clearFocusThen = rememberClearFocusThen()
     var menuApp by remember { mutableStateOf<PackageMeta?>(null) }
+    var currentSort by remember { mutableStateOf(SortOption.NAME_ASC) }
+    var showSortDialog by remember { mutableStateOf(false) }
+    val sortedApps = remember(apps, currentSort) { apps.sortedByOption(currentSort) }
+    val enterList = rememberEnterListFocus(listRestorer, listState, sortedApps.size)
+    val extractWithStorage = rememberExtractWithStoragePermission(vm::extractApkRequest)
+
+    // Search/filter shrinks the list — old lastFocused index is meaningless.
+    LaunchedEffect(sortedApps.size, searchQuery) {
+        listRestorer.clampToSize(sortedApps.size)
+    }
+
+    listRestorer.RestoreFocusOnReturn(listState, sortedApps.size)
 
     LaunchedEffect(activity) {
         vm.activityProvider = { activity }
@@ -86,19 +114,25 @@ fun ExtractorScreen(
     }
 
     fun openDetail(app: PackageMeta) {
-        nav.currentBackStackEntry?.savedStateHandle?.set("detail_app", app)
-        nav.navigate(TvRoutes.appDetail(app.packageName))
+        listRestorer.markRestorePending()
+        clearFocusThen {
+            nav.currentBackStackEntry?.savedStateHandle?.set("detail_app", app)
+            nav.navigate(TvRoutes.appDetail(app.packageName))
+        }
     }
 
     fun openManifest(app: PackageMeta) {
-        nav.currentBackStackEntry?.savedStateHandle?.set("manifest_app", app)
-        nav.currentBackStackEntry?.savedStateHandle?.set("manifest_xml", null as String?)
-        nav.navigate(TvRoutes.Manifest)
+        listRestorer.markRestorePending()
+        clearFocusThen {
+            nav.currentBackStackEntry?.savedStateHandle?.set("manifest_app", app)
+            nav.currentBackStackEntry?.savedStateHandle?.set("manifest_xml", null as String?)
+            nav.navigate(TvRoutes.Manifest)
+        }
     }
 
     fun onMenuAction(app: PackageMeta, id: AppMenuActionId) {
         when (id) {
-            AppMenuActionId.Extract -> vm.extractApkRequest(app)
+            AppMenuActionId.Extract -> extractWithStorage(app)
             AppMenuActionId.ShareApk -> vm.shareApk(app)
             AppMenuActionId.PlayStore -> vm.openPlayStore(app)
             AppMenuActionId.Launch -> vm.launchApp(app)
@@ -119,28 +153,79 @@ fun ExtractorScreen(
         )
     }
 
+    if (showSortDialog) {
+        TvSortDialog(
+            current = currentSort,
+            onSelect = { currentSort = it },
+            onDismiss = { showSortDialog = false }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
-        TvEditableField(
-            value = searchQuery,
-            onValueChange = vm::setSearchQuery,
-            hint = stringResource(ExtR.string.search_hint),
-            leftFocus = drawerFocus,
-            downFocus = listRestorer.group.takeIf { apps.isNotEmpty() },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null
-                )
-            },
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp)
-                .then(leftToDrawer)
-        )
+                .padding(bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TvEditableField(
+                value = searchQuery,
+                onValueChange = vm::setSearchQuery,
+                hint = stringResource(ExtR.string.search_hint),
+                leftFocus = drawerFocus,
+                rightFocus = sortFocus,
+                onDown = enterList.takeIf { sortedApps.isNotEmpty() },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
+                    )
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(searchFocus)
+                    .then(leftToDrawer)
+            )
+            Surface(
+                onClick = { showSortDialog = true },
+                scale = ClickableSurfaceDefaults.scale(focusedScale = 1.08f),
+                colors = ClickableSurfaceDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer
+                ),
+                modifier = Modifier
+                    .size(56.dp)
+                    .focusRequester(sortFocus)
+                    .focusProperties { left = searchFocus }
+                    .onPreviewKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyDown &&
+                            event.key == Key.DirectionDown &&
+                            sortedApps.isNotEmpty()
+                        ) {
+                            enterList()
+                            true
+                        } else {
+                            false
+                        }
+                    }
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Sort,
+                        contentDescription = stringResource(R.string.sort),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -151,19 +236,11 @@ fun ExtractorScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                apps.isEmpty() -> {
-                    Text(
-                        text = if (searchQuery.isBlank()) {
-                            "—"
-                        } else {
-                            stringResource(ExtR.string.search_no_results, searchQuery)
-                        },
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                // Keep one LazyColumn instance — swapping it out while pinned crashes
+                // FocusRestorer ("Release should only be called once").
                 else -> {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .fillMaxSize()
                             .tvLazyFocusGroup(listRestorer)
@@ -171,13 +248,29 @@ fun ExtractorScreen(
                         contentPadding = PaddingValues(bottom = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        itemsIndexed(apps, key = { _, app -> app.packageName }) { index, app ->
-                            AppRow(
-                                app = app,
-                                modifier = listRestorer.itemModifier(index, apps.size),
-                                onClick = { openDetail(app) },
-                                onLongClick = { menuApp = app }
-                            )
+                        if (sortedApps.isEmpty()) {
+                            item(key = "empty") {
+                                Text(
+                                    text = if (searchQuery.isBlank()) {
+                                        "—"
+                                    } else {
+                                        stringResource(ExtR.string.search_no_results, searchQuery)
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        } else {
+                            itemsIndexed(sortedApps, key = { _, app -> app.packageName }) { index, app ->
+                                AppRow(
+                                    app = app,
+                                    modifier = listRestorer.itemModifier(index, sortedApps.size),
+                                    onClick = { openDetail(app) },
+                                    onLongClick = { menuApp = app }
+                                )
+                            }
                         }
                     }
                 }

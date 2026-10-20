@@ -40,7 +40,9 @@ import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 import com.walhalla.appextractor.utils.prettyFileSize
 import com.walhalla.compose.detail.AppDetailTabs
+import com.walhalla.compose.storage.rememberExtractWithStoragePermission
 import com.walhalla.compose.ui.tv.components.TvFocusTabRow
+import com.walhalla.compose.ui.tv.components.rememberClearFocusThen
 import com.walhalla.compose.viewmodel.AppDetailViewModel
 import com.walhalla.compose.viewmodel.ExtractorViewModel
 import com.walhalla.extractor.R as ExtR
@@ -69,6 +71,12 @@ fun AppDetailScreen(
     val firstAction = remember { FocusRequester() }
     val tabRowFallback = remember { FocusRequester() }
     var selectedTab by remember { mutableIntStateOf(AppDetailTabs.INFO) }
+    val clearFocusThen = rememberClearFocusThen()
+    val extractWithStorage = rememberExtractWithStoragePermission(extractorViewModel::extractApkRequest)
+    val goBack = { clearFocusThen(onBack) }
+    val openManifest: (PackageMeta, String?) -> Unit = { meta, xml ->
+        clearFocusThen { onViewManifest(meta, xml) }
+    }
 
     LaunchedEffect(Unit) {
         extractorViewModel.activityProvider = { activity }
@@ -78,7 +86,7 @@ fun AppDetailScreen(
         app?.let { detailViewModel.loadAppDetails(it) }
     }
 
-    BackHandler(onBack = onBack)
+    BackHandler(onBack = goBack)
 
     if (app == null) {
         Column(
@@ -88,7 +96,7 @@ fun AppDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("App not found: $packageName", color = MaterialTheme.colorScheme.onSurface)
-            Button(onClick = onBack, modifier = Modifier.focusRequester(firstAction)) {
+            Button(onClick = goBack, modifier = Modifier.focusRequester(firstAction)) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
         }
@@ -96,20 +104,18 @@ fun AppDetailScreen(
         return
     }
 
-    val actions = remember(app.packageName) {
-        listOf(
-            TvAction(ExtR.string.action_extract) { extractorViewModel.extractApkRequest(app) },
-            TvAction(ExtR.string.action_share_app) { extractorViewModel.shareApk(app) },
-            TvAction(ExtR.string.open_on_google_play) { extractorViewModel.openPlayStore(app) },
-            TvAction(ExtR.string.action_launch_app) { extractorViewModel.launchApp(app) },
-            TvAction(ExtR.string.action_uninstall_app) { extractorViewModel.uninstallApp(app) },
-            TvAction(ExtR.string.action_copy_package_name) { extractorViewModel.copyPackageName(app) },
-            TvAction(ExtR.string.action_save_icon) { extractorViewModel.saveIcon(app) },
-            TvAction(ExtR.string.action_export_icon) { extractorViewModel.shareIcon(app) },
-            TvAction(ExtR.string.action_app_manifest) { onViewManifest(app, null) },
-            TvAction(ExtR.string.action_app_info) { detailViewModel.openInSettings(app) },
-        )
-    }
+    val actions = listOf(
+        TvAction(ExtR.string.action_extract) { extractWithStorage(app) },
+        TvAction(ExtR.string.action_share_app) { extractorViewModel.shareApk(app) },
+        TvAction(ExtR.string.open_on_google_play) { extractorViewModel.openPlayStore(app) },
+        TvAction(ExtR.string.action_launch_app) { extractorViewModel.launchApp(app) },
+        TvAction(ExtR.string.action_uninstall_app) { extractorViewModel.uninstallApp(app) },
+        TvAction(ExtR.string.action_copy_package_name) { extractorViewModel.copyPackageName(app) },
+        TvAction(ExtR.string.action_save_icon) { extractorViewModel.saveIcon(app) },
+        TvAction(ExtR.string.action_export_icon) { extractorViewModel.shareIcon(app) },
+        TvAction(ExtR.string.action_app_manifest) { openManifest(app, null) },
+        TvAction(ExtR.string.action_app_info) { detailViewModel.openInSettings(app) },
+    )
 
     LaunchedEffect(Unit) {
         runCatching { firstAction.requestFocus() }
@@ -200,25 +206,25 @@ fun AppDetailScreen(
                 appDetails = appDetails,
                 onLaunchService = { detailViewModel.launchExportedService(it) },
                 onOpenAppSettings = { detailViewModel.openInSettings(app) },
-                onViewXml = { onViewManifest(app, it) },
+                onViewXml = { openManifest(app, it) },
                 modifier = Modifier.weight(1f)
             )
             AppDetailTabs.META -> TvMetaTab(app, Modifier.weight(1f))
             AppDetailTabs.STRING -> TvStringTab(
                 app = app,
                 resourceType = ResourcesToolForPlugin.STRING,
-                onViewXml = { onViewManifest(app, it) },
+                onViewXml = { openManifest(app, it) },
                 modifier = Modifier.weight(1f)
             )
             AppDetailTabs.XML -> TvStringTab(
                 app = app,
                 resourceType = ResourcesToolForPlugin.XML,
-                onViewXml = { onViewManifest(app, it) },
+                onViewXml = { openManifest(app, it) },
                 modifier = Modifier.weight(1f)
             )
             AppDetailTabs.ASSETS -> TvAssetsTab(
                 app = app,
-                onViewXml = { path -> onViewManifest(app, "assets/$path") },
+                onViewXml = { path -> openManifest(app, "assets/$path") },
                 modifier = Modifier.weight(1f)
             )
         }

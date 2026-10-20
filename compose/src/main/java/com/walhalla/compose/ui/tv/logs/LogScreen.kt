@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +30,13 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.walhalla.compose.model.LogModel
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import com.walhalla.compose.ui.tv.components.RestoreFocusOnReturn
+import com.walhalla.compose.ui.tv.components.rememberEnterListFocus
 import com.walhalla.compose.ui.tv.components.rememberTvLazyFocusRestorer
 import com.walhalla.compose.ui.tv.components.tvLazyFocusGroup
 import com.walhalla.compose.viewmodel.LogViewModel
@@ -42,7 +50,11 @@ fun LogScreen(viewModel: LogViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
     val drawerFocus = LocalTvDrawerFocusRequester.current
     val listRestorer = rememberTvLazyFocusRestorer()
+    val listState = rememberLazyListState()
+    val enterList = rememberEnterListFocus(listRestorer, listState, logs.size)
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    listRestorer.RestoreFocusOnReturn(listState, logs.size)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -59,13 +71,19 @@ fun LogScreen(viewModel: LogViewModel = viewModel()) {
     Column(modifier = Modifier.fillMaxSize()) {
         Button(
             onClick = { viewModel.refresh() },
-            // Down into list: enter Lazy **group** (not child FR) — avoids pin double-release.
+            // Scroll-then-focus — never focusProperties { down = list.group } (uninit child crash).
             modifier = Modifier
                 .padding(16.dp)
                 .then(leftToDrawer)
-                .focusProperties {
-                    if (logs.isNotEmpty()) {
-                        down = listRestorer.group
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown &&
+                        event.key == Key.DirectionDown &&
+                        logs.isNotEmpty()
+                    ) {
+                        enterList()
+                        true
+                    } else {
+                        false
                     }
                 }
         ) {
@@ -81,6 +99,7 @@ fun LogScreen(viewModel: LogViewModel = viewModel()) {
                 }
                 else -> {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .fillMaxSize()
                             .tvLazyFocusGroup(listRestorer)

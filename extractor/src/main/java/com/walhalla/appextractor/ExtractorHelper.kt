@@ -86,41 +86,82 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
      * drwxrwx--x 3 system install      4096 2022-11-19 14:05 oat
      * -rw-r--r-- 1 system system    3275913 2022-11-19 14:05 split_config.xxhdpi.apk
      */
+    /**
+     * App-private Downloads — always writable without storage permission.
+     * Used when public Downloads / MediaStore fails (common on Android TV).
+     */
+    private fun appExtractDir(context: Context): File {
+        val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+            ?: File(context.filesDir, Environment.DIRECTORY_DOWNLOADS)
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
+    /**
+     * [Util.get_out_filename] is `/pkg_vN.apk` for string concat with EXTERNAL_STORAGE.
+     * [File](parent, child) treats a leading `/` as **absolute** and ignores parent —
+     * that becomes `/pkg_vN.apk` (needs root). Strip for File/MediaStore display names.
+     */
+    private fun relativeOutName(meta: PackageMeta): String =
+        Util.get_out_filename(meta).trimStart('/', '\\')
+
     @Throws(Exception::class)
     private fun extractBaseApkWithoutRoot(context: Context, meta: PackageMeta): File {
         val newApi = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
-        //DLog.d("@@@" + meta.packageName+" "+meta.sourceDir);
         val src = File(meta.sourceDir)
-        val fileName = Util.get_out_filename(meta)
+        val fileName = relativeOutName(meta)
+
+        // Q+: prefer MediaStore Downloads (phone). TV often returns null insert →
+        // fall back to app-external storage (same helper for phone+TV, no fork).
+        if (newApi) {
+            try {
+                copyApkFileToDownloads(context.contentResolver, src, fileName)
+                return File(Troubleshooting.defLocation(), fileName)
+            } catch (ex: Exception) {
+                d("MediaStore/Downloads extract failed, app storage fallback: ${ex.message}")
+                var out = File(appExtractDir(context), fileName)
+                out = Util.buildDstPath(out)
+                if (out.exists()) out.delete()
+                try {
+                    copyFileOld(context, src, out, out.name)
+                } catch (ex2: Exception) {
+                    println("@@@@@@@@@@@@@@" + ex2.message + " " + ex2.javaClass.simpleName)
+                    throw Exception(ex2.message)
+                }
+                if (!out.exists() || out.length() == 0L) {
+                    println("cannot extract file [no root]")
+                    throw Exception("cannot extract file [no root]")
+                }
+                return out
+            }
+        }
+
         var out = File(Troubleshooting.defLocation(), fileName)
         out = Util.buildDstPath(out)
         if (out.exists()) {
-            val res = out.delete()
+            out.delete()
         }
         try {
-//            File tmp = new File(out.getAbsolutePath());
-//            if (BuildConfig.DEBUG) {
-//                String s = Util.getFileSizeMegaBytes(src) + "\t" + Util.getFileSizeMegaBytes(out);
-//                DLog.d("ExtractWithoutRoot: --> " + s);
-//                DLog.d("--> " + src.getAbsolutePath() + "-->" + src.length());
-//                DLog.d("--> " + tmp.getAbsolutePath() + "-->" + tmp.length());
-//                for (File f : new File(Troubleshooting.defLocation(), __CLOUD_BACKUP_LOCATION_LOCAL).listFiles()) {
-//                    DLog.d("F->" + f.getName() + "\t" + f.length());
-//                }
-//            }
-
-
-            if (!newApi && out.exists() && out.isFile && out.length() == src.length()) {
+            if (out.exists() && out.isFile && out.length() == src.length()) {
                 println("skip file...")
             } else {
-                copyFileRequest(context, src, out, out.name)
+                copyFileOld(context, src, out, out.name)
             }
         } catch (ex: Exception) {
-            println("@@@@@@@@@@@@@@" + ex.message + " " + ex.javaClass.simpleName)
-            throw Exception(ex.message)
+            // Pre-Q public Downloads may be blocked — same app-storage fallback.
+            d("Public Downloads extract failed, app storage fallback: ${ex.message}")
+            out = File(appExtractDir(context), fileName)
+            out = Util.buildDstPath(out)
+            if (out.exists()) out.delete()
+            try {
+                copyFileOld(context, src, out, out.name)
+            } catch (ex2: Exception) {
+                println("@@@@@@@@@@@@@@" + ex2.message + " " + ex2.javaClass.simpleName)
+                throw Exception(ex2.message)
+            }
         }
-        if (!newApi && !out.exists()) {
+        if (!out.exists() || out.length() == 0L) {
             println("cannot extract file [no root]")
             throw Exception("cannot extract file [no root]")
         }
@@ -139,25 +180,18 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
         apkFiles1 = ArrayList(apkFiles1)
         Collections.sort(apkFiles1)
 
-        val base = File(Troubleshooting.defLocation(), Config.PREV + packageName.replace(".", "_"))
-        val out00 = Util.buildDstPath(File(base, apkFiles1[0].name)) //Создаем папку куда дропать
-        d("{@}--> $out00 ")
-        //        if (out0.exists()) {
-//            boolean res = out0.delete();
-//        }
+        val folderName = Config.PREV + packageName.replace(".", "_")
+        var base = File(Troubleshooting.defLocation(), folderName)
+        try {
+            Util.buildDstPath(File(base, apkFiles1[0].name))
+        } catch (ex: Exception) {
+            d("Split extract dir not writable, app storage: ${ex.message}")
+            base = File(appExtractDir(context), folderName)
+            Util.buildDstPath(File(base, apkFiles1[0].name))
+        }
+        d("{@}--> base $base ")
         var out: File? = null
         try {
-//            File tmp = new File(out.getAbsolutePath());
-//            if (BuildConfig.DEBUG) {
-//                String s = Util.getFileSizeMegaBytes(src) + "\t" + Util.getFileSizeMegaBytes(out);
-//                DLog.d("ExtractWithoutRoot: --> " + s);
-//                DLog.d("--> " + src.getAbsolutePath() + "-->" + src.length());
-//                DLog.d("--> " + tmp.getAbsolutePath() + "-->" + tmp.length());
-//                for (File f : new File(Troubleshooting.defLocation(), __CLOUD_BACKUP_LOCATION_LOCAL).listFiles()) {
-//                    DLog.d("F->" + f.getName() + "\t" + f.length());
-//                }
-//            }
-
             for (src in apkFiles1) {
                 out = File(base, src.name)
                 d("{@}--> $out ")
@@ -166,8 +200,8 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
                     result.add(out)
                 } else {
                     d("--> Copy file..." + out.absolutePath)
-                    copyFileRequest(context, src, out, out.name)
-                    result.add(out)
+                    val written = copyFileRequest(context, src, out, out.name)
+                    result.add(written)
                 }
             }
         } catch (ex: Exception) {
@@ -181,20 +215,30 @@ class ExtractorHelper @OptIn(DelicateCoroutinesApi::class) constructor(
         return result
     }
 
+    /** @return actual destination file written */
     @Throws(IOException::class)
-    private fun copyFileRequest(context: Context, sourceApk: File, out: File, apkName: String) {
+    private fun copyFileRequest(context: Context, sourceApk: File, out: File, apkName: String): File {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
                 val resolver = context.contentResolver
-                //String apkName = "example_app_" + System.currentTimeMillis() + ".apk";
                 copyApkFileToDownloads(resolver, sourceApk, apkName)
                 d("APK copied successfully to Downloads.")
+                return out
             } catch (e: IOException) {
-                e("Failed to copy APK: " + e.message)
-                copyFileOld(context, sourceApk, out, apkName)
+                e("Failed to copy APK to MediaStore: " + e.message)
+                val fallback = try {
+                    out.parentFile?.mkdirs()
+                    if (out.parentFile?.canWrite() == true) out
+                    else Util.buildDstPath(File(appExtractDir(context), apkName))
+                } catch (_: Exception) {
+                    Util.buildDstPath(File(appExtractDir(context), apkName))
+                }
+                copyFileOld(context, sourceApk, fallback, apkName)
+                return fallback
             }
         } else {
             copyFileOld(context, sourceApk, out, apkName)
+            return out
         }
     }
 

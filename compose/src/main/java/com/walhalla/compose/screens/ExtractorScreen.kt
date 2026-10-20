@@ -25,21 +25,16 @@ import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -80,17 +75,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.text.input.ImeAction
 import com.walhalla.compose.R
+import com.walhalla.compose.detail.SortOption
+import com.walhalla.compose.detail.sortMenuItems
+import com.walhalla.compose.detail.sortedByOption
 import com.walhalla.extractor.R as ExtR
-
-
-// Sort options
-enum class SortOption {
-    NAME_ASC, NAME_DESC,
-    PACKAGE_ASC, PACKAGE_DESC,
-    SIZE_ASC, SIZE_DESC,
-    UPDATE_DATE_ASC, UPDATE_DATE_DESC,
-    SYSTEM_FIRST, USER_FIRST
-}
 
 @Composable
 fun MainMenu(viewModel: ExtractorViewModel) {
@@ -288,22 +276,7 @@ fun ExtractorScreen(
     val showAboutDialog by viewModel.showAboutDialog.collectAsState()
 
     var currentSort by remember { mutableStateOf(SortOption.NAME_ASC) }
-
-    // Sort apps based on current option
-    val sortedApps = remember(apps, currentSort) {
-        when (currentSort) {
-            SortOption.NAME_ASC -> apps.sortedBy { it.label }
-            SortOption.NAME_DESC -> apps.sortedByDescending { it.label }
-            SortOption.PACKAGE_ASC -> apps.sortedBy { it.packageName }
-            SortOption.PACKAGE_DESC -> apps.sortedByDescending { it.packageName }
-            SortOption.SIZE_ASC -> apps.sortedBy { it.fileSize }
-            SortOption.SIZE_DESC -> apps.sortedByDescending { it.fileSize }
-            SortOption.UPDATE_DATE_ASC -> apps.sortedBy { it.updateTime }
-            SortOption.UPDATE_DATE_DESC -> apps.sortedByDescending { it.updateTime }
-            SortOption.SYSTEM_FIRST -> apps.sortedWith(compareByDescending<PackageMeta> { it.isSystemApp }.thenBy { it.label })
-            SortOption.USER_FIRST -> apps.sortedWith(compareBy<PackageMeta> { it.isSystemApp }.thenBy { it.label })
-        }
-    }
+    val sortedApps = remember(apps, currentSort) { apps.sortedByOption(currentSort) }
 
     // Debug logging for extraction state
     LaunchedEffect(extractionProgress, extractionFileCount) {
@@ -617,11 +590,12 @@ fun ExtractorScreen(
 @Composable
 fun SortMenu(currentSort: (sort: SortOption) -> Unit) {
     var showSortMenu by remember { mutableStateOf(false) }
+    val items = remember { sortMenuItems() }
     Box {
         IconButton(onClick = { showSortMenu = true }) {
             Icon(
                 Icons.Default.Sort,
-                contentDescription = "Sort apps"
+                contentDescription = stringResource(R.string.sort)
             )
         }
 
@@ -629,136 +603,18 @@ fun SortMenu(currentSort: (sort: SortOption) -> Unit) {
             expanded = showSortMenu,
             onDismissRequest = { showSortMenu = false }
         ) {
-            DropdownMenuItem(
-                text = { Text("Name (A-Z)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.SortByAlpha,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.NAME_ASC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Name (Z-A)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.SortByAlpha,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.NAME_DESC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Package (A-Z)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Code,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.PACKAGE_ASC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Package (Z-A)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Code,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.PACKAGE_DESC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Size (Small-Large)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Storage,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.SIZE_ASC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Size (Large-Small)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Storage,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.SIZE_DESC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Update Date (Old-New)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Update,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.UPDATE_DATE_ASC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Update Date (New-Old)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Update,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.UPDATE_DATE_DESC)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("System Apps First") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Android,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.SYSTEM_FIRST)
-                    showSortMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("User Apps First") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Person,
-                        contentDescription = null
-                    )
-                },
-                onClick = {
-                    currentSort(SortOption.USER_FIRST)
-                    showSortMenu = false
-                }
-            )
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(item.labelRes)) },
+                    leadingIcon = {
+                        Icon(item.icon, contentDescription = null)
+                    },
+                    onClick = {
+                        currentSort(item.option)
+                        showSortMenu = false
+                    }
+                )
+            }
         }
     }
 }

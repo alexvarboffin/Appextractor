@@ -28,6 +28,7 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.walhalla.appextractor.model.PackageMeta
+import com.walhalla.compose.ui.tv.components.rememberClearFocusThen
 import com.walhalla.compose.viewmodel.ManifestViewModel
 import com.walhalla.extractor.R as ExtR
 
@@ -43,6 +44,8 @@ fun TvManifestScreen(
     val loading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val backFocus = remember { FocusRequester() }
+    val clearFocusThen = rememberClearFocusThen()
+    val goBack = { clearFocusThen(onBack) }
 
     LaunchedEffect(app.packageName, xmlFileName) {
         if (xmlFileName.isNullOrBlank()) {
@@ -52,7 +55,7 @@ fun TvManifestScreen(
         }
     }
 
-    BackHandler(onBack = onBack)
+    BackHandler(onBack = goBack)
 
     Column(
         Modifier
@@ -60,7 +63,7 @@ fun TvManifestScreen(
             .padding(24.dp)
     ) {
         Button(
-            onClick = onBack,
+            onClick = goBack,
             modifier = Modifier
                 .focusRequester(backFocus)
                 .padding(bottom = 12.dp)

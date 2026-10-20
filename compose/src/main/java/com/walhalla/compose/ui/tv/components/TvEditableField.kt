@@ -41,7 +41,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 
 /**
  * TV text field (FireTv pattern): focus opens IME; Up/Down leave the field;
- * Left at caret start → drawer/left; Back clears focus and hides IME.
+ * Left at caret start → drawer/left; Right at caret end → [rightFocus];
+ * [onDown] preferred over [downFocus] (e.g. scroll-then-focus into a Lazy list);
+ * Back clears focus and hides IME.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -54,7 +56,10 @@ fun TvEditableField(
     leadingIcon: (@Composable () -> Unit)? = null,
     upFocus: FocusRequester? = null,
     downFocus: FocusRequester? = null,
+    /** Prefer this for Lazy lists — see [rememberEnterListFocus]. */
+    onDown: (() -> Unit)? = null,
     leftFocus: FocusRequester? = null,
+    rightFocus: FocusRequester? = null,
 ) {
     val colors = MaterialTheme.colorScheme
     val focusManager = LocalFocusManager.current
@@ -105,36 +110,37 @@ fun TvEditableField(
             }
             .onPreviewKeyEvent { event ->
                 if (!focused || event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                when (event.key) {
-                    Key.DirectionUp -> {
-                        keyboard?.hide()
-                        if (upFocus != null) {
-                            upFocus.requestFocus()
-                            true
-                        } else {
-                            focusManager.moveFocus(FocusDirection.Up)
-                        }
+                fun tryFocus(target: FocusRequester?, direction: FocusDirection): Boolean {
+                    keyboard?.hide()
+                    if (target != null && runCatching { target.requestFocus() }.isSuccess) {
+                        return true
                     }
+                    return focusManager.moveFocus(direction)
+                }
+                when (event.key) {
+                    Key.DirectionUp -> tryFocus(upFocus, FocusDirection.Up)
                     Key.DirectionDown -> {
                         keyboard?.hide()
-                        if (downFocus != null) {
-                            downFocus.requestFocus()
+                        if (onDown != null) {
+                            // Drop TextField focus so list child.requestFocus can win (IME).
+                            focusManager.clearFocus(force = true)
+                            onDown()
                             true
                         } else {
-                            focusManager.moveFocus(FocusDirection.Down)
+                            tryFocus(downFocus, FocusDirection.Down)
                         }
                     }
                     Key.DirectionLeft -> {
                         val atStart = fieldValue.selection.collapsed &&
                             fieldValue.selection.start == 0
                         if (!atStart) return@onPreviewKeyEvent false
-                        keyboard?.hide()
-                        if (leftFocus != null) {
-                            leftFocus.requestFocus()
-                            true
-                        } else {
-                            focusManager.moveFocus(FocusDirection.Left)
-                        }
+                        tryFocus(leftFocus, FocusDirection.Left)
+                    }
+                    Key.DirectionRight -> {
+                        val atEnd = fieldValue.selection.collapsed &&
+                            fieldValue.selection.start == fieldValue.text.length
+                        if (!atEnd) return@onPreviewKeyEvent false
+                        tryFocus(rightFocus, FocusDirection.Right)
                     }
                     else -> false
                 }

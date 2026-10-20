@@ -275,6 +275,13 @@ Record of corrections that changed implementation:
 27. [x] TV list long-press → actions dialog with thematic icons (`appMenuActions` / `TvAppActionsDialog`; FireTv KeyUp long-press).
 28. [x] UI colors via `MaterialTheme.colorScheme` (no ad-hoc `Color(0x…)` in screens); brand hex only in `ui.theme.Color` / theme schemes.
 29. [x] TV toasts: `dokar3/compose-sonner` top-center (`TvToasterHost` + `AppLogBus.toasts`); not `android.widget.Toast` on TV.
+30. [x] TV extractor sort: button right of search → `TvSortDialog`; shared `SortOption` / `sortedByOption` / `sortMenuItems` with phone (`detail/SortOptions.kt`) (2026-10-20).
+31. [x] TV nav crash `LazyLayoutPinnableItem` / "Release should only be called once": `rememberClearFocusThen` before leaving any `tvLazyFocusGroup` Lazy* (detail/manifest/panel switch); keep Extractor LazyColumn mounted (2026-10-20).
+32. [x] TV search → Sort: `TvEditableField.rightFocus` at caret end + Sort `FocusRequester` (D-pad Right) (2026-10-20).
+33. [x] TV focus crash "FocusRequester is not initialized": `TvEditableField` `runCatching` + `moveFocus` fallback (2026-10-20).
+34. [x] TV list focus = FireTv Case B adapted: pin-only `focusRestorer()`; enter via `rememberEnterListFocus` (scroll→child); never `focusProperties { down = group }` (uninit crash on our BOM) (2026-10-20).
+35. [x] TV extract “Need root”: shared `ExtractorHelper` — `get_out_filename` leading `/` made `File(parent,"/…")` absolute (TV MediaStore fail → bad fallback); `relativeOutName` + same storage gate as phone (`rememberExtractWithStoragePermission`) (2026-10-20).
+36. [x] TV search Down→list: clamp `lastFocused` on filter; `prepareEnterIndex` + 2 frames then child focus; clear TextField focus before enter (2026-10-20).
 
 ---
 
@@ -320,6 +327,7 @@ For each section 0–14:
 - [x] **Reuse rule:** maximize shared ViewModels / `:extractor` / models; **TV UI must not use phone Material3 controls or phone composables** (D-pad) — see `Documentation/guidelines/PHONE_TV_REUSE.md`.
 - [x] **TV D-pad lists:** one focus target per row — no PopupMenu/IconButton overflow; OK → detail; long-press → `TvAppActionsDialog` (`appMenuActions` + icons).
 - [x] **TV Extractor search:** `TvEditableField` (FireTv D-pad/IME pattern) → shared `ExtractorViewModel.setSearchQuery` (2026-10-20).
+- [x] **TV Extractor sort:** Sort icon right of search → `TvSortDialog`; same options as phone via shared `detail/SortOptions.kt` (2026-10-20).
 - [ ] Packages: phone screens still under `compose.screens` until full `ui.mobile.*` move (TV already under `ui.tv.*`).
 - [x] TV shell: `NavigationDrawer` + focusRestorer; Extractor → AppDetail (action LazyRow) → Logs → Settings on `tv.material3` only. Debug: `FORCE_TV_IN_DEBUG` in `LauncherActivity`.
 - [x] **Share APK:** `ExtractorViewModel.shareApk` → `ShareUtils.shareApkFile` (copy to app storage first). Direct `FileProvider` on `/system/...` sourceDir crashes (2026-10-20).
@@ -332,6 +340,8 @@ Key files:
 - `compose/.../tv/MainActivity.kt`, `TvNavHost.kt`, `TvRoutes.kt`
 - `compose/.../ui/tv/shell/MainShellScreen.kt`
 - `compose/.../ui/tv/extractor/ExtractorScreen.kt`
+- `compose/.../ui/tv/components/TvSortDialog.kt`
+- `compose/.../detail/SortOptions.kt`
 - `compose/.../ui/tv/detail/AppDetailScreen.kt`, `TvInformationTab.kt`, `TvMetaTab.kt`, `TvStringTab.kt`, `TvAssetsTab.kt`, `TvManifestScreen.kt`
 - `compose/.../detail/AppDetailTabs.kt`, `InfoSections.kt`, `MetaSections.kt`, `InfoLineMapping.kt`
 - `compose/.../ui/tv/logs/LogScreen.kt`, `…/settings/SettingsScreen.kt`

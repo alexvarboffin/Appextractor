@@ -42,6 +42,7 @@ import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
+import com.walhalla.compose.ui.tv.components.rememberClearFocusThen
 import com.walhalla.compose.ui.tv.components.rememberTvLazyFocusRestorer
 import com.walhalla.compose.ui.tv.components.tvLazyFocusGroup
 import com.walhalla.compose.ui.tv.extractor.ExtractorScreen
@@ -66,6 +67,7 @@ fun MainShellScreen() {
     var showAbout by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     val drawerRestorer = rememberTvLazyFocusRestorer()
+    val clearFocusThen = rememberClearFocusThen()
     val activity = LocalContext.current as ComponentActivity
     val extractorVm: ExtractorViewModel = viewModel(viewModelStoreOwner = activity)
 
@@ -78,15 +80,21 @@ fun MainShellScreen() {
         runCatching { drawerRestorer.group.requestFocus() }
     }
 
+    fun selectPanel(next: ShellPanel) {
+        if (next == panel) return
+        // Unpin content Lazy focusRestorer before disposing the panel.
+        clearFocusThen { panel = next }
+    }
+
     val drawerItems = listOf(
         DrawerItem(ShellPanel.Extractor, "Extractor", Icons.Default.Storage) {
-            panel = ShellPanel.Extractor
+            selectPanel(ShellPanel.Extractor)
         },
         DrawerItem(ShellPanel.Logs, "Logs", Icons.AutoMirrored.Filled.List) {
-            panel = ShellPanel.Logs
+            selectPanel(ShellPanel.Logs)
         },
         DrawerItem(ShellPanel.Settings, "Settings", Icons.Default.Settings) {
-            panel = ShellPanel.Settings
+            selectPanel(ShellPanel.Settings)
         },
         DrawerItem(null, "About", Icons.Default.Info) {
             showAbout = true

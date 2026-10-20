@@ -6,4 +6,14 @@
     <string name="sort">Sort</string>
     <string name="sort_by_name">Sort by name</string>
     <string name="sort_by_install_date">Sort by install date</string>
+    <string name="sort_name_asc">Name (A-Z)</string>
+    <string name="sort_name_desc">Name (Z-A)</string>
+    <string name="sort_package_asc">Package (A-Z)</string>
+    <string name="sort_package_desc">Package (Z-A)</string>
+    <string name="sort_size_asc">Size (Small-Large)</string>
+    <string name="sort_size_desc">Size (Large-Small)</string>
+    <string name="sort_update_asc">Update Date (Old-New)</string>
+    <string name="sort_update_desc">Update Date (New-Old)</string>
+    <string name="sort_system_first">System Apps First</string>
+    <string name="sort_user_first">User Apps First</string>
 </resources>
