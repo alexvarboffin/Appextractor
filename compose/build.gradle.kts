@@ -62,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -77,6 +78,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     // Adaptive nav (bar ↔ rail) for tablets / landscape — see adaptive skill Step 2
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.2")
+    // Android TV Material3 (tv shell) — see compose-tv-from-mobile / FireTv
+    implementation("androidx.tv:tv-material:1.0.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.espresso.core)

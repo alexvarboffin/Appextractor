@@ -1,4 +1,4 @@
-package com.walhalla.compose
+package com.walhalla.compose.phone
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -39,6 +39,10 @@ import com.walhalla.compose.screens.ManifestScreen
 import com.walhalla.compose.screens.SettingsScreen
 import com.walhalla.compose.ui.theme.AppextractorTheme
 
+/**
+ * Phone / tablet entry. Screens still live under [com.walhalla.compose.screens]
+ * until moved to [com.walhalla.compose.ui.mobile].
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppextractorRoot()
+                    PhoneRoot()
                 }
             }
         }
@@ -56,7 +60,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun AppextractorRoot() {
+private fun PhoneRoot() {
     val navController = rememberNavController()
     val items = listOf(
         Screen.Extractor,
@@ -177,7 +181,7 @@ private fun AppextractorRoot() {
     }
 }
 
-sealed class Screen(
+private sealed class Screen(
     val route: String,
     val label: String,
     val icon: ImageVector
@@ -185,8 +189,6 @@ sealed class Screen(
     object Extractor : Screen("extractor", "Extractor", Icons.Default.Storage)
     object Logs : Screen("logs", "Logs", Icons.AutoMirrored.Filled.List)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
-
     object Manifest : Screen("manifest", "Manifest", Icons.Default.Description)
-
     object AppDetail : Screen("app_detail/{packageName}", "App Detail", Icons.Default.Info)
 }

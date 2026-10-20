@@ -1,6 +1,7 @@
 # Задача: Compose phone + TV (2 в 1) — Appextractor
 
-> Статус: **описание зафиксировано** 2026-10-19 (код ещё не начат).  
+> Статус: **TV shell done** — 2026-10-20: Launcher + phone + `TvNavHost` / `ui.tv` (drawer, Extractor без overflow → detail actions, Logs, Settings). Phone screens still under `compose.screens` until `ui.mobile` move.  
+> Ранее: stub 2026-10-20; описание 2026-10-19.  
 > Референс: `C:\Synced\FireTv` (`:app-compose`, `Documentation/TASKS/compose-phone-tv.md`, skill `compose-tv-from-mobile`).  
 > Живой чеклист продукта: корневой `AI-PROJECT-CHECKLIST.md` (§18 ниже по ссылке).
 
@@ -14,8 +15,10 @@
 | TV | `tv.MainActivity` | `ui.tv.*` | `androidx.tv.material3` |
 
 - Два **независимых** UI-дерева (не `if (isTv)` внутри одного `setContent`).
-- Общие: **ViewModel**, логика в `:extractor` / `:shared` (extract, INFO/META builders, cloud, icons…).
-- Имена экранов/компонентов phone и tv **могут совпадать** (`ExtractorScreen`, `AppDetailScreen`, …) — различаются пакет и Material / фокус.
+- **Максимальный reuse** вне UI: ViewModel, `:extractor` / `:shared`, models, pure helpers, строки.
+- **TV UI ≠ phone UI:** в `ui.tv` **запрещены** phone-контролы и зависимости **`androidx.compose.material3`** (D-pad ломается на phone Material). Только `androidx.tv.material3` + foundation focus/keys.
+- Имена экранов phone/tv **могут совпадать**; пакеты и Material-импорты разные. Не вызывать `ui.mobile.*` из TV.
+- Детали: [`Documentation/guidelines/PHONE_TV_REUSE.md`](../guidelines/PHONE_TV_REUSE.md).
 
 Сейчас (до задачи): один `com.walhalla.compose.MainActivity` + `screens/*` на Material3 + adaptive NavigationSuite (phone/tablet). Это станет **phone**-веткой; TV — зеркало.
 
@@ -68,9 +71,17 @@ Kotlin `namespace` модуля может остаться `com.walhalla.compos
 |------|-----|
 | Extract / cloud / presenters / IconSaver / … | `:extractor` (как сейчас) |
 | ViewModels, UiState, AppLogBus | `compose/.../viewmodel`, `log` — **одни** на phone+tv |
+| Pure models / formatters (без Compose Material) | `compose/.../model`, мелкие Kotlin helpers |
 | Строки продукта | `:extractor` resources + compose strings; TV-only строки — допустимы в compose |
 
-TV-экран **не** зовёт `ui.mobile.*ScreenBody` «как есть» — свой composable на `tv.material3` + D-pad.
+### UI — не общий
+
+| Ветка | Разрешено | Запрещено |
+|-------|-----------|-----------|
+| `ui.mobile` / phone `screens`/`components` | `androidx.compose.material3`, adaptive suite | — |
+| `ui.tv` | `androidx.tv.material3`, foundation focus/keys | `androidx.compose.material3.*`, импорт phone screens/components |
+
+Паттерн: `*Screen()` (VM) + `*ScreenBody(state, callbacks)` **в каждой ветке отдельно** — как FireTv `SCREEN_SCREENBODY.md`.
 
 ## Что зеркалить по смыслу (порядок работ)
 
@@ -85,20 +96,21 @@ Phone-ветка: сохранить текущий adaptive NavigationSuite + �
 ## Запреты
 
 - Один `MainActivity` / один `setContent` с ветвлением всего UI по `isTv`.
-- TV UI на чистом phone Material3 без `tv.material3` и без D-pad пути.
-- Дублировать extract/cloud/info builders в `ui.tv`.
-- Трогать общий слой «заодно» без явного согласования (правило FireTv / Appextractor checklist).
+- TV UI на **phone Material3** / shared phone composables (D-pad / focus).
+- Дублировать extract/cloud/info builders или ViewModels «под TV».
+- Трогать общий слой «заодно» без явного согласования.
 
-## Чеклист приёмки (когда начнём код)
+## Чеклист приёмки
 
-- [ ] LAUNCHER = `LauncherActivity` → phone **или** tv → `finish()`
-- [ ] Детект: `UI_MODE_TYPE_TELEVISION` (+ согласованный DEBUG-форс)
-- [ ] Пакеты `ui.mobile` / `ui.tv` с зеркальными именами экранов
-- [ ] Общие ViewModel; phone и tv только подписываются
-- [ ] TV: только `androidx.tv.material3` (+ foundation focus/keys) для chrome/экранов
-- [ ] Manifest: TV banner / `LEANBACK_LAUNCHER` по необходимости
-- [ ] Smoke D-pad: меню → список → detail → back; диалоги; поля ввода без залипания фокуса
-- [ ] Phone-сборка не регрессирует (install + list/extract/detail)
+- [x] LAUNCHER = `LauncherActivity` → phone **или** tv → `finish()`
+- [x] Детект: `UI_MODE_TYPE_TELEVISION` (+ `FORCE_TV_IN_DEBUG` для отладки на телефоне/эмуляторе)
+- [ ] Пакеты `ui.mobile` / `ui.tv` с зеркальными именами (TV: `ui.tv.*`; phone: ещё `screens/` → `ui.mobile` позже)
+- [x] Общие ViewModel; phone и tv только подписываются
+- [x] TV: только `androidx.tv.material3` (+ foundation focus/keys) для chrome/экранов
+- [x] Manifest: TV banner / `LEANBACK_LAUNCHER`
+- [x] List D-pad: **нет** overflow на айтемах; OK → detail → actions LazyRow → Back
+- [ ] Smoke D-pad на реальном TV / leanback: drawer ↔ list ↔ detail; диалоги
+- [ ] Phone-сборка не регрессирует при `FORCE_TV_IN_DEBUG = false`
 
 ## Куда смотреть (референс FireTv)
 
@@ -111,7 +123,11 @@ Phone-ветка: сохранить текущий adaptive NavigationSuite + �
 | TV UX / focus / long-click / TextField | skill `compose-tv-from-mobile` |
 | User-corrected TV cases | `FireTv/Documentation/guidelines/USER_CORRECTED_CHECKLIST.md` |
 | Screen / ScreenBody | `FireTv/Documentation/guidelines/SCREEN_SCREENBODY.md` |
+| Reuse vs Material split (Appextractor) | `Documentation/guidelines/PHONE_TV_REUSE.md` |
 
 ## Следующий шаг
 
-После ок на это описание — реализация по этапам выше, начиная с Launcher + переноса текущего `MainActivity` в `phone/` и пустого TV shell. Обновлять `AI-PROJECT-CHECKLIST.md` §18 по мере закрытия пунктов.
+1. ~~Launcher + phone MainActivity + TV stub~~ (done 2026-10-20).
+2. ~~TV shell (drawer + routes) + Extractor/detail/logs/settings на `tv.material3`~~ (done 2026-10-20).
+3. Smoke на leanback / Fire TV; при необходимости ScreenBody split.
+4. Перенос `screens/` → `ui.mobile/` для симметрии имён; `FORCE_TV_IN_DEBUG = false` перед phone release.

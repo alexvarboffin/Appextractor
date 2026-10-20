@@ -52,6 +52,7 @@
 - [x] App detail must not create a fresh `ExtractorViewModel` / block Main thread on heavy PM work — load on `Dispatchers.Default` / `IO`, pass `PackageMeta` via `savedStateHandle`.
 - [x] Nested Scaffold: avoid double system/inset padding (empty bottom strip).
 - [x] Compose visual identity: **no** Material template purple / wallpaper dynamic color — brand blue from legacy (`#5C8FED`), dense utility typography, quiet chrome (selection bar / chips).
+- [x] Phone+TV: share ViewModels/domain maximally; **never** feed TV UI phone Material3 widgets/composables (D-pad) — `Documentation/guidelines/PHONE_TV_REUSE.md`.
 
 ---
 
@@ -266,7 +267,9 @@ Record of corrections that changed implementation:
 19. [x] UI felt “нейро-шаблонно” → drop purple/dynamic Material defaults; ApkChief blue + denser list chrome.
 20. [x] META section title showed `(2)(2)` — count already in `HeaderObject.title`; Compose must not append `items.size` again.
 21. [x] Compose must use legacy `applicationId` + signing keystore + launcher icon to replace `:app` install.
-22. [ ] Compose phone+TV (2-in-1): task described in `Documentation/TASKS/compose-phone-tv.md`; FireTv as reference — **code not started**.
+22. [x] Compose phone+TV shell start: Launcher + phone move + TV stub (2026-10-20); full `ui.tv` port still open.
+23. [x] Phone/TV: max reuse outside UI; TV forbids phone Material3 / phone controls (`PHONE_TV_REUSE.md`).
+24. [x] TV shell: NavigationDrawer + Extractor/Logs/Settings + detail actions (2026-10-20). List rows: **no overflow menu** (D-pad); OK → detail for extract/share/….
 
 ---
 
@@ -301,14 +304,27 @@ For each section 0–14:
 
 ---
 
-## 18. Compose phone + TV (planned — description only)
+## 18. Compose phone + TV
 
 > Full task write-up: [`Documentation/TASKS/compose-phone-tv.md`](Documentation/TASKS/compose-phone-tv.md).  
-> Reference implementation: `C:\Synced\FireTv` + skill `compose-tv-from-mobile`.
+> Reference: `C:\Synced\FireTv` + skill `compose-tv-from-mobile`.
 
-- [ ] **Launcher** detects TV via `UI_MODE_TYPE_TELEVISION` → `phone.MainActivity` **or** `tv.MainActivity` (no single `setContent { if (isTv) }` tree).
-- [ ] Packages: `ui.mobile.*` (Material3) ↔ `ui.tv.*` (`androidx.tv.material3`); same screen names allowed; shared ViewModels / `:extractor`.
-- [ ] TV shell: drawer + D-pad focus rules from FireTv / `compose-tv-from-mobile` (no FAB; focus restore; dialogs; text fields).
-- [ ] Phone path keeps current adaptive list/nav parity; TV ports critical path (Extractor → detail → logs/settings).
+- [x] **Launcher** → `launcher/LauncherActivity` detects `UI_MODE_TYPE_TELEVISION` (+ optional `FORCE_TV_IN_DEBUG`) → `phone.MainActivity` **or** `tv.MainActivity`; LAUNCHER + LEANBACK_LAUNCHER; leanback/touchscreen `required=false`; banner.
+- [x] Phone entry: former root `MainActivity` moved to `phone/MainActivity` (screens still under `compose.screens` until `ui.mobile` move).
+- [x] TV entry: `tv/MainActivity` landscape + `TvNavHost` + `AppextractorTvTheme` (`androidx.tv:tv-material:1.0.1`).
+- [x] **Reuse rule:** maximize shared ViewModels / `:extractor` / models; **TV UI must not use phone Material3 controls or phone composables** (D-pad) — see `Documentation/guidelines/PHONE_TV_REUSE.md`.
+- [x] **TV D-pad lists:** one focus target per row — **no** PopupMenu / DropdownMenu / IconButton overflow on list items; open app detail for extract/share/launch/….
+- [ ] Packages: phone screens still under `compose.screens` until full `ui.mobile.*` move (TV already under `ui.tv.*`).
+- [x] TV shell: `NavigationDrawer` + focusRestorer; Extractor → AppDetail (action LazyRow) → Logs → Settings on `tv.material3` only. Debug: `FORCE_TV_IN_DEBUG` in `LauncherActivity`.
+
+Key files:
+- `compose/.../launcher/LauncherActivity.kt`
+- `compose/.../phone/MainActivity.kt`
+- `compose/.../tv/MainActivity.kt`, `TvNavHost.kt`, `TvRoutes.kt`
+- `compose/.../ui/tv/shell/MainShellScreen.kt`
+- `compose/.../ui/tv/extractor/ExtractorScreen.kt`
+- `compose/.../ui/tv/detail/AppDetailScreen.kt`
+- `compose/.../ui/tv/logs/LogScreen.kt`, `…/settings/SettingsScreen.kt`
+- `compose/src/main/AndroidManifest.xml`
 
 ---

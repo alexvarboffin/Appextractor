@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.Appextractor" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Appextractor.Tv" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#FF0E1116</item>
+    </style>
 </resources>
