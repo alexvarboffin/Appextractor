@@ -10,8 +10,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowScope
@@ -281,7 +281,13 @@ private fun TvStatHero(
 ) {
     val colors = MaterialTheme.colorScheme
     val bringHero = remember { BringIntoViewRequester() }
-    val scope = rememberCoroutineScope()
+    var exportFocused by remember { mutableStateOf(false) }
+    // Button focus scrolls only the button. After that frame, scroll the whole card.
+    LaunchedEffect(exportFocused) {
+        if (!exportFocused) return@LaunchedEffect
+        withFrameNanos { }
+        runCatching { bringHero.bringIntoView() }
+    }
     Column(
         modifier = Modifier
             .bringIntoViewRequester(bringHero)
@@ -309,11 +315,7 @@ private fun TvStatHero(
             }
             Button(
                 onClick = onExport,
-                modifier = Modifier.onFocusChanged { state ->
-                    if (state.isFocused) {
-                        scope.launch { runCatching { bringHero.bringIntoView() } }
-                    }
-                }
+                modifier = Modifier.onFocusChanged { exportFocused = it.isFocused }
             ) {
                 Icon(Icons.Default.IosShare, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
