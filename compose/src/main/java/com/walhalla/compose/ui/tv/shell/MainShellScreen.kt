@@ -77,7 +77,7 @@ fun MainShellScreen() {
         initialFocusDone = true
         withFrameNanos { }
         // Enter drawer **group** — restorer picks the child (never requestFocus a raw item).
-        runCatching { drawerRestorer.group.requestFocus() }
+        runCatching { drawerRestorer.parent.requestFocus() }
     }
 
     fun selectPanel(next: ShellPanel) {
@@ -121,7 +121,7 @@ fun MainShellScreen() {
         }
     }
 
-    CompositionLocalProvider(LocalTvDrawerFocusRequester provides drawerRestorer.group) {
+    CompositionLocalProvider(LocalTvDrawerFocusRequester provides drawerRestorer.parent) {
         NavigationDrawer(
             drawerState = drawerState,
             modifier = Modifier.fillMaxSize(),
@@ -139,7 +139,7 @@ fun MainShellScreen() {
                         NavigationDrawerItem(
                             selected = item.id != null && item.id == panel,
                             onClick = item.onClick,
-                            modifier = drawerRestorer.itemModifier(index, drawerItems.size),
+                            modifier = if (index == 0) drawerRestorer.firstItemModifier() else Modifier,
                             leadingContent = {
                                 Icon(
                                     imageVector = item.icon,

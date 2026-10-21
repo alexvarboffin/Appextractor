@@ -73,7 +73,6 @@ import com.walhalla.compose.model.LogType
 import com.walhalla.compose.transfer.SharedFile
 import com.walhalla.compose.transfer.rememberQrTransfer
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
-import com.walhalla.compose.ui.tv.components.RestoreFocusOnReturn
 import com.walhalla.compose.ui.tv.components.TvChoice
 import com.walhalla.compose.ui.tv.components.TvChoiceDialog
 import com.walhalla.compose.ui.tv.components.TvQrTransferDialog
@@ -103,12 +102,10 @@ fun LogScreen(viewModel: LogViewModel = viewModel()) {
     val drawerFocus = LocalTvDrawerFocusRequester.current
     val listRestorer = rememberTvLazyFocusRestorer()
     val listState = rememberLazyListState()
-    val enterList = rememberEnterListFocus(listRestorer, listState, logs.size)
+    val enterList = rememberEnterListFocus(listRestorer)
     val lifecycleOwner = LocalLifecycleOwner.current
     val qrTransfer = rememberQrTransfer()
     var fileMenu by remember { mutableStateOf<LogModel.FileLog?>(null) }
-
-    listRestorer.RestoreFocusOnReturn(listState, logs.size)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -193,11 +190,11 @@ fun LogScreen(viewModel: LogViewModel = viewModel()) {
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    itemsIndexed(logs) { index, log ->
-                        LogRow(
-                            log = log,
-                            modifier = listRestorer.itemModifier(index, logs.size),
-                            onOpen = {
+                        itemsIndexed(logs) { index, log ->
+                            LogRow(
+                                log = log,
+                                modifier = if (index == 0) listRestorer.firstItemModifier() else Modifier,
+                                onOpen = {
                                 when (log) {
                                     is LogModel.FileLog -> fileMenu = log
                                     is LogModel.MessageLog -> copyMessage(context, log.message)

@@ -16,7 +16,7 @@ android {
     // Kotlin/R package stays compose; install id matches legacy for in-place updates
     namespace = "com.walhalla.compose"
     // 36: needed by dokar3/sonner (TV toasts); targetSdk can stay lower
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         multiDexEnabled = true

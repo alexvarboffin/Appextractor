@@ -220,8 +220,8 @@ fun SearchScreen(
                         ) { item ->
                             SearchResultItem1(
                                 item = item,
-                                modifier = Modifier.animateItemPlacement(
-                                    animationSpec = spring(
+                                modifier = Modifier.animateItem(
+                                    placementSpec = spring(
                                         dampingRatio = Spring.DampingRatioMediumBouncy,
                                         stiffness = Spring.StiffnessLow
                                     )
@@ -252,8 +252,8 @@ fun SearchScreen(
                 ) { item ->
                     SearchResultItem1(
                         item = item,
-                        modifier = Modifier.animateItemPlacement(
-                            animationSpec = spring(
+                        modifier = Modifier.animateItem(
+                            placementSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
                                 stiffness = Spring.StiffnessLow
                             )

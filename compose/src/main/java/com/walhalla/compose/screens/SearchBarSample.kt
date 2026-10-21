@@ -197,7 +197,7 @@ fun SearchBarSample(
                     ) { item ->
                         SearchResultItem(
                             item = item,
-                            modifier = Modifier.animateItemPlacement()
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }
@@ -219,7 +219,7 @@ fun SearchBarSample(
                 ) { item ->
                     SearchResultItem(
                         item = item,
-                        modifier = Modifier.animateItemPlacement()
+                        modifier = Modifier.animateItem()
                     )
                 }
             }

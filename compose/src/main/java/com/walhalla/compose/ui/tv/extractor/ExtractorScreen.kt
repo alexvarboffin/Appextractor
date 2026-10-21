@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -74,11 +75,11 @@ import com.walhalla.compose.ui.tv.components.TvAppActionsDialog
 import com.walhalla.compose.ui.tv.components.TvEditableField
 import com.walhalla.compose.ui.tv.components.TvSortDialog
 import com.walhalla.compose.storage.rememberExtractWithStoragePermission
-import com.walhalla.compose.ui.tv.components.RestoreFocusOnReturn
 import com.walhalla.compose.ui.tv.components.rememberClearFocusThen
 import com.walhalla.compose.ui.tv.components.rememberEnterListFocus
 import com.walhalla.compose.ui.tv.components.rememberTvLazyFocusRestorer
 import com.walhalla.compose.ui.tv.components.tvLazyFocusGroup
+
 import com.walhalla.compose.viewmodel.ExtractorViewModel
 import com.walhalla.extractor.R as ExtR
 import kotlinx.coroutines.delay
@@ -115,15 +116,8 @@ fun ExtractorScreen(
     var currentSort by remember { mutableStateOf(SortOption.NAME_ASC) }
     var showSortDialog by remember { mutableStateOf(false) }
     val sortedApps = remember(apps, currentSort) { apps.sortedByOption(currentSort) }
-    val enterList = rememberEnterListFocus(listRestorer, listState, sortedApps.size)
+    val enterList = rememberEnterListFocus(listRestorer)
     val extractWithStorage = rememberExtractWithStoragePermission(vm::extractApkRequest)
-
-    // Search/filter shrinks the list — old lastFocused index is meaningless.
-    LaunchedEffect(sortedApps.size, searchQuery) {
-        listRestorer.clampToSize(sortedApps.size)
-    }
-
-    listRestorer.RestoreFocusOnReturn(listState, sortedApps.size)
 
     LaunchedEffect(activity) {
         vm.activityProvider = { activity }
@@ -136,7 +130,6 @@ fun ExtractorScreen(
     }
 
     fun openDetail(app: PackageMeta) {
-        listRestorer.markRestorePending()
         clearFocusThen {
             nav.currentBackStackEntry?.savedStateHandle?.set("detail_app", app)
             nav.navigate(TvRoutes.appDetail(app.packageName))
@@ -144,7 +137,6 @@ fun ExtractorScreen(
     }
 
     fun openManifest(app: PackageMeta) {
-        listRestorer.markRestorePending()
         clearFocusThen {
             nav.currentBackStackEntry?.savedStateHandle?.set("manifest_app", app)
             nav.currentBackStackEntry?.savedStateHandle?.set("manifest_xml", null as String?)
@@ -298,10 +290,11 @@ fun ExtractorScreen(
                 // Keep one LazyColumn instance — swapping it out while pinned crashes
                 // FocusRestorer ("Release should only be called once").
                 else -> {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
+
+
+
+                    LazyColumn(state = listState,
+                        modifier = Modifier.fillMaxSize()
                             .tvLazyFocusGroup(listRestorer)
                             .then(leftToDrawer),
                         contentPadding = PaddingValues(bottom = 8.dp),
@@ -328,7 +321,7 @@ fun ExtractorScreen(
                                     query = searchQuery.trim(),
                                     selected = app in selectedApps,
                                     tvLauncher = traits[app.packageName]?.tvLauncher == true,
-                                    modifier = listRestorer.itemModifier(index, sortedApps.size),
+                                    modifier = if (index == 0) listRestorer.firstItemModifier() else Modifier,
                                     onClick = {
                                         if (selectionMode) vm.toggleAppSelection(app) else openDetail(app)
                                     },

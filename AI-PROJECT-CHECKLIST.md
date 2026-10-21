@@ -309,6 +309,8 @@ Record of corrections that changed implementation:
 45. [x] TV Logs parity: file row OK → open folder / share / QR / delete; message row OK → copy; Refresh + Clear messages; `log/LogFileActions.kt` `shareApkFile` shared with phone `LogItem` (2026-10-21).
 46. [x] TV Settings: Telegram token + chat id via `TvEditableField` (2026-10-21).
 47. [x] `ui/tv/components/TvChoiceDialog.kt` = single TV pick-one dialog (sort, filter, app actions, report, log file). Do not add new copy-paste dialogs.
+48. [x] Compose BOM `2024.04.01` → `2025.12.01` (`compileSdk` 37, `activity-compose` 1.13). `2026.09` (FireTv) needs AGP 9.1; this repo stays on AGP 8.13. `animateItemPlacement` → `animateItem` in the unused search samples (2026-10-21).
+49. [x] TV list focus: no saved row index. `tvLazyFocusGroup` = `focusRequester(group).focusRestorer()` (Compose UI 1.10 stores the child hash; missing child → `FocusRequester.Default`). Enter from search = `clearFocus` + `group.requestFocus()` (2026-10-21).
 
 ---
 
