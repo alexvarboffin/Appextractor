@@ -23,7 +23,10 @@ import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.tv.material3.Button
 import com.walhalla.compose.R
 import com.walhalla.compose.detail.AppInsights
@@ -73,6 +76,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
+import androidx.tv.material3.ColorScheme
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
@@ -282,15 +286,27 @@ private fun TvStatHero(
     val colors = MaterialTheme.colorScheme
     val bringHero = remember { BringIntoViewRequester() }
     var exportFocused by remember { mutableStateOf(false) }
-    // Button focus scrolls only the button. After that frame, scroll the whole card.
-    LaunchedEffect(exportFocused) {
-        if (!exportFocused) return@LaunchedEffect
+    var heroSize by remember { mutableStateOf(IntSize.Zero) }
+    // Button focus scrolls only itself. After that, scroll the whole card.
+    // Requester stays outside clip: a clip layer reports only the on-screen part.
+    LaunchedEffect(exportFocused, heroSize) {
+        if (!exportFocused || heroSize == IntSize.Zero) return@LaunchedEffect
         withFrameNanos { }
-        runCatching { bringHero.bringIntoView() }
+        withFrameNanos { }
+        runCatching {
+            bringHero.bringIntoView(
+                Rect(0f, 0f, heroSize.width.toFloat(), heroSize.height.toFloat())
+            )
+        }
     }
     Column(
         modifier = Modifier
+            .fillMaxWidth()
+            .onSizeChanged { heroSize = it }
             .bringIntoViewRequester(bringHero)
+    ) {
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(
@@ -323,6 +339,7 @@ private fun TvStatHero(
             }
         }
         insights?.let { TvStorageAndPerms(it) }
+    }
     }
 }
 
@@ -473,18 +490,19 @@ private fun TvStatStrip(stats: List<TvStat>) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        stats.forEach { stat ->
+        stats.forEachIndexed { index, stat ->
+            val (background, content) = statTileTone(colors, index)
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(colors.surface.copy(alpha = 0.55f))
+                    .background(background)
                     .padding(horizontal = 14.dp, vertical = 12.dp)
             ) {
                 Text(
                     text = stat.label.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = colors.onSurfaceVariant,
+                    color = content.copy(alpha = 0.72f),
                     maxLines = 1
                 )
                 Spacer(Modifier.height(4.dp))
@@ -492,13 +510,26 @@ private fun TvStatStrip(stats: List<TvStat>) {
                     text = stat.value,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = colors.onSurface,
+                    color = content,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
         }
     }
+}
+
+/** Neighboring tiles take a different scheme role, same brightness family. */
+private fun statTileTone(colors: ColorScheme, index: Int): Pair<Color, Color> {
+    val tones = listOf(
+        colors.primaryContainer to colors.onPrimaryContainer,
+        colors.tertiaryContainer to colors.onTertiaryContainer,
+        colors.secondaryContainer to colors.onSecondaryContainer,
+        colors.primary to colors.onPrimary,
+        colors.tertiary to colors.onTertiary,
+        colors.secondary to colors.onSecondary,
+    )
+    return tones[index % tones.size]
 }
 
 // endregion
@@ -608,11 +639,19 @@ private fun TvSpecSheet(title: String, specs: List<Pair<String, String>>) {
     }
 }
 
+private fun String.isFingerprintLine(): Boolean =
+    equals("MD5", ignoreCase = true) ||
+        equals("SHA1", ignoreCase = true) ||
+        equals("SHA-1", ignoreCase = true) ||
+        equals("SHA256", ignoreCase = true) ||
+        equals("SHA-256", ignoreCase = true)
+
 @Composable
 private fun TvSpecGrid(specs: List<Pair<String, String>>, columns: Int) {
     val colors = MaterialTheme.colorScheme
+    val (fingerprints, cells) = specs.partition { it.first.isFingerprintLine() }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        specs.chunked(columns).forEach { chunk ->
+        cells.chunked(columns).forEach { chunk ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -644,6 +683,24 @@ private fun TvSpecGrid(specs: List<Pair<String, String>>, columns: Int) {
                     }
                 }
                 repeat(columns - chunk.size) { Box(Modifier.weight(1f)) }
+            }
+        }
+        fingerprints.forEach { (label, value) ->
+            Column(modifier = Modifier.fillMaxWidth().padding(end = 32.dp)) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.primary,
+                    maxLines = 1
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.onSurface,
+                    fontFamily = FontFamily.Monospace,
+                    softWrap = true
+                )
             }
         }
     }
