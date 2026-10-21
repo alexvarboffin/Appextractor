@@ -1,6 +1,15 @@
-package com.walhalla.compose.screens
+package com.walhalla.compose.ui.mobile
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,25 +39,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-data class SearchItem(
-    val id: Int,
-    val title: String,
-    val description: String,
-    val type: ItemType
-)
 
-enum class ItemType {
-    RECENT, FAVORITE, REGULAR
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun SearchBarSample(
+fun SearchScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     var query by remember { mutableStateOf("") }
@@ -115,6 +116,7 @@ fun SearchBarSample(
                     active = isActive
                     if (!isActive) {
                         query = ""
+                        selectedFilter = null
                         focusManager.clearFocus()
                     }
                 },
@@ -125,6 +127,7 @@ fun SearchBarSample(
                             onClick = {
                                 active = false
                                 query = ""
+                                selectedFilter = null
                                 focusManager.clearFocus()
                             }
                         ) {
@@ -148,64 +151,94 @@ fun SearchBarSample(
                 }
             ) {
                 // Фильтры
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                AnimatedVisibility(
+                    visible = filteredItems.isNotEmpty(),
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
                 ) {
-                    FilterChip(
-                        selected = selectedFilter == null,
-                        onClick = { selectedFilter = null },
-                        label = { Text("Все") }
-                    )
-                    FilterChip(
-                        selected = selectedFilter == ItemType.RECENT,
-                        onClick = { selectedFilter = ItemType.RECENT },
-                        label = { Text("Недавние") },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.History,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    )
-                    FilterChip(
-                        selected = selectedFilter == ItemType.FAVORITE,
-                        onClick = { selectedFilter = ItemType.FAVORITE },
-                        label = { Text("Избранное") },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = selectedFilter == null,
+                            onClick = { selectedFilter = null },
+                            label = { Text("Все") }
+                        )
+                        FilterChip(
+                            selected = selectedFilter == ItemType.RECENT,
+                            onClick = { selectedFilter = ItemType.RECENT },
+                            label = { Text("Недавние") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.History,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+                        FilterChip(
+                            selected = selectedFilter == ItemType.FAVORITE,
+                            onClick = { selectedFilter = ItemType.FAVORITE },
+                            label = { Text("Избранное") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Star,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+                    }
                 }
 
                 // Результаты поиска
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = filteredItems,
-                        key = { it.id }
-                    ) { item ->
-                        SearchResultItem(
-                            item = item,
-                            modifier = Modifier.animateItem()
+                if (filteredItems.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Ничего не найдено",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(
+                            items = filteredItems,
+                            key = { it.id }
+                        ) { item ->
+                            SearchResultItem1(
+                                item = item,
+                                modifier = Modifier.animateItem(
+                                    placementSpec = spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             }
         }
     ) { paddingValues ->
-        // Основной контент
-        if (!active) {
+        // Основной список (когда поиск не активен)
+        AnimatedVisibility(
+            visible = !active,
+            enter = fadeIn() + expandIn(expandFrom = Alignment.TopCenter),
+            exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
+        ) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -217,9 +250,14 @@ fun SearchBarSample(
                     items = allItems,
                     key = { it.id }
                 ) { item ->
-                    SearchResultItem(
+                    SearchResultItem1(
                         item = item,
-                        modifier = Modifier.animateItem()
+                        modifier = Modifier.animateItem(
+                            placementSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
                     )
                 }
             }
@@ -229,7 +267,7 @@ fun SearchBarSample(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultItem(
+fun SearchResultItem1(
     item: SearchItem,
     modifier: Modifier = Modifier
 ) {

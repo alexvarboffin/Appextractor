@@ -100,6 +100,8 @@ dependencies {
 
     implementation(project(":extractor"))
     implementation(project(":shared"))
+    implementation(project(":features:ui"))
+    implementation(libs.play.services.ads)
 
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")

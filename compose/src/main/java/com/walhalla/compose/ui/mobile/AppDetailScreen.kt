@@ -1,4 +1,4 @@
-package com.walhalla.compose.screens
+package com.walhalla.compose.ui.mobile
 
 import android.content.Intent
 import android.provider.Settings

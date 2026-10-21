@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
-private const val SearchQueryMaxLength = 128
+private const val SearchQueryMaxLength = 40
 
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     /** Full installed list — never shrink by search. */

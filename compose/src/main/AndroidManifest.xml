@@ -76,6 +76,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Appextractor">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/app_id" />
         <!-- Routes to phone.MainActivity or tv.MainActivity — no Compose UI here -->
         <activity
             android:name=".launcher.LauncherActivity"

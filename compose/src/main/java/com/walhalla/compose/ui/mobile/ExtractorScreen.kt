@@ -1,4 +1,4 @@
-package com.walhalla.compose.screens
+package com.walhalla.compose.ui.mobile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

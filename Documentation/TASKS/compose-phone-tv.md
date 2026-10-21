@@ -1,6 +1,6 @@
 # Задача: Compose phone + TV (2 в 1) — Appextractor
 
-> Статус: **TV shell done** — 2026-10-20: Launcher + phone + `TvNavHost` / `ui.tv` (drawer, Extractor без overflow → detail actions, Logs, Settings). Phone screens still under `compose.screens` until `ui.mobile` move.  
+> Статус: **TV shell done** — phone screens are `ui.mobile` (`git mv`, 2026-10-21). TV is `ui.tv`.  
 > Ранее: stub 2026-10-20; описание 2026-10-19.  
 > Референс: `C:\Synced\FireTv` (`:app-compose`, `Documentation/TASKS/compose-phone-tv.md`, skill `compose-tv-from-mobile`).  
 > Живой чеклист продукта: корневой `AI-PROJECT-CHECKLIST.md` (§18 ниже по ссылке).
@@ -104,7 +104,7 @@ Phone-ветка: сохранить текущий adaptive NavigationSuite + �
 
 - [x] LAUNCHER = `LauncherActivity` → phone **или** tv → `finish()`
 - [x] Детект: `UI_MODE_TYPE_TELEVISION` (+ `FORCE_TV_IN_DEBUG` для отладки на телефоне/эмуляторе)
-- [ ] Пакеты `ui.mobile` / `ui.tv` с зеркальными именами (TV: `ui.tv.*`; phone: ещё `screens/` → `ui.mobile` позже)
+- [x] Пакеты: TV `ui.tv.*`; phone `com.walhalla.compose.ui.mobile` (`git mv` из `screens/`, 2026-10-21). `components/` общие, не переносились.
 - [x] Общие ViewModel; phone и tv только подписываются
 - [x] TV: только `androidx.tv.material3` (+ foundation focus/keys) для chrome/экранов
 - [x] Manifest: TV banner / `LEANBACK_LAUNCHER`

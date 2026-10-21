@@ -67,7 +67,7 @@
 
 Key files:
 - `compose/.../MainActivity.kt`
-- `compose/.../screens/AppDetailScreen.kt`
+- `compose/.../ui/mobile/AppDetailScreen.kt`
 - dep: `material3-adaptive-navigation-suite:1.3.2`
 
 ---
@@ -91,7 +91,7 @@ Key files:
 - [x] **TV multi-select:** long-press → Select/Unselect; while a selection exists, OK toggles the row and the header shows Extract (N) + Deselect → `extractSelectedApps()`.
 
 Key files:
-- `compose/.../screens/ExtractorScreen.kt`, `ui/tv/extractor/ExtractorScreen.kt`
+- `compose/.../ui/mobile/ExtractorScreen.kt`, `ui/tv/extractor/ExtractorScreen.kt`
 - `compose/.../viewmodel/ExtractorViewModel.kt`
 - `compose/.../components/AppListItem.kt`
 - `compose/.../detail/AppFilters.kt`, `TextHighlight.kt`, `AppMenuActions.kt`
@@ -138,7 +138,7 @@ Key file: `extractor/.../utils/IconSaver.kt`
 - [x] **TV Logs:** file row OK → open folder / share / QR / delete; message row OK → copy to clipboard; header Refresh + Clear messages.
 
 Key files:
-- `compose/.../screens/LogScreen.kt`, `ui/tv/logs/LogScreen.kt`
+- `compose/.../ui/mobile/LogScreen.kt`, `ui/tv/logs/LogScreen.kt`
 - `compose/.../viewmodel/LogViewModel.kt`
 - `compose/.../log/AppLogBus.kt`, `log/LogFileActions.kt`
 - `compose/.../components/LogItem.kt`
@@ -172,7 +172,7 @@ Key files:
 - `extractor/.../sdk/F0Presenter.kt` (`buildInfoList`)
 - `extractor/.../utils/ApplicationFlags.kt`
 - `extractor/.../utils/LauncherUtils.kt`
-- `compose/.../screens/InformationScreen.kt`, `ui/tv/detail/TvInformationTab.kt`
+- `compose/.../ui/mobile/InformationScreen.kt`, `ui/tv/detail/TvInformationTab.kt`
 - `compose/.../viewmodel/AppDetailViewModel.kt`
 - `compose/.../detail/AppInsights.kt`, `InfoReport.kt`
 
@@ -185,7 +185,7 @@ Key files:
 - [x] Expandable sections, icons, tap-to-copy.
 - [x] Load off main thread (`Dispatchers.Default`).
 
-Key file: `compose/.../screens/MetaScreen.kt`
+Key file: `compose/.../ui/mobile/MetaScreen.kt`
 
 ---
 
@@ -203,9 +203,9 @@ Key file: `compose/.../screens/MetaScreen.kt`
 - [x] `ManifestScreen(xmlFileName: String?)`.
 
 Key files:
-- `compose/.../screens/StringScreen.kt`
-- `compose/.../screens/AssetsScreen.kt`
-- `compose/.../screens/ManifestScreen.kt`
+- `compose/.../ui/mobile/StringScreen.kt`
+- `compose/.../ui/mobile/AssetsScreen.kt`
+- `compose/.../ui/mobile/ManifestScreen.kt`
 - `compose/.../viewmodel/ManifestViewModel.kt`
 - `compose/.../viewmodel/AssetsViewModel.kt`
 
@@ -218,7 +218,7 @@ Key files:
 - [x] **TV Settings (2026-10-21):** same three toggles; Telegram token + chat id edited with `TvEditableField` (not a "edit on phone" placeholder).
 
 Key files:
-- `compose/.../screens/SettingsScreen.kt`, `ui/tv/settings/SettingsScreen.kt`
+- `compose/.../ui/mobile/SettingsScreen.kt`, `ui/tv/settings/SettingsScreen.kt`
 - `compose/.../viewmodel/SettingsViewModel.kt`
 - `extractor/.../storage/LocalStorage.kt`
 
@@ -247,7 +247,7 @@ Key files:
 | 17 | Save icon same path as legacy | [x] |
 | 18 | Debug suite | [ ] deferred |
 | 19 | ServiceIntentScanner | [ ] deferred |
-| 20 | Ads / rate / double-back | [ ] deferred |
+| 20 | Ads / rate / double-back | [x] phone banner; `RateAppModule` on phone `MainActivity`; double-back at the root tab (`press_again_to_exit`, 1100 ms). TV unchanged (2026-10-21). |
 
 ---
 
@@ -354,13 +354,13 @@ For each section 0–14:
 > Reference: `C:\Synced\FireTv` + skill `compose-tv-from-mobile`.
 
 - [x] **Launcher** → `launcher/LauncherActivity` detects `UI_MODE_TYPE_TELEVISION` (+ optional `FORCE_TV_IN_DEBUG`) → `phone.MainActivity` **or** `tv.MainActivity`; LAUNCHER + LEANBACK_LAUNCHER; leanback/touchscreen `required=false`; banner.
-- [x] Phone entry: former root `MainActivity` moved to `phone/MainActivity` (screens still under `compose.screens` until `ui.mobile` move).
+- [x] Phone entry: former root `MainActivity` moved to `phone/MainActivity`. Screens are `ui.mobile` (2026-10-21, `git mv`).
 - [x] TV entry: `tv/MainActivity` landscape + `TvNavHost` + `AppextractorTvTheme` (`androidx.tv:tv-material:1.0.1`).
 - [x] **Reuse rule:** maximize shared ViewModels / `:extractor` / models; **TV UI must not use phone Material3 controls or phone composables** (D-pad) — see `Documentation/guidelines/PHONE_TV_REUSE.md`.
 - [x] **TV D-pad lists:** one focus target per row — no PopupMenu/IconButton overflow; OK → detail; long-press → `TvAppActionsDialog` (`appMenuActions` + icons).
 - [x] **TV Extractor search:** `TvEditableField` (FireTv D-pad/IME pattern) → shared `ExtractorViewModel.setSearchQuery` (2026-10-20).
 - [x] **TV Extractor sort:** Sort icon right of search → `TvSortDialog`; same options as phone via shared `detail/SortOptions.kt` (2026-10-20).
-- [ ] Packages: phone screens still under `compose.screens` until full `ui.mobile.*` move (TV already under `ui.tv.*`).
+- [x] Packages: phone screens are `com.walhalla.compose.ui.mobile` (`git mv` from `compose.screens`, 2026-10-21). TV stays `ui.tv.*`. Shared `components/` stayed put.
 - [x] TV shell: `NavigationDrawer` + focusRestorer; Extractor → AppDetail (action LazyRow) → Logs → Settings on `tv.material3` only. Debug: `FORCE_TV_IN_DEBUG` in `LauncherActivity`.
 - [x] **Share APK:** `ExtractorViewModel.shareApk` → `ShareUtils.shareApkFile` (copy to app storage first). Direct `FileProvider` on `/system/...` sourceDir crashes (2026-10-20).
 - [x] **TV App Detail parity (2026-10-20):** same tabs INFO|META|STRING|XML|ASSETS as phone (`AppDetailTabs`); shared `groupIntoSections` / `loadMetaSections` / `mapInfoLine`; TV chrome via `tv.material3` (`TvInformationTab`, `TvMetaTab`, `TvStringTab`, `TvAssetsTab`, `TvFocusTabRow`); Manifest route + action; overflow actions + App settings. No Material3 in `ui.tv`.

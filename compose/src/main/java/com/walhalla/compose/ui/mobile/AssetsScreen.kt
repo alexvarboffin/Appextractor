@@ -1,4 +1,4 @@
-package com.walhalla.compose.screens
+package com.walhalla.compose.ui.mobile
 
 import android.Manifest
 import android.content.pm.PackageManager
