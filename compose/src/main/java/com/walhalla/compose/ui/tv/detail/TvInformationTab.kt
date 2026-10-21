@@ -7,6 +7,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.CallSplit
+import androidx.compose.material.icons.filled.IosShare
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.ui.graphics.Color
+import androidx.tv.material3.Button
+import com.walhalla.compose.R
+import com.walhalla.compose.detail.AppInsights
+import com.walhalla.compose.detail.ReportAction
+import com.walhalla.compose.detail.insightFacts
+import com.walhalla.compose.ui.tv.components.TvChoice
+import com.walhalla.compose.ui.tv.components.TvChoiceDialog
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -92,23 +111,51 @@ private data class TvStat(val label: String, val value: String)
 fun TvInformationTab(
     app: PackageMeta,
     appDetails: AppDetails?,
+    insights: AppInsights?,
     onLaunchService: (String) -> Unit,
     onOpenAppSettings: () -> Unit,
     onViewXml: (String) -> Unit,
+    onReportAction: (ReportAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val shelves = remember(appDetails?.infoLines, app.packageName) {
-        buildShelves(context, app, appDetails)
+    val shelves = remember(appDetails?.infoLines, app.packageName, insights) {
+        val overview = insights?.let {
+            TvShelf(
+                context.getString(R.string.insight_overview),
+                0,
+                insightFacts(context, it),
+                emptyList(),
+                emptyList()
+            )
+        }
+        listOfNotNull(overview) + buildShelves(context, app, appDetails)
     }
     val stats = remember(shelves, app.packageName) { buildStats(context, app, shelves) }
+    var showReport by remember { mutableStateOf(false) }
+
+    if (showReport) {
+        val actions = ReportAction.entries
+        TvChoiceDialog(
+            title = stringResource(R.string.report_export),
+            choices = actions.map { TvChoice(stringResource(it.labelRes), it.icon) },
+            onSelect = { onReportAction(actions[it]) },
+            onDismiss = { showReport = false }
+        )
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(top = 8.dp, bottom = 48.dp),
         verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
-        item(key = "hero") { TvStatHero(stats) }
+        item(key = "hero") {
+            TvStatHero(
+                stats = stats,
+                insights = insights,
+                onExport = { showReport = true }
+            )
+        }
         itemsIndexed(shelves, key = { index, shelf -> "$index-${shelf.title}" }) { _, shelf ->
             TvShelfBlock(
                 shelf = shelf,
@@ -130,7 +177,13 @@ private fun buildShelves(
 ): List<TvShelf> {
     if (appDetails == null) {
         return listOf(
-            TvShelf("Basic Information", 0, fallbackSpecs(app), emptyList(), emptyList())
+            TvShelf(
+                context.getString(ExtR.string.app_info_basic),
+                0,
+                fallbackSpecs(context, app),
+                emptyList(),
+                emptyList()
+            )
         )
     }
     return groupIntoSections(appDetails.infoLines, app).map { sec -> sec.toShelf(context, app) }
@@ -145,7 +198,7 @@ private fun InfoSection.toShelf(context: Context, app: PackageMeta): TvShelf {
         val ui = mapInfoLine(context, line, app.packageName) ?: continue
         partition(ui, specs, cards, groups)
     }
-    return TvShelf(title.ifBlank { "Details" }, iconRes, specs, cards, groups)
+    return TvShelf(title.ifBlank { context.getString(ExtR.string.app_info_basic) }, iconRes, specs, cards, groups)
 }
 
 /** Plain values (copy-only) → spec sheet; anything with a status or a real action → card. */
@@ -176,12 +229,14 @@ private fun specValue(ui: InfoLineUi): String = buildString {
     }
 }.ifBlank { "—" }
 
-private fun fallbackSpecs(app: PackageMeta): List<Pair<String, String>> = listOf(
-    "Package" to app.packageName,
-    "Version" to "${app.versionName ?: "?"} (${app.versionCode})",
-    "Size" to prettyFileSize(app.fileSize),
-    "Splits" to if (app.hasSplits) "Yes" else "No",
-    "Pinning" to if (app.hasPinning) "Yes" else "No",
+private fun yesNo(context: Context, value: Boolean) =
+    context.getString(if (value) R.string.value_yes else R.string.value_no)
+
+private fun fallbackSpecs(context: Context, app: PackageMeta): List<Pair<String, String>> = listOf(
+    context.getString(ExtR.string.app_info_package_name) to app.packageName,
+    context.getString(R.string.stat_version) to "${app.versionName ?: "?"} (${app.versionCode})",
+    context.getString(R.string.stat_size) to prettyFileSize(app.fileSize),
+    context.getString(R.string.stat_splits) to yesNo(context, app.hasSplits),
 )
 
 private fun buildStats(context: Context, app: PackageMeta, shelves: List<TvShelf>): List<TvStat> {
@@ -190,14 +245,20 @@ private fun buildStats(context: Context, app: PackageMeta, shelves: List<TvShelf
         val label = runCatching { context.getString(resId) }.getOrNull() ?: return null
         return allSpecs.firstOrNull { it.first == label }?.second
     }
+    fun s(id: Int) = context.getString(id)
     return buildList {
-        add(TvStat("Version", app.versionName ?: app.versionCode.toString()))
-        add(TvStat("Build", app.versionCode.toString()))
-        if (app.fileSize > 0) add(TvStat("Size", prettyFileSize(app.fileSize)))
-        spec(ExtR.string.app_info_target_sdk)?.let { add(TvStat("Target SDK", it)) }
-        spec(ExtR.string.app_info_min_sdk)?.let { add(TvStat("Min SDK", it)) }
-        add(TvStat("Type", if (app.isSystemApp) "System" else "User"))
-        add(TvStat("Splits", if (app.hasSplits) "Yes" else "No"))
+        add(TvStat(s(R.string.stat_version), app.versionName ?: app.versionCode.toString()))
+        add(TvStat(s(R.string.stat_build), app.versionCode.toString()))
+        if (app.fileSize > 0) add(TvStat(s(R.string.stat_size), prettyFileSize(app.fileSize)))
+        spec(ExtR.string.app_info_target_sdk)?.let { add(TvStat(s(R.string.stat_target_sdk), it)) }
+        spec(ExtR.string.app_info_min_sdk)?.let { add(TvStat(s(R.string.stat_min_sdk), it)) }
+        add(
+            TvStat(
+                s(R.string.stat_type),
+                s(if (app.isSystemApp) R.string.type_system else R.string.type_user)
+            )
+        )
+        add(TvStat(s(R.string.stat_splits), yesNo(context, app.hasSplits)))
     }
 }
 
@@ -205,11 +266,15 @@ private fun buildStats(context: Context, app: PackageMeta, shelves: List<TvShelf
 
 // region hero
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun TvStatHero(stats: List<TvStat>) {
+private fun TvStatHero(
+    stats: List<TvStat>,
+    insights: AppInsights?,
+    onExport: () -> Unit,
+) {
     val colors = MaterialTheme.colorScheme
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
@@ -219,6 +284,175 @@ private fun TvStatHero(stats: List<TvStat>) {
                 )
             )
             .padding(horizontal = 24.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        TvStatStrip(stats)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            FlowRow(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                insights?.let { TvInsightBadges(it) }
+            }
+            Button(onClick = onExport) {
+                Icon(Icons.Default.IosShare, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.report_export))
+            }
+        }
+        insights?.let { TvStorageAndPerms(it) }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FlowRowScope.TvInsightBadges(insights: AppInsights) {
+    val colors = MaterialTheme.colorScheme
+    TvBadge(
+        icon = Icons.Default.Tv,
+        text = stringResource(if (insights.tvLauncher) R.string.insight_tv_ready else R.string.insight_not_tv),
+        color = if (insights.tvLauncher) colors.tertiary else colors.onSurfaceVariant
+    )
+    TvBadge(
+        icon = Icons.Default.TouchApp,
+        text = stringResource(
+            if (insights.touchscreenRequired) R.string.insight_touch_required else R.string.insight_touch_optional
+        ),
+        color = if (insights.touchscreenRequired) colors.error else colors.tertiary
+    )
+    if (insights.abis.isEmpty()) {
+        TvBadge(Icons.Default.Memory, stringResource(R.string.insight_abi_none), colors.onSurfaceVariant)
+    } else {
+        insights.abis.forEach { TvBadge(Icons.Default.Memory, it, colors.primary) }
+    }
+    TvBadge(
+        icon = Icons.Default.Store,
+        text = stringResource(insights.installSource.labelRes),
+        color = colors.secondary
+    )
+    if (insights.debuggable) {
+        TvBadge(Icons.Default.BugReport, stringResource(R.string.insight_debuggable), colors.error)
+    }
+    if (insights.splitNames.isNotEmpty()) {
+        TvBadge(
+            Icons.Default.CallSplit,
+            "${stringResource(R.string.stat_splits)}: ${insights.splitNames.size}",
+            colors.secondary
+        )
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun TvBadge(icon: ImageVector, text: String, color: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(color.copy(alpha = 0.16f))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(text, style = MaterialTheme.typography.labelMedium, color = color, maxLines = 1)
+    }
+}
+
+/** Permissions summary + APK / data / cache proportional bar. */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun TvStorageAndPerms(insights: AppInsights) {
+    val colors = MaterialTheme.colorScheme
+    Row(horizontalArrangement = Arrangement.spacedBy(24.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.insight_permissions).uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(
+                    R.string.insight_perms_value,
+                    insights.permsRequested,
+                    insights.permsGranted,
+                    insights.permsDangerous
+                ),
+                style = MaterialTheme.typography.titleSmall,
+                color = colors.onSurface
+            )
+        }
+        Column(modifier = Modifier.weight(1.4f)) {
+            Text(
+                text = stringResource(R.string.insight_storage).uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant
+            )
+            Spacer(Modifier.height(6.dp))
+            val apk = insights.apkBytes
+            if (apk == null) {
+                Text(
+                    text = stringResource(R.string.insight_storage_denied),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant
+                )
+            } else {
+                val parts = listOf(
+                    Triple(stringResource(R.string.storage_apk), apk, colors.primary),
+                    Triple(stringResource(R.string.storage_data), insights.dataBytes ?: 0L, colors.tertiary),
+                    Triple(stringResource(R.string.storage_cache), insights.cacheBytes ?: 0L, colors.secondary),
+                )
+                val total = parts.sumOf { it.second }.coerceAtLeast(1L)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(colors.surfaceVariant)
+                ) {
+                    parts.filter { it.second > 0 }.forEach { (_, bytes, color) ->
+                        Box(
+                            modifier = Modifier
+                                .weight(bytes.toFloat() / total)
+                                .fillMaxHeight()
+                                .background(color)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    parts.forEach { (label, bytes, color) ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                Modifier
+                                    .size(10.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(color)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "$label ${prettyFileSize(bytes)}",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = colors.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun TvStatStrip(stats: List<TvStat>) {
+    val colors = MaterialTheme.colorScheme
+    Row(
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         stats.forEach { stat ->
@@ -500,14 +734,14 @@ private fun TvComponentCard(
 @Composable
 private fun TvStatusPill(status: InfoLineStatus) {
     val scheme = MaterialTheme.colorScheme
-    val (label, color) = when (status) {
-        InfoLineStatus.Granted -> "granted" to scheme.tertiary
-        InfoLineStatus.Denied -> "denied" to scheme.error
-        InfoLineStatus.Exported -> "exported" to scheme.primary
-        InfoLineStatus.NotExported -> "internal" to scheme.onSurfaceVariant
+    val (labelRes, color) = when (status) {
+        InfoLineStatus.Granted -> R.string.status_granted to scheme.tertiary
+        InfoLineStatus.Denied -> R.string.status_denied to scheme.error
+        InfoLineStatus.Exported -> R.string.status_exported to scheme.primary
+        InfoLineStatus.NotExported -> R.string.status_internal to scheme.onSurfaceVariant
     }
     Text(
-        text = label,
+        text = stringResource(labelRes),
         style = MaterialTheme.typography.labelSmall,
         color = color,
         modifier = Modifier

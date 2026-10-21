@@ -39,7 +39,14 @@ import coil3.compose.AsyncImage
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
 import com.walhalla.appextractor.utils.prettyFileSize
+import androidx.compose.runtime.rememberCoroutineScope
+import com.walhalla.compose.R
 import com.walhalla.compose.detail.AppDetailTabs
+import com.walhalla.compose.detail.runReportAction
+import com.walhalla.compose.transfer.appSharedFiles
+import com.walhalla.compose.transfer.rememberQrTransfer
+import com.walhalla.compose.ui.tv.components.TvQrTransferDialog
+import kotlinx.coroutines.launch
 import com.walhalla.compose.storage.rememberExtractWithStoragePermission
 import com.walhalla.compose.ui.tv.components.TvFocusTabRow
 import com.walhalla.compose.ui.tv.components.rememberClearFocusThen
@@ -68,6 +75,10 @@ fun AppDetailScreen(
     val appDetails by detailViewModel.appDetails.collectAsState()
     val isLoading by detailViewModel.isLoading.collectAsState()
     val needsUsageAccess by detailViewModel.needsUsageAccess.collectAsState()
+    val insights by detailViewModel.insights.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val qrTransfer = rememberQrTransfer()
     val firstAction = remember { FocusRequester() }
     val tabRowFallback = remember { FocusRequester() }
     var selectedTab by remember { mutableIntStateOf(AppDetailTabs.INFO) }
@@ -107,6 +118,7 @@ fun AppDetailScreen(
     val actions = listOf(
         TvAction(ExtR.string.action_extract) { extractWithStorage(app) },
         TvAction(ExtR.string.action_share_app) { extractorViewModel.shareApk(app) },
+        TvAction(R.string.action_send_qr) { qrTransfer.start(app.label, appSharedFiles(context, app)) },
         TvAction(ExtR.string.open_on_google_play) { extractorViewModel.openPlayStore(app) },
         TvAction(ExtR.string.action_launch_app) { extractorViewModel.launchApp(app) },
         TvAction(ExtR.string.action_uninstall_app) { extractorViewModel.uninstallApp(app) },
@@ -120,6 +132,8 @@ fun AppDetailScreen(
     LaunchedEffect(Unit) {
         runCatching { firstAction.requestFocus() }
     }
+
+    TvQrTransferDialog(qrTransfer)
 
     Column(
         modifier = Modifier
@@ -204,9 +218,21 @@ fun AppDetailScreen(
             AppDetailTabs.INFO -> TvInformationTab(
                 app = app,
                 appDetails = appDetails,
+                insights = insights,
                 onLaunchService = { detailViewModel.launchExportedService(it) },
                 onOpenAppSettings = { detailViewModel.openInSettings(app) },
                 onViewXml = { openManifest(app, it) },
+                onReportAction = { action ->
+                    scope.launch {
+                        runReportAction(
+                            context,
+                            action,
+                            app,
+                            appDetails?.infoLines.orEmpty(),
+                            insights
+                        )
+                    }
+                },
                 modifier = Modifier.weight(1f)
             )
             AppDetailTabs.META -> TvMetaTab(app, Modifier.weight(1f))

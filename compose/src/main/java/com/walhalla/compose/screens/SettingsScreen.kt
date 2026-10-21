@@ -10,6 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.walhalla.compose.R
 import com.walhalla.compose.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +99,7 @@ fun SettingsScreen(
                         tokenText = it
                         viewModel.updateTelegramToken(it)
                     },
-                    label = { Text("Telegram Bot Token") },
+                    label = { Text(stringResource(R.string.telegram_token)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
@@ -109,7 +111,7 @@ fun SettingsScreen(
                         chatIdText = it
                         viewModel.updateTelegramChatId(it)
                     },
-                    label = { Text("Telegram Chat ID") },
+                    label = { Text(stringResource(R.string.telegram_chat_id)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)

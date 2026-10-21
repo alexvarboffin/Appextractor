@@ -72,12 +72,18 @@ import com.walhalla.appextractor.sdk.V2Line
 import com.walhalla.appextractor.utils.ApplicationFlags
 import com.walhalla.appextractor.utils.LauncherUtils
 import com.walhalla.appextractor.utils.prettyFileSize
+import androidx.compose.material.icons.filled.Insights
+import com.walhalla.compose.R
+import com.walhalla.compose.detail.AppInsights
+import com.walhalla.compose.detail.ReportAction
+import com.walhalla.compose.detail.insightFacts
 import com.walhalla.compose.detail.InfoSection
 import com.walhalla.compose.detail.groupIntoSections
 import com.walhalla.compose.detail.resolvePermissionDescription
 import com.walhalla.compose.viewmodel.AppDetails
 import com.walhalla.extractor.R as ExtR
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun InformationScreen(
     paddingValues: PaddingValues,
@@ -85,12 +91,16 @@ fun InformationScreen(
     appDetails: AppDetails?,
     onLaunchService: (className: String) -> Unit = {},
     onOpenAppSettings: () -> Unit = {},
-    onViewXml: (xmlPath: String) -> Unit = {}
+    onViewXml: (xmlPath: String) -> Unit = {},
+    insights: AppInsights? = null,
+    onReportAction: (ReportAction) -> Unit = {}
 ) {
+    val context = LocalContext.current
     val sections = remember(appDetails?.infoLines, app.packageName) {
         val lines = appDetails?.infoLines.orEmpty()
         groupIntoSections(lines, app)
     }
+    val facts = remember(insights) { insights?.let { insightFacts(context, it) }.orEmpty() }
 
     LazyColumn(
         modifier = Modifier
@@ -98,6 +108,26 @@ fun InformationScreen(
             .padding(paddingValues),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
+        item(key = "overview") {
+            ExpandableCard(
+                title = stringResource(R.string.insight_overview),
+                icon = Icons.Default.Insights,
+                initiallyExpanded = true
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    facts.forEach { (label, value) -> DetailRow(label, value, copyable = true) }
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReportAction.entries.forEach { action ->
+                            AssistChip(
+                                onClick = { onReportAction(action) },
+                                label = { Text(stringResource(action.labelRes)) },
+                                leadingIcon = { Icon(action.icon, contentDescription = null) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
         if (appDetails == null) {
             item {
                 ExpandableCard(

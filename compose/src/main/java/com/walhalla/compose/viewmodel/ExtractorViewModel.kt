@@ -31,6 +31,10 @@ import com.walhalla.appextractor.utils.ShareUtils
 import com.walhalla.appextractor.utils.XmlUtils
 import com.walhalla.ui.DLog
 import com.walhalla.compose.R
+import com.walhalla.compose.detail.AppFilter
+import com.walhalla.compose.detail.AppTraits
+import com.walhalla.compose.detail.loadAppTraits
+import com.walhalla.compose.detail.matches
 import com.walhalla.compose.log.AppLogBus
 import com.walhalla.ui.plugins.Launcher
 import com.walhalla.ui.plugins.Module_U
@@ -55,6 +59,13 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _filter = MutableStateFlow(AppFilter.ALL)
+    val filter: StateFlow<AppFilter> = _filter.asStateFlow()
+
+    /** packageName → traits; filled in background after the list is shown. */
+    private val _traits = MutableStateFlow<Map<String, AppTraits>>(emptyMap())
+    val traits: StateFlow<Map<String, AppTraits>> = _traits.asStateFlow()
 
     private val _extractionProgress = MutableStateFlow<Pair<String, Int>?>(null)
     val extractionProgress: StateFlow<Pair<String, Int>?> = _extractionProgress.asStateFlow()
@@ -181,6 +192,23 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         applySearchFilter()
     }
 
+    fun setFilter(filter: AppFilter) {
+        _filter.value = filter
+        applySearchFilter()
+    }
+
+    private fun loadTraits(apps: List<PackageMeta>) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val pm = getApplication<Application>().packageManager
+            val map = apps.mapNotNull { app ->
+                runCatching { pm.getApplicationInfo(app.packageName, 0) }.getOrNull()
+                    ?.let { app.packageName to loadAppTraits(pm, it) }
+            }.toMap()
+            _traits.value = map
+            launch(Dispatchers.Main) { applySearchFilter() }
+        }
+    }
+
     private fun loadInstalledApps() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -228,6 +256,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                 }
                 _allApps.value = appsList
                 applySearchFilter()
+                loadTraits(appsList)
             } catch (e: Exception) {
                 // Handle error
             } finally {
@@ -239,13 +268,14 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     /** Always filter from full [_allApps], never from already-filtered [_apps]. */
     private fun applySearchFilter() {
         val query = _searchQuery.value.trim()
-        _apps.value = if (query.isEmpty()) {
-            _allApps.value
-        } else {
-            _allApps.value.filter { app ->
-                app.label.contains(query, ignoreCase = true) ||
-                        app.packageName.contains(query, ignoreCase = true)
-            }
+        val filter = _filter.value
+        val traits = _traits.value
+        _apps.value = _allApps.value.filter { app ->
+            app.matches(filter, traits[app.packageName]) && (
+                query.isEmpty() ||
+                    app.label.contains(query, ignoreCase = true) ||
+                    app.packageName.contains(query, ignoreCase = true)
+                )
         }
     }
 
@@ -402,7 +432,6 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     fun clearSelection() {
         _selectedApps.value = emptySet()
     }
-
 
     fun selectExtractedApps() {
         viewModelScope.launch {

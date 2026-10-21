@@ -85,6 +85,8 @@ dependencies {
     // TV toasts (top-center) instead of android.widget.Toast
     // Prefer API-compatible release; force kotlin-stdlib to project Kotlin (sonner 0.4 pulls 2.4.x)
     implementation("io.github.dokar3:sonner:0.3.8")
+    // QR encoder for LAN APK transfer (phone + TV)
+    implementation("com.google.zxing:core:3.5.3")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.espresso.core)

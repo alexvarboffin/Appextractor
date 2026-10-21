@@ -40,7 +40,14 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.ResourcesToolForPlugin
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.ui.res.stringResource
+import com.walhalla.compose.R
+import com.walhalla.compose.components.QrTransferDialog
 import com.walhalla.compose.detail.AppDetailTabs
+import com.walhalla.compose.detail.runReportAction
+import com.walhalla.compose.transfer.appSharedFiles
+import com.walhalla.compose.transfer.rememberQrTransfer
 import com.walhalla.compose.viewmodel.AppDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -55,8 +62,12 @@ fun AppDetailScreen(
     val appDetails by viewModel.appDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val needsUsageAccess by viewModel.needsUsageAccess.collectAsState()
+    val insights by viewModel.insights.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val qrTransfer = rememberQrTransfer()
+    QrTransferDialog(qrTransfer)
 
     LaunchedEffect(app.packageName) {
         viewModel.loadAppDetails(app)
@@ -104,6 +115,9 @@ fun AppDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { qrTransfer.start(app.label, appSharedFiles(context, app)) }) {
+                        Icon(Icons.Default.QrCode2, contentDescription = stringResource(R.string.action_send_qr))
+                    }
                     IconButton(onClick = { onViewManifest(app, null) }) {
                         Icon(Icons.Default.Description, contentDescription = "Manifest")
                     }
@@ -153,7 +167,19 @@ fun AppDetailScreen(
                         appDetails,
                         onLaunchService = { viewModel.launchExportedService(it) },
                         onOpenAppSettings = { viewModel.openInSettings(app) },
-                        onViewXml = { onViewManifest(app, it) }
+                        onViewXml = { onViewManifest(app, it) },
+                        insights = insights,
+                        onReportAction = { action ->
+                            scope.launch {
+                                runReportAction(
+                                    context,
+                                    action,
+                                    app,
+                                    appDetails?.infoLines.orEmpty(),
+                                    insights
+                                )
+                            }
+                        }
                     )
                     AppDetailTabs.META -> MetaScreen(app)
                     AppDetailTabs.STRING -> StringScreen(

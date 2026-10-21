@@ -19,7 +19,14 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.ui.res.stringResource
+import androidx.tv.material3.Icon
+import com.walhalla.compose.R
 import com.walhalla.compose.tv.LocalTvDrawerFocusRequester
+import com.walhalla.compose.ui.tv.components.TvEditableField
 import com.walhalla.compose.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -38,7 +45,11 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Settings", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            "Settings",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         Text(
             "Version ${settings.appVersion}",
             style = MaterialTheme.typography.bodyMedium,
@@ -64,14 +75,35 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             modifier = leftToDrawer
         )
         if (settings.telegramEnabled) {
-            Text(
-                text = "Token / chat id: edit on phone Settings (TV text fields next)",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 8.dp)
+            FieldLabel(stringResource(R.string.telegram_token))
+            TvEditableField(
+                value = settings.telegramToken,
+                onValueChange = viewModel::updateTelegramToken,
+                hint = stringResource(R.string.telegram_token),
+                leftFocus = drawerFocus,
+                leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) }
+            )
+            FieldLabel(stringResource(R.string.telegram_chat_id))
+            TvEditableField(
+                value = settings.telegramChatId,
+                onValueChange = viewModel::updateTelegramChatId,
+                hint = stringResource(R.string.telegram_chat_id),
+                leftFocus = drawerFocus,
+                leadingIcon = { Icon(Icons.Default.Chat, contentDescription = null) }
             )
         }
     }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun FieldLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+    )
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)

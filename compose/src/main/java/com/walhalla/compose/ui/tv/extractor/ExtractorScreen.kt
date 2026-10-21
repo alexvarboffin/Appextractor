@@ -14,9 +14,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.tv.material3.Button
+import com.walhalla.compose.detail.AppFilter
+import com.walhalla.compose.detail.highlightMatches
+import com.walhalla.compose.detail.totals
+import com.walhalla.compose.storage.rememberStorageGate
+import com.walhalla.compose.transfer.appSharedFiles
+import com.walhalla.compose.transfer.rememberQrTransfer
+import com.walhalla.compose.ui.tv.components.TvFilterDialog
+import com.walhalla.compose.ui.tv.components.TvQrTransferDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -82,6 +97,13 @@ fun ExtractorScreen(
     val apps by vm.apps.collectAsState()
     val searchQuery by vm.searchQuery.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
+    val filter by vm.filter.collectAsState()
+    val traits by vm.traits.collectAsState()
+    val selectedApps by vm.selectedApps.collectAsState()
+    val context = LocalContext.current
+    val qrTransfer = rememberQrTransfer()
+    val storageGate = rememberStorageGate()
+    var showFilterDialog by remember { mutableStateOf(false) }
     val nav = LocalTvNavController.current
     val drawerFocus = LocalTvDrawerFocusRequester.current
     val listRestorer = rememberTvLazyFocusRestorer()
@@ -142,6 +164,7 @@ fun ExtractorScreen(
             AppMenuActionId.Manifest -> openManifest(app)
             AppMenuActionId.SaveIcon -> vm.saveIcon(app)
             AppMenuActionId.ExportIcon -> vm.shareIcon(app)
+            AppMenuActionId.SendQr -> qrTransfer.start(app.label, appSharedFiles(context, app))
         }
     }
 
@@ -149,7 +172,9 @@ fun ExtractorScreen(
         TvAppActionsDialog(
             appLabel = app.label,
             onAction = { onMenuAction(app, it) },
-            onDismiss = { menuApp = null }
+            onDismiss = { menuApp = null },
+            isSelected = app in selectedApps,
+            onToggleSelected = { vm.toggleAppSelection(app) }
         )
     }
 
@@ -160,6 +185,30 @@ fun ExtractorScreen(
             onDismiss = { showSortDialog = false }
         )
     }
+
+    if (showFilterDialog) {
+        TvFilterDialog(
+            current = filter,
+            onSelect = vm::setFilter,
+            onDismiss = { showFilterDialog = false }
+        )
+    }
+
+    TvQrTransferDialog(qrTransfer)
+
+    val downToList = Modifier.onPreviewKeyEvent { event ->
+        if (event.type == KeyEventType.KeyDown &&
+            event.key == Key.DirectionDown &&
+            sortedApps.isNotEmpty()
+        ) {
+            enterList()
+            true
+        } else {
+            false
+        }
+    }
+    val totals = remember(apps) { apps.totals() }
+    val selectionMode = selectedApps.isNotEmpty()
 
     Column(
         modifier = Modifier
@@ -191,41 +240,51 @@ fun ExtractorScreen(
                     .focusRequester(searchFocus)
                     .then(leftToDrawer)
             )
-            Surface(
+            HeaderIconButton(
+                icon = Icons.Default.Sort,
+                contentDescription = stringResource(R.string.sort),
                 onClick = { showSortDialog = true },
-                scale = ClickableSurfaceDefaults.scale(focusedScale = 1.08f),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer
-                ),
                 modifier = Modifier
-                    .size(56.dp)
                     .focusRequester(sortFocus)
                     .focusProperties { left = searchFocus }
-                    .onPreviewKeyEvent { event ->
-                        if (event.type == KeyEventType.KeyDown &&
-                            event.key == Key.DirectionDown &&
-                            sortedApps.isNotEmpty()
-                        ) {
-                            enterList()
-                            true
-                        } else {
-                            false
-                        }
-                    }
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    .then(downToList)
+            )
+            HeaderIconButton(
+                icon = filter.icon,
+                contentDescription = stringResource(R.string.filter),
+                highlighted = filter != AppFilter.ALL,
+                onClick = { showFilterDialog = true },
+                modifier = downToList
+            )
+            if (selectionMode) {
+                Button(
+                    onClick = { storageGate { vm.extractSelectedApps() } },
+                    modifier = downToList
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Sort,
-                        contentDescription = stringResource(R.string.sort),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+                    Icon(Icons.Default.SaveAlt, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("${stringResource(ExtR.string.action_extract_btn)} (${selectedApps.size})")
+                }
+                Button(onClick = vm::clearSelection, modifier = downToList) {
+                    Text(stringResource(ExtR.string.action_deselect))
                 }
             }
         }
+
+        Text(
+            text = buildString {
+                append(stringResource(filter.labelRes))
+                append(" · ")
+                append(stringResource(R.string.apps_totals, totals.count, prettyFileSize(totals.bytes)))
+                if (selectionMode) {
+                    append(" · ")
+                    append(stringResource(R.string.selected_count, selectedApps.size))
+                }
+            },
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 4.dp, bottom = 10.dp)
+        )
 
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -266,8 +325,13 @@ fun ExtractorScreen(
                             itemsIndexed(sortedApps, key = { _, app -> app.packageName }) { index, app ->
                                 AppRow(
                                     app = app,
+                                    query = searchQuery.trim(),
+                                    selected = app in selectedApps,
+                                    tvLauncher = traits[app.packageName]?.tvLauncher == true,
                                     modifier = listRestorer.itemModifier(index, sortedApps.size),
-                                    onClick = { openDetail(app) },
+                                    onClick = {
+                                        if (selectionMode) vm.toggleAppSelection(app) else openDetail(app)
+                                    },
                                     onLongClick = { menuApp = app }
                                 )
                             }
@@ -281,14 +345,53 @@ fun ExtractorScreen(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
+private fun HeaderIconButton(
+    icon: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    highlighted: Boolean = false,
+) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        onClick = onClick,
+        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.08f),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = if (highlighted) colors.primaryContainer else colors.surfaceVariant,
+            focusedContainerColor = colors.secondaryContainer
+        ),
+        modifier = modifier.size(56.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = if (highlighted) colors.onPrimaryContainer else colors.onSurface
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
 private fun AppRow(
     app: PackageMeta,
+    query: String,
+    selected: Boolean,
+    tvLauncher: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // FireTv / Cinema: long-press arms a flag; invoke on KeyUp so dialog is not
     // activated by the same KeyUp that opened it.
+    val colors = MaterialTheme.colorScheme
+    val highlightedLabel = remember(app.label, query, colors.primary) {
+        highlightMatches(app.label, query, colors.primary)
+    }
+    val highlightedPackage = remember(app.packageName, query, colors.primary) {
+        highlightMatches(app.packageName, query, colors.primary)
+    }
     var isKeyDown by remember { mutableStateOf(false) }
     var longPressTriggered by remember { mutableStateOf(false) }
     val longPressThresholdMs = 500L
@@ -338,8 +441,8 @@ private fun AppRow(
             },
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (selected) colors.primaryContainer else colors.surface,
+            focusedContainerColor = if (selected) colors.secondaryContainer else colors.surfaceVariant
         )
     ) {
         Row(
@@ -365,14 +468,14 @@ private fun AppRow(
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = app.label,
+                    text = highlightedLabel,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = app.packageName,
+                    text = highlightedPackage,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -384,6 +487,22 @@ private fun AppRow(
                     text = ver + size,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (tvLauncher) {
+                Icon(
+                    imageVector = Icons.Default.Tv,
+                    contentDescription = stringResource(R.string.insight_tv_ready),
+                    tint = colors.tertiary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+            if (selected) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = colors.primary,
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }

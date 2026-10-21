@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.QrCode2
+import com.walhalla.compose.R
 import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Shop
@@ -28,7 +30,8 @@ enum class AppMenuActionId {
     AppInfo,
     Manifest,
     SaveIcon,
-    ExportIcon
+    ExportIcon,
+    SendQr
 }
 
 data class AppMenuAction(
@@ -40,6 +43,7 @@ data class AppMenuAction(
 fun appMenuActions(): List<AppMenuAction> = listOf(
     AppMenuAction(AppMenuActionId.Extract, ExtR.string.action_extract, Icons.Default.SaveAlt),
     AppMenuAction(AppMenuActionId.ShareApk, ExtR.string.action_share_app, Icons.Default.Share),
+    AppMenuAction(AppMenuActionId.SendQr, R.string.action_send_qr, Icons.Default.QrCode2),
     AppMenuAction(AppMenuActionId.PlayStore, ExtR.string.open_on_google_play, Icons.Default.Shop),
     AppMenuAction(AppMenuActionId.Launch, ExtR.string.action_launch_app, Icons.Default.PlayArrow),
     AppMenuAction(AppMenuActionId.Uninstall, ExtR.string.action_uninstall_app, Icons.Default.Delete),

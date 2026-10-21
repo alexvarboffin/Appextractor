@@ -84,11 +84,18 @@ Key files:
 - [x] Main overflow: share app, discover more, rate, about, privacy, contact, accessibility, **Google Play categories**.
 - [x] About via Compose `AboutDialog` (neptune `DialogAbout` not assumed available to `:compose`).
 - [x] **Adaptive list (skill Step 4):** `LazyVerticalGrid` + `GridCells.Adaptive(360.dp)` (multi-column on landscape/tablet).
+- [x] **Quick filters + totals (phone+TV, 2026-10-21):** `detail/AppFilters.kt` — `AppFilter` ALL / USER / SYSTEM / TV / SPLIT / SIDELOADED, `matches()`, `totals()`. Phone = `FilterChip` row; TV = filter button → `TvFilterDialog`. Line `filter · N apps · size`. TV/sideload traits (`AppTraits`) load in background (`ExtractorViewModel.loadTraits`); until they arrive those two filters stay empty.
+- [x] **Search highlight** is shared `detail/TextHighlight.kt` `highlightMatches` (phone `AppListItem` + TV `AppRow`).
+- [x] **Send to phone (QR):** `AppMenuActionId.SendQr` in the shared action catalog (`detail/AppMenuActions.kt`). Phone menu + TV long-press + detail action bar. Server/QR live in `compose/.../transfer/` (see §18).
+- [x] **Storage gate runs once:** `storage/ExtractStoragePermission.kt` `rememberStorageGate` — prompt only on API < 29, action exactly once. Phone extract (one + selected) and TV extract both go through it.
+- [x] **TV multi-select:** long-press → Select/Unselect; while a selection exists, OK toggles the row and the header shows Extract (N) + Deselect → `extractSelectedApps()`.
 
 Key files:
-- `compose/.../screens/ExtractorScreen.kt`
+- `compose/.../screens/ExtractorScreen.kt`, `ui/tv/extractor/ExtractorScreen.kt`
 - `compose/.../viewmodel/ExtractorViewModel.kt`
 - `compose/.../components/AppListItem.kt`
+- `compose/.../detail/AppFilters.kt`, `TextHighlight.kt`, `AppMenuActions.kt`
+- `compose/.../storage/ExtractStoragePermission.kt`
 
 ---
 
@@ -126,11 +133,15 @@ Key file: `extractor/.../utils/IconSaver.kt`
 - [x] Scan extracted APKs on disk under def location.
 - [x] Session messages via `AppLogBus` merged into Log UI.
 - [x] Open / share / delete style actions (parity + enhancements).
+- [x] **Share one implementation (2026-10-21):** `log/LogFileActions.kt` `shareApkFile` — phone `LogItem` and TV log menu both call it.
+- [x] **Send file by QR** from the file row (phone menu + TV `TvChoiceDialog`).
+- [x] **TV Logs:** file row OK → open folder / share / QR / delete; message row OK → copy to clipboard; header Refresh + Clear messages.
 
 Key files:
-- `compose/.../screens/LogScreen.kt`
+- `compose/.../screens/LogScreen.kt`, `ui/tv/logs/LogScreen.kt`
 - `compose/.../viewmodel/LogViewModel.kt`
-- `compose/.../log/AppLogBus.kt`
+- `compose/.../log/AppLogBus.kt`, `log/LogFileActions.kt`
+- `compose/.../components/LogItem.kt`
 
 ---
 
@@ -153,13 +164,17 @@ Key files:
 - [x] `InfoApkLine` overflow → view path as XML (nav to Manifest).
 - [x] Usage-stats missing → snackbar → `ACTION_USAGE_ACCESS_SETTINGS`.
 - [x] Toolbar: system settings + **Manifest** shortcut.
+- [x] **Overview facts (phone+TV, 2026-10-21):** `detail/AppInsights.kt` `loadAppInsights` (off main) → `AppDetailViewModel.insights`. TV launcher, touchscreen required, native ABIs (zip `lib/*`), install source, debuggable, permissions requested/granted/dangerous, split names, signer SHA-256, storage APK/data/cache (usage access). Display rows = shared `insightFacts()` — phone Overview card and TV hero/Overview sheet must not format these differently.
+- [x] **Report export:** `detail/InfoReport.kt` `ReportAction` COPY / SHARE / SAVE_JSON → `Downloads/<package>_<versionCode>_info.json` (MediaStore). Phone = chips on the Overview card; TV = hero "Export report" → `TvChoiceDialog`.
+- [x] **TV INFO is a catalog, not a row per field** (`ui/tv/detail/TvInformationTab.kt`): hero stat strip + badges + storage bar; one focusable spec sheet per section (OK copies the section); `LazyRow` cards only for lines with a status or a launch/settings/XML action. Data stays `groupIntoSections` + `mapInfoLine`.
 
 Key files:
 - `extractor/.../sdk/F0Presenter.kt` (`buildInfoList`)
 - `extractor/.../utils/ApplicationFlags.kt`
 - `extractor/.../utils/LauncherUtils.kt`
-- `compose/.../screens/InformationScreen.kt`
+- `compose/.../screens/InformationScreen.kt`, `ui/tv/detail/TvInformationTab.kt`
 - `compose/.../viewmodel/AppDetailViewModel.kt`
+- `compose/.../detail/AppInsights.kt`, `InfoReport.kt`
 
 ---
 
@@ -199,9 +214,10 @@ Key files:
 
 - [x] Toggles: Google Drive / Dropbox / Telegram (+ token, chat id) via `LocalStorage`.
 - [x] About row opens Compose `AboutDialog` (version).
+- [x] **TV Settings (2026-10-21):** same three toggles; Telegram token + chat id edited with `TvEditableField` (not a "edit on phone" placeholder).
 
 Key files:
-- `compose/.../screens/SettingsScreen.kt`
+- `compose/.../screens/SettingsScreen.kt`, `ui/tv/settings/SettingsScreen.kt`
 - `compose/.../viewmodel/SettingsViewModel.kt`
 - `extractor/.../storage/LocalStorage.kt`
 
@@ -282,7 +298,17 @@ Record of corrections that changed implementation:
 34. [x] TV list focus = FireTv Case B adapted: pin-only `focusRestorer()`; enter via `rememberEnterListFocus` (scroll→child); never `focusProperties { down = group }` (uninit crash on our BOM) (2026-10-20).
 35. [x] TV extract “Need root”: shared `ExtractorHelper` — `get_out_filename` leading `/` made `File(parent,"/…")` absolute (TV MediaStore fail → bad fallback); `relativeOutName` + same storage gate as phone (`rememberExtractWithStoragePermission`) (2026-10-20).
 36. [x] TV search Down→list: clamp `lastFocused` on filter; `prepareEnterIndex` + 2 frames then child focus; clear TextField focus before enter (2026-10-20).
-37. [ ] TV INFO = catalog page, not a row/tile per field (`TvInformationTab.kt`): hero stat strip (version/build/size/SDK/type/splits); per section a header (icon + count) + one focusable spec sheet (3-col grid, OK = copy whole section) for plain/Copy lines; LazyRow cards only for lines with status or launch/settings/XML action. Data stays `groupIntoSections` + `mapInfoLine` (2026-10-20, built+installed, awaiting user check).
+37. [x] TV INFO = catalog page, not a row/tile per field (`TvInformationTab.kt`): hero stat strip + insight badges + storage bar; one focusable spec sheet per section (OK copies the section); LazyRow cards only for status/launch/settings/XML lines. Data stays `groupIntoSections` + `mapInfoLine` (2026-10-21, emulator: hero + badges confirmed).
+38. [x] Phone+TV list filters + totals: shared `detail/AppFilters.kt` (`AppFilter` ALL/USER/SYSTEM/TV/SPLIT/SIDELOADED, `totals()`); traits (`AppTraits`: leanback launcher, install source) loaded in background by `ExtractorViewModel.loadTraits`; phone = `FilterChip` row, TV = filter button → `TvFilterDialog`; "filter · N apps · size" line (2026-10-21, emulator-verified TV).
+39. [x] TV multi-select extract: long-press menu "Select/Unselect" (`TvAppActionsDialog(isSelected)`); in selection mode OK toggles; header "Extract (N)" + Deselect → `vm.extractSelectedApps()` through `rememberStorageGate` (2026-10-21).
+40. [x] Search highlight shared: `detail/TextHighlight.kt` `highlightMatches` (phone `AppListItem` + TV `AppRow`) (2026-10-21).
+41. [x] Storage gate fix: `rememberStorageGate` runs the action exactly once (old `rememberExtractWithStoragePermission` extracted twice: immediately + in permission callback); prompt only on API < 29; phone `ExtractorScreen` uses the same gate (2026-10-21).
+42. [x] INFO overview (`detail/AppInsights.kt` → `AppDetailViewModel.insights`): TV launcher, touchscreen required, native ABIs (zip `lib/*`), install source, debuggable, perms requested/granted/dangerous, splits, signer SHA-256, storage APK/data/cache. Rows = shared `insightFacts()`; TV hero badges + storage bar + "Overview" spec sheet; phone "Overview" card (2026-10-21, emulator-verified TV).
+43. [x] INFO report export: `detail/InfoReport.kt` `ReportAction` COPY / SHARE / SAVE_JSON (`Downloads/<pkg>_<code>_info.json` via MediaStore); TV hero button → `TvChoiceDialog`, phone overview chips (2026-10-21, JSON verified on emulator).
+44. [x] LAN QR transfer: `transfer/LanFileServer.kt` (ServerSocket, random token, one file → direct URL, splits → index page) + `transfer/QrTransfer.kt` (`appSharedFiles`, `QrTransferController`, zxing `qrBitmap`); shared `AppMenuActionId.SendQr`; TV `TvQrTransferDialog`, phone `QrTransferDialog`; entries: app actions menu, detail actions, Logs file menu (2026-10-21, download byte-identical via adb forward).
+45. [x] TV Logs parity: file row OK → open folder / share / QR / delete; message row OK → copy; Refresh + Clear messages; `log/LogFileActions.kt` `shareApkFile` shared with phone `LogItem` (2026-10-21).
+46. [x] TV Settings: Telegram token + chat id via `TvEditableField` (2026-10-21).
+47. [x] `ui/tv/components/TvChoiceDialog.kt` = single TV pick-one dialog (sort, filter, app actions, report, log file). Do not add new copy-paste dialogs.
 
 ---
 
@@ -334,6 +360,10 @@ For each section 0–14:
 - [x] **Share APK:** `ExtractorViewModel.shareApk` → `ShareUtils.shareApkFile` (copy to app storage first). Direct `FileProvider` on `/system/...` sourceDir crashes (2026-10-20).
 - [x] **TV App Detail parity (2026-10-20):** same tabs INFO|META|STRING|XML|ASSETS as phone (`AppDetailTabs`); shared `groupIntoSections` / `loadMetaSections` / `mapInfoLine`; TV chrome via `tv.material3` (`TvInformationTab`, `TvMetaTab`, `TvStringTab`, `TvAssetsTab`, `TvFocusTabRow`); Manifest route + action; overflow actions + App settings. No Material3 in `ui.tv`.
 - [x] **TV Sonner toasts:** `io.github.dokar3:sonner` via `TvToasterHost` (`Alignment.TopCenter`, dark+richColors); events from `AppLogBus.toasts`.
+- [x] **TV list filters + totals + multi-select extract** — same `AppFilter` / `extractSelectedApps` as phone (§4). Filter button sits right of Sort.
+- [x] **TV INFO catalog + overview + report** — §8. One `TvChoiceDialog` for sort, filter, app actions, report and log-file actions; do not add another copy.
+- [x] **LAN QR transfer (phone+TV, 2026-10-21):** `transfer/LanFileServer.kt` (plain `ServerSocket`, random token; one file → direct URL, splits → index page) + `transfer/QrTransfer.kt` (`appSharedFiles`, `QrTransferController`, zxing `qrBitmap`). Dep `com.google.zxing:core` (encoder only). Dialogs: `ui/tv/components/TvQrTransferDialog`, `components/QrTransferDialog`. Closes when dismissed. Verified: download byte-identical, bad token → 404.
+- [x] **TV Logs + TV Telegram fields** — §7 / §11.
 
 Key files:
 - `compose/.../launcher/LauncherActivity.kt`
@@ -341,8 +371,9 @@ Key files:
 - `compose/.../tv/MainActivity.kt`, `TvNavHost.kt`, `TvRoutes.kt`
 - `compose/.../ui/tv/shell/MainShellScreen.kt`
 - `compose/.../ui/tv/extractor/ExtractorScreen.kt`
-- `compose/.../ui/tv/components/TvSortDialog.kt`
-- `compose/.../detail/SortOptions.kt`
+- `compose/.../ui/tv/components/TvChoiceDialog.kt`, `TvSortDialog.kt`, `TvQrTransferDialog.kt`
+- `compose/.../detail/SortOptions.kt`, `AppFilters.kt`, `AppInsights.kt`, `InfoReport.kt`
+- `compose/.../transfer/LanFileServer.kt`, `QrTransfer.kt`
 - `compose/.../ui/tv/detail/AppDetailScreen.kt`, `TvInformationTab.kt`, `TvMetaTab.kt`, `TvStringTab.kt`, `TvAssetsTab.kt`, `TvManifestScreen.kt`
 - `compose/.../detail/AppDetailTabs.kt`, `InfoSections.kt`, `MetaSections.kt`, `InfoLineMapping.kt`
 - `compose/.../ui/tv/logs/LogScreen.kt`, `…/settings/SettingsScreen.kt`

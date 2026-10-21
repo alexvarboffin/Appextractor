@@ -11,6 +11,8 @@ import com.walhalla.appextractor.activity.detail.DetailsF0
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.sdk.BaseViewModel
 import com.walhalla.appextractor.sdk.F0Presenter
+import com.walhalla.compose.detail.AppInsights
+import com.walhalla.compose.detail.loadAppInsights
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +30,9 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _insights = MutableStateFlow<AppInsights?>(null)
+    val insights: StateFlow<AppInsights?> = _insights.asStateFlow()
+
     private val _needsUsageAccess = MutableStateFlow(false)
     val needsUsageAccess: StateFlow<Boolean> = _needsUsageAccess.asStateFlow()
 
@@ -39,6 +44,10 @@ class AppDetailViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun loadAppDetails(app: PackageMeta) {
+        _insights.value = null
+        viewModelScope.launch(Dispatchers.IO) {
+            _insights.value = loadAppInsights(getApplication(), app.packageName)
+        }
         viewModelScope.launch(Dispatchers.Default) {
             _isLoading.value = true
             _appDetails.value = null

@@ -16,4 +16,84 @@
     <string name="sort_update_desc">Update Date (New-Old)</string>
     <string name="sort_system_first">System Apps First</string>
     <string name="sort_user_first">User Apps First</string>
+
+    <!-- List filters / totals / selection -->
+    <string name="filter">Filter</string>
+    <string name="filter_all">All apps</string>
+    <string name="filter_user">User apps</string>
+    <string name="filter_system">System apps</string>
+    <string name="filter_tv">TV apps</string>
+    <string name="filter_split">Split APKs</string>
+    <string name="filter_sideloaded">Sideloaded</string>
+    <string name="apps_totals">%1$d apps · %2$s</string>
+    <string name="action_select">Select</string>
+    <string name="action_unselect">Unselect</string>
+    <string name="selected_count">Selected: %1$d</string>
+
+    <!-- Install source -->
+    <string name="src_play">Google Play</string>
+    <string name="src_amazon">Amazon Appstore</string>
+    <string name="src_sideload">Sideloaded</string>
+    <string name="src_system">System image</string>
+    <string name="src_other">Other store</string>
+
+    <!-- INFO overview -->
+    <string name="stat_version">Version</string>
+    <string name="stat_build">Build</string>
+    <string name="stat_size">Size</string>
+    <string name="stat_target_sdk">Target SDK</string>
+    <string name="stat_min_sdk">Min SDK</string>
+    <string name="stat_type">Type</string>
+    <string name="stat_splits">Splits</string>
+    <string name="type_system">System</string>
+    <string name="type_user">User</string>
+    <string name="value_yes">Yes</string>
+    <string name="value_no">No</string>
+    <string name="insight_overview">Overview</string>
+    <string name="insight_tv_ready">Android TV launcher</string>
+    <string name="insight_not_tv">No TV launcher</string>
+    <string name="insight_touch_required">Touchscreen required</string>
+    <string name="insight_touch_optional">Touchscreen optional</string>
+    <string name="insight_abi">Native ABI</string>
+    <string name="insight_abi_none">No native code</string>
+    <string name="insight_installer">Installed from</string>
+    <string name="insight_debuggable">Debuggable</string>
+    <string name="insight_permissions">Permissions</string>
+    <string name="insight_perms_value">%1$d requested · %2$d granted · %3$d dangerous</string>
+    <string name="insight_storage">Storage</string>
+    <string name="insight_storage_denied">Grant usage access to see storage</string>
+    <string name="storage_apk">APK</string>
+    <string name="storage_data">Data</string>
+    <string name="storage_cache">Cache</string>
+    <string name="insight_signer">Signer SHA-256</string>
+    <string name="status_granted">granted</string>
+    <string name="status_denied">denied</string>
+    <string name="status_exported">exported</string>
+    <string name="status_internal">internal</string>
+
+    <!-- INFO report -->
+    <string name="report_export">Export report</string>
+    <string name="report_copy">Copy as text</string>
+    <string name="report_share">Share as text</string>
+    <string name="report_save_json">Save JSON to Downloads</string>
+    <string name="report_saved">Report saved: %1$s</string>
+    <string name="report_failed">Could not save report</string>
+
+    <!-- LAN QR transfer -->
+    <string name="action_send_qr">Send to phone (QR)</string>
+    <string name="qr_title">Scan to download</string>
+    <string name="qr_hint">Phone and this device must be on the same Wi-Fi network. Keep this window open while downloading.</string>
+    <string name="qr_no_network">No Wi-Fi / LAN connection</string>
+    <string name="qr_file_missing">File is not readable</string>
+    <string name="qr_stop">Stop sharing</string>
+
+    <!-- Logs -->
+    <string name="logs_title">Logs</string>
+    <string name="logs_refresh">Refresh</string>
+    <string name="logs_clear">Clear messages</string>
+    <string name="log_copy_message">Copy message</string>
+
+    <!-- Settings -->
+    <string name="telegram_token">Telegram Bot Token</string>
+    <string name="telegram_chat_id">Telegram Chat ID</string>
 </resources>

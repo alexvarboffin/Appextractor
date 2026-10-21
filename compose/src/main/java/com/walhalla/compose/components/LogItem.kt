@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.walhalla.appextractor.utils.Util
 import com.walhalla.appextractor.utils.prettyFileSize
+import androidx.compose.material.icons.filled.QrCode2
+import com.walhalla.compose.R
+import com.walhalla.compose.log.shareApkFile
 import com.walhalla.compose.model.LogModel
 import com.walhalla.compose.model.LogType
 import com.walhalla.extractor.R as ExtR
@@ -55,10 +58,11 @@ import java.util.Locale
 @Composable
 fun LogItem(
     log: LogModel,
-    onDeleteClick: ((String) -> Unit)? = null
+    onDeleteClick: ((String) -> Unit)? = null,
+    onQrClick: ((String) -> Unit)? = null,
 ) {
     when (log) {
-        is LogModel.FileLog -> FileLogRow(log = log, onDeleteClick = onDeleteClick)
+        is LogModel.FileLog -> FileLogRow(log = log, onDeleteClick = onDeleteClick, onQrClick = onQrClick)
         is LogModel.MessageLog -> MessageLogRow(log = log)
     }
 }
@@ -66,7 +70,8 @@ fun LogItem(
 @Composable
 private fun FileLogRow(
     log: LogModel.FileLog,
-    onDeleteClick: ((String) -> Unit)?
+    onDeleteClick: ((String) -> Unit)?,
+    onQrClick: ((String) -> Unit)?,
 ) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
@@ -148,9 +153,21 @@ private fun FileLogRow(
                             },
                             onClick = {
                                 showMenu = false
-                                shareApk(context, File(log.filePath))
+                                shareApkFile(context, File(log.filePath))
                             }
                         )
+                        if (onQrClick != null) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.action_send_qr)) },
+                                leadingIcon = {
+                                    Icon(Icons.Default.QrCode2, contentDescription = null)
+                                },
+                                onClick = {
+                                    showMenu = false
+                                    onQrClick(log.filePath)
+                                }
+                            )
+                        }
                         if (onDeleteClick != null) {
                             DropdownMenuItem(
                                 text = {
@@ -246,27 +263,5 @@ private fun messageStyle(type: LogType): Triple<androidx.compose.ui.graphics.Col
             scheme.onSurfaceVariant,
             Icons.Default.Info
         )
-    }
-}
-
-private fun shareApk(context: android.content.Context, file: File) {
-    if (!file.exists() || !file.canRead()) return
-    try {
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            file
-        )
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/vnd.android.package-archive"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        context.startActivity(
-            Intent.createChooser(intent, context.getString(ExtR.string.action_share_file))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
-    } catch (_: Exception) {
-        // FileProvider / no handler
     }
 }

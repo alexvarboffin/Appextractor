@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.walhalla.appextractor.model.PackageMeta
 import com.walhalla.appextractor.utils.prettyFileSize
+import androidx.compose.material.icons.filled.QrCode2
+import com.walhalla.compose.R
+import com.walhalla.compose.detail.highlightMatches
 import com.walhalla.extractor.R as ExtR
 import java.text.DateFormat
 import java.util.Date
@@ -82,7 +85,8 @@ fun AppListItem(
     onCopyPackageNameClick: () -> Unit = {},
     onManifestClick: () -> Unit = {},
     onSaveIconClick: () -> Unit = {},
-    onShareIconClick: () -> Unit = {}
+    onShareIconClick: () -> Unit = {},
+    onSendQrClick: () -> Unit = {}
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val menuScope = rememberCoroutineScope()
@@ -120,10 +124,10 @@ fun AppListItem(
     val highlightColor = MaterialTheme.colorScheme.primary
     val query = highlightQuery.trim()
     val highlightedLabel = remember(app.label, query, highlightColor) {
-        highlightAnnotated(app.label, query, highlightColor)
+        highlightMatches(app.label, query, highlightColor)
     }
     val highlightedPackage = remember(app.packageName, query, highlightColor) {
-        highlightAnnotated(app.packageName, query, highlightColor)
+        highlightMatches(app.packageName, query, highlightColor)
     }
 
     Surface(
@@ -257,6 +261,13 @@ fun AppListItem(
                             onClick = { runAfterMenuClose(onExtractClick) }
                         )
                         DropdownMenuItem(
+                            text = { Text(stringResource(R.string.action_send_qr)) },
+                            leadingIcon = {
+                                Icon(Icons.Default.QrCode2, contentDescription = null)
+                            },
+                            onClick = { runAfterMenuClose(onSendQrClick) }
+                        )
+                        DropdownMenuItem(
                             text = { Text(stringResource(ExtR.string.open_on_google_play)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Shop, contentDescription = null)
@@ -334,47 +345,6 @@ fun AppListItem(
                 thickness = 0.5.dp,
                 color = MaterialTheme.colorScheme.outlineVariant
             )
-        }
-    }
-}
-
-/**
- * Case-insensitive highlight of all [query] occurrences (legacy AppVh.setAndHighlight).
- * Cheap: only visible LazyColumn items + remember(text, query).
- */
-private fun highlightAnnotated(
-    text: String,
-    query: String,
-    highlightColor: Color
-): AnnotatedString {
-    if (query.isEmpty()) {
-        return AnnotatedString(text)
-    }
-    val lowerText = text.lowercase(Locale.getDefault())
-    val lowerQuery = query.lowercase(Locale.getDefault())
-    if (!lowerText.contains(lowerQuery)) {
-        return AnnotatedString(text)
-    }
-    return buildAnnotatedString {
-        var start = 0
-        while (start < text.length) {
-            val index = lowerText.indexOf(lowerQuery, start)
-            if (index < 0) {
-                append(text.substring(start))
-                break
-            }
-            if (index > start) {
-                append(text.substring(start, index))
-            }
-            withStyle(
-                SpanStyle(
-                    color = highlightColor,
-                    fontWeight = FontWeight.Bold
-                )
-            ) {
-                append(text.substring(index, index + lowerQuery.length))
-            }
-            start = index + lowerQuery.length
         }
     }
 }

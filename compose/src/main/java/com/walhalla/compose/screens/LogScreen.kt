@@ -31,7 +31,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.walhalla.compose.R
 import com.walhalla.compose.components.LogItem
+import com.walhalla.compose.components.QrTransferDialog
+import com.walhalla.compose.transfer.SharedFile
+import com.walhalla.compose.transfer.rememberQrTransfer
+import java.io.File
 import com.walhalla.compose.model.LogModel
 import com.walhalla.compose.viewmodel.LogViewModel
 
@@ -44,6 +50,8 @@ fun LogScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val lifecycleOwner = LocalLifecycleOwner.current
+    val qrTransfer = rememberQrTransfer()
+    QrTransferDialog(qrTransfer)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -70,19 +78,19 @@ fun LogScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
-                title = { Text("Logs") },
+                title = { Text(stringResource(R.string.logs_title)) },
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 actions = {
                     IconButton(onClick = { viewModel.refresh() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = null
+                            contentDescription = stringResource(R.string.logs_refresh)
                         )
                     }
                     IconButton(onClick = { viewModel.clearSessionMessages() }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = null
+                            contentDescription = stringResource(R.string.logs_clear)
                         )
                     }
                 }
@@ -111,7 +119,11 @@ fun LogScreen(
                     ) { log ->
                         LogItem(
                             log = log,
-                            onDeleteClick = { path -> viewModel.deleteFile(path) }
+                            onDeleteClick = { path -> viewModel.deleteFile(path) },
+                            onQrClick = { path ->
+                                val file = File(path)
+                                qrTransfer.start(file.name, listOf(SharedFile(file, file.name)))
+                            }
                         )
                     }
                 }

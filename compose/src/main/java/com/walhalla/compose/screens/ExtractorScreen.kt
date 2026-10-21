@@ -1,9 +1,5 @@
 package com.walhalla.compose.screens
 
-import android.Manifest
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,6 +74,17 @@ import com.walhalla.compose.R
 import com.walhalla.compose.detail.SortOption
 import com.walhalla.compose.detail.sortMenuItems
 import com.walhalla.compose.detail.sortedByOption
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.FilterChip
+import com.walhalla.appextractor.utils.prettyFileSize
+import com.walhalla.compose.components.QrTransferDialog
+import com.walhalla.compose.detail.AppFilter
+import com.walhalla.compose.detail.totals
+import com.walhalla.compose.storage.rememberStorageGate
+import com.walhalla.compose.transfer.appSharedFiles
+import com.walhalla.compose.transfer.rememberQrTransfer
 import com.walhalla.extractor.R as ExtR
 
 @Composable
@@ -338,32 +345,11 @@ fun ExtractorScreen(
         )
     }
 
-    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_MEDIA_IMAGES,
-            Manifest.permission.READ_MEDIA_VIDEO,
-            Manifest.permission.READ_MEDIA_AUDIO
-        )
-    } else {
-        arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissionsMap ->
-        val allGranted = permissionsMap.values.all { it }
-        println("DEBUG: Permissions result: $permissionsMap")
-        if (allGranted) {
-            println("DEBUG: All permissions granted")
-        } else {
-            println("DEBUG: Some permissions denied")
-        }
-    }
+    val storageGate = rememberStorageGate()
+    val qrTransfer = rememberQrTransfer()
+    val filter by viewModel.filter.collectAsState()
+    val totals = remember(apps) { apps.totals() }
+    QrTransferDialog(qrTransfer)
 
     // Outer MainActivity Scaffold already applies bottom nav + system insets.
     // Zero insets here so we don't reserve an empty "banner" strip at the bottom.
@@ -423,6 +409,28 @@ fun ExtractorScreen(
                     keyboardActions = KeyboardActions(onDone = { }),
                 )
 
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(AppFilter.entries) { option ->
+                        FilterChip(
+                            selected = option == filter,
+                            onClick = { viewModel.setFilter(option) },
+                            label = { Text(stringResource(option.labelRes)) },
+                            leadingIcon = {
+                                Icon(option.icon, contentDescription = null, modifier = Modifier.size(18.dp))
+                            }
+                        )
+                    }
+                }
+                Text(
+                    text = stringResource(R.string.apps_totals, totals.count, prettyFileSize(totals.bytes)),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
+                )
+
                 // Selection bar — quiet strip, not a loud tinted banner
                 val selectedCount = selectedApps.size
                 val hasSelection = selectedCount > 0
@@ -473,10 +481,7 @@ fun ExtractorScreen(
                             }
 
                             TextButton(
-                                onClick = {
-                                    permissionLauncher.launch(permissions)
-                                    viewModel.extractSelectedApps()
-                                },
+                                onClick = { storageGate { viewModel.extractSelectedApps() } },
                                 enabled = hasSelection,
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -549,8 +554,10 @@ fun ExtractorScreen(
                                                 viewModel.toggleAppSelection(app)
                                             },
                                             onExtractClick = {
-                                                permissionLauncher.launch(permissions)
-                                                viewModel.extractApkRequest(app)
+                                                storageGate { viewModel.extractApkRequest(app) }
+                                            },
+                                            onSendQrClick = {
+                                                qrTransfer.start(app.label, appSharedFiles(context, app))
                                             },
                                             onShareClick = {
                                                 viewModel.shareApk(app)
