@@ -6,7 +6,12 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowScope
@@ -26,6 +31,7 @@ import com.walhalla.compose.detail.ReportAction
 import com.walhalla.compose.detail.insightFacts
 import com.walhalla.compose.ui.tv.components.TvChoice
 import com.walhalla.compose.ui.tv.components.TvChoiceDialog
+import com.walhalla.compose.ui.tv.components.tvBringIntoViewOnFocus
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -266,7 +272,7 @@ private fun buildStats(context: Context, app: PackageMeta, shelves: List<TvShelf
 
 // region hero
 
-@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TvStatHero(
     stats: List<TvStat>,
@@ -274,8 +280,11 @@ private fun TvStatHero(
     onExport: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
+    val bringHero = remember { BringIntoViewRequester() }
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
+            .bringIntoViewRequester(bringHero)
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(
@@ -298,7 +307,14 @@ private fun TvStatHero(
             ) {
                 insights?.let { TvInsightBadges(it) }
             }
-            Button(onClick = onExport) {
+            Button(
+                onClick = onExport,
+                modifier = Modifier.onFocusChanged { state ->
+                    if (state.isFocused) {
+                        scope.launch { runCatching { bringHero.bringIntoView() } }
+                    }
+                }
+            ) {
                 Icon(Icons.Default.IosShare, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.report_export))
@@ -569,6 +585,7 @@ private fun TvSpecSheet(title: String, specs: List<Pair<String, String>>) {
         },
         modifier = Modifier
             .fillMaxWidth()
+            .tvBringIntoViewOnFocus()
             .onFocusChanged { focused = it.isFocused },
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.01f),
@@ -675,6 +692,7 @@ private fun TvComponentCard(
         modifier = Modifier
             .width(300.dp)
             .height(132.dp)
+            .tvBringIntoViewOnFocus()
             .onFocusChanged { focused = it.isFocused },
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.08f),
