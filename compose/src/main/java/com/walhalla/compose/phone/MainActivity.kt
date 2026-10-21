@@ -59,12 +59,12 @@ import java.util.Locale
 /** Phone / tablet entry. Screens live in [com.walhalla.compose.ui.mobile]. */
 class MainActivity : ComponentActivity() {
 
-    private var rateAppModule: RateAppModule? = null
+    //private var rateAppModule: RateAppModule? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rateAppModule = RateAppModule(context)
-        lifecycle.addObserver(rateAppModule!!)
+        //rateAppModule = RateAppModule(context)
+        //lifecycle.addObserver(rateAppModule!!)
         val testDevices = listOf(
             AdRequest.DEVICE_ID_EMULATOR,
             "B9F431FA79D446517D20E015CC3D013E"
@@ -85,10 +85,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        rateAppModule?.appReloadedHandler()
-        super.onSaveInstanceState(outState)
-    }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        rateAppModule?.appReloadedHandler()
+//        super.onSaveInstanceState(outState)
+//    }
 }
 
 @Composable
