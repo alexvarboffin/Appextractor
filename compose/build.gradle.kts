@@ -15,7 +15,7 @@ fun versionCodeDate(): Int {
 android {
     // Kotlin/R package stays compose; install id matches legacy for in-place updates
     namespace = "com.walhalla.compose"
-    // 36: needed by dokar3/sonner (TV toasts); targetSdk can stay lower
+    // 37 matches the catalog. Play rejects new uploads below target 36 (since 31 Aug 2026).
     compileSdk = 37
 
     defaultConfig {
@@ -23,7 +23,7 @@ android {
         applicationId = "com.walhalla.appextractor"
         // sonner (TV toasts) requires 24+
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 37
         val code = versionCodeDate()
         versionCode = code
         versionName = "1.4.$code"
