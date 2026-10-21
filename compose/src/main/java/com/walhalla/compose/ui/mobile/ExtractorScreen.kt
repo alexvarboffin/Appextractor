@@ -321,13 +321,14 @@ fun ExtractorScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                    if (extractionProgress != null) {
+                    val progress = extractionProgress
+                    if (progress != null) {
                         LinearProgressIndicator(
-                            progress = { extractionProgress!!.second / 100f },
+                            progress = { progress.second / 100f },
                             modifier = Modifier.fillMaxWidth(),
                         )
                         Text(
-                            text = "${extractionProgress!!.second}%",
+                            text = "${progress.second}%",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -365,8 +366,7 @@ fun ExtractorScreen(
                         currentSort = it
                     })
                     MainMenu(viewModel = viewModel)
-                },
-                windowInsets = WindowInsets(0, 0, 0, 0)
+                }
             )
         },
         snackbarHost = {
