@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="compose">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-10-21T14:09:07.293756300Z">
+        <DropdownSelection timestamp="2026-10-21T14:49:58.721980600Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=emulator-5554;connection=18cf09ad" />
+              <DeviceId pluginId="Default" identifier="serial=emulator-5554;connection=262348dc" />
             </handle>
           </Target>
         </DropdownSelection>

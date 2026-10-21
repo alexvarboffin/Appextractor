@@ -2,6 +2,7 @@ package com.walhalla.compose.phone
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -56,12 +57,13 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 /** Phone / tablet entry. Screens live in [com.walhalla.compose.ui.mobile]. */
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
+
     private var rateAppModule: RateAppModule? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rateAppModule = RateAppModule(this)
+        rateAppModule = RateAppModule(context)
         lifecycle.addObserver(rateAppModule!!)
         val testDevices = listOf(
             AdRequest.DEVICE_ID_EMULATOR,
