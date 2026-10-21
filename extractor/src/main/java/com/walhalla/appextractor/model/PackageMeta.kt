@@ -33,6 +33,10 @@ class PackageMeta : Parcelable {
 
     var category: Int = 0
 
+    /** ApplicationInfo min/target. Cheap list facts; not parcelled. */
+    var minSdk: Int = 0
+    var targetSdk: Int = 0
+
     //Extended
 
     var isGranted: Boolean = false

@@ -481,6 +481,33 @@ private fun AppRow(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                val context = LocalContext.current
+                val facts = remember(app.lastUpdateTime, app.minSdk, app.targetSdk) {
+                    buildList {
+                        if (app.lastUpdateTime > 0L) {
+                            val date = android.text.format.DateUtils.formatDateTime(
+                                context,
+                                app.lastUpdateTime,
+                                android.text.format.DateUtils.FORMAT_SHOW_DATE or
+                                    android.text.format.DateUtils.FORMAT_ABBREV_MONTH or
+                                    android.text.format.DateUtils.FORMAT_SHOW_YEAR
+                            )
+                            add(context.getString(R.string.list_updated, date))
+                        }
+                        if (app.minSdk > 0 || app.targetSdk > 0) {
+                            add(context.getString(R.string.list_sdk_range, app.minSdk, app.targetSdk))
+                        }
+                    }.joinToString(" · ")
+                }
+                if (facts.isNotEmpty()) {
+                    Text(
+                        text = facts,
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             if (tvLauncher) {
                 Icon(

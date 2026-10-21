@@ -47,6 +47,8 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
+private const val SearchQueryMaxLength = 128
+
 class ExtractorViewModel(application: Application) : AndroidViewModel(application) {
     /** Full installed list — never shrink by search. */
     private val _allApps = MutableStateFlow<List<PackageMeta>>(emptyList())
@@ -188,7 +190,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun setSearchQuery(query: String) {
-        _searchQuery.value = query
+        _searchQuery.value = query.take(SearchQueryMaxLength)
         applySearchFilter()
     }
 
@@ -246,6 +248,8 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                     val file = File(applicationInfo.publicSourceDir)
                     meta.fileSize = file.length()
                     meta.sourceDir = applicationInfo.sourceDir
+                    meta.minSdk = applicationInfo.minSdkVersion
+                    meta.targetSdk = applicationInfo.targetSdkVersion
                     meta.firstInstallTime = packageInfo.firstInstallTime
                     meta.lastUpdateTime = packageInfo.lastUpdateTime
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

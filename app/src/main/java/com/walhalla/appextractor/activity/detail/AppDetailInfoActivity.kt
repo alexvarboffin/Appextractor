@@ -247,7 +247,7 @@ class AppDetailInfoActivity : BaseActivity(), DetailContract.View {
     }
 
 
-    override fun shareText(value: String) {
+    override fun shareText(value: kotlin.String) {
     }
 
     //    android:name=""
@@ -271,10 +271,10 @@ class AppDetailInfoActivity : BaseActivity(), DetailContract.View {
     override fun hideProgress() {
     }
 
-    override fun handleException(exception: Exception) {
+    override fun handleException(exception: kotlin.Exception?) {
     }
 
-    override fun success(text: Int) {
+    override fun success(text: kotlin.Int) {
     }
 
 

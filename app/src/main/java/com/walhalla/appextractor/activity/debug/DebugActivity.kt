@@ -1,10 +1,11 @@
 package com.walhalla.appextractor.activity.debug
 
 import android.os.Bundle
+import com.walhalla.appextractor.fragment.QCallback
 
 class DebugActivity : androidx.appcompat.app.AppCompatActivity(), QCallback {
+
     
-    @Override
     public override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
         setContentView(com.walhalla.appextractor.R.layout.activity_debug)
@@ -16,27 +17,27 @@ class DebugActivity : androidx.appcompat.app.AppCompatActivity(), QCallback {
         }
     }
 
-    @Override
+    
     override fun showProgress() {
     }
 
-    @Override
+    
     override fun hideProgress() {
     }
 
-    @Override
-    fun handleException(exception: java.lang.Exception?) {
+    
+    override fun handleException(exception: kotlin.Exception?) {
     }
 
-    @Override
+    
     override fun success(text: kotlin.Int) {
     }
 
-    @Override
-    fun copyToBuffer(value: kotlin.String?) {
+    
+    override fun copyToBuffer(value: kotlin.String) {
     }
 
-    @Override
-    fun shareText(value: kotlin.String?) {
+    
+    override fun shareText(value: kotlin.String) {
     }
 }

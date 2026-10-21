@@ -198,6 +198,7 @@ Key file: `compose/.../screens/MetaScreen.kt`
 - [x] Assets success/error toasts wired (`AssetsViewModel.toastMessage`).
 - [x] **Assets UI polish:** flat `LazyColumn` tree (indent + chevron + folder/file/preview icons), expand/collapse all, no nested Cards. **Not** adrielcafe/bonsai (Kotlin 1.6 / stale) nor vooft/compose-treeview (JetBrains CMP clashes with AndroidX Compose here) — same Bonsai-style UX in-house.
 - [x] Assets listing skips `dexopt` and `webkit` (same as zip filter in `AssetsPresenter`).
+- [x] **Asset image preview (2026-10-21):** png/jpg/webp/gif open as a picture. Text assets on TV use `ui/tv/components/TvTextSectionViewer` (`VerticalPager`, one D-pad step = one page). Pages are packed by wrapped rows that fit the pane (`splitTextSections`). Marker is `n / total`; dots only when there are 2–12 pages. Phone text dialog stays touch-scroll.
 - [x] `ManifestViewModel.loadManifests` (APK manifests) + `loadXmlResource` (arbitrary XML inside APK).
 - [x] `ManifestScreen(xmlFileName: String?)`.
 
@@ -312,6 +313,7 @@ Record of corrections that changed implementation:
 48. [x] Compose BOM `2024.04.01` → `2025.12.01` (`compileSdk` 37, `activity-compose` 1.13). `2026.09` (FireTv) needs AGP 9.1; this repo stays on AGP 8.13. `animateItemPlacement` → `animateItem` in the unused search samples (2026-10-21).
 49. [x] TV list focus: Cinema `MoviesRow` — `focusRequester(parent).focusRestorer(firstItem)`, `firstItem` only on the first child. No saved row index (2026-10-21).
 50. [x] TV INFO tall card clipped after focus restore: `BringIntoViewRequester.bringIntoView()` on focus (Cinema `EpisodeCardTV`). Spec sheet + component card bring themselves; hero button brings the whole hero column (2026-10-21).
+51. [x] TV list row, one extra line only: `lastUpdateTime` (`Updated 12 Oct 2026`) and `minSdk–targetSdk` (`SDK 24–35`). Stored on `PackageMeta` at the existing package scan (no zip, no permission or storage stats). Phone list unchanged (2026-10-21).
 
 ---
 
@@ -363,7 +365,7 @@ For each section 0–14:
 - [x] **Share APK:** `ExtractorViewModel.shareApk` → `ShareUtils.shareApkFile` (copy to app storage first). Direct `FileProvider` on `/system/...` sourceDir crashes (2026-10-20).
 - [x] **TV App Detail parity (2026-10-20):** same tabs INFO|META|STRING|XML|ASSETS as phone (`AppDetailTabs`); shared `groupIntoSections` / `loadMetaSections` / `mapInfoLine`; TV chrome via `tv.material3` (`TvInformationTab`, `TvMetaTab`, `TvStringTab`, `TvAssetsTab`, `TvFocusTabRow`); Manifest route + action; overflow actions + App settings. No Material3 in `ui.tv`.
 - [x] **TV Sonner toasts:** `io.github.dokar3:sonner` via `TvToasterHost` (`Alignment.TopCenter`, dark+richColors); events from `AppLogBus.toasts`.
-- [x] **TV list filters + totals + multi-select extract** — same `AppFilter` / `extractSelectedApps` as phone (§4). Filter button sits right of Sort.
+- [x] **TV list row facts (2026-10-21):** under version/size, one line — update date and SDK range (`list_updated`, `list_sdk_range`). `PackageMeta.minSdk` / `targetSdk` filled in `ExtractorViewModel.loadInstalledApps`. Not on the phone row.
 - [x] **TV INFO catalog + overview + report** — §8. One `TvChoiceDialog` for sort, filter, app actions, report and log-file actions; do not add another copy.
 - [x] **LAN QR transfer (phone+TV, 2026-10-21):** `transfer/LanFileServer.kt` (plain `ServerSocket`, random token; one file → direct URL, splits → index page) + `transfer/QrTransfer.kt` (`appSharedFiles`, `QrTransferController`, zxing `qrBitmap`). Dep `com.google.zxing:core` (encoder only). Dialogs: `ui/tv/components/TvQrTransferDialog`, `components/QrTransferDialog`. Closes when dismissed. Verified: download byte-identical, bad token → 404.
 - [x] **TV Logs + TV Telegram fields** — §7 / §11.

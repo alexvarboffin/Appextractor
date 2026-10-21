@@ -26,6 +26,10 @@
     <string name="filter_split">Split APKs</string>
     <string name="filter_sideloaded">Sideloaded</string>
     <string name="apps_totals">%1$d apps · %2$s</string>
+    <string name="list_updated">Updated %1$s</string>
+    <string name="list_sdk_range">SDK %1$d–%2$d</string>
+    <string name="asset_preview_failed">Cannot preview this image</string>
+    <string name="section_page">%1$d / %2$d</string>
     <string name="action_select">Select</string>
     <string name="action_unselect">Unselect</string>
     <string name="selected_count">Selected: %1$d</string>

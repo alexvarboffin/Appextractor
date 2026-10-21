@@ -1,7 +1,7 @@
 package com.walhalla.appextractor
 
 interface BaseUtilsCallback {
-    fun copyToBuffer(value: String)
+    fun copyToBuffer(value: kotlin.String)
 
-    fun shareText(value: String)
+    fun shareText(value: kotlin.String)
 }

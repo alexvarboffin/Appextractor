@@ -187,6 +187,26 @@ class AssetsPresenter(private val context: Context, private val view: MvpContrac
         }
     }
 
+    /** Raw bytes for an in-app image preview. Text preview stays on [readAssetRequest]. */
+    fun readAssetBytes(resource: ResItem): ByteArray {
+        val input = am?.open(resource.fullPath) ?: throw java.io.FileNotFoundException(resource.fullPath)
+        input.use { stream ->
+            val out = java.io.ByteArrayOutputStream()
+            val buf = ByteArray(8192)
+            var total = 0
+            while (true) {
+                val n = stream.read(buf)
+                if (n < 0) break
+                total += n
+                if (total > 8 * 1024 * 1024) {
+                    throw java.io.IOException("image is larger than 8 MB")
+                }
+                out.write(buf, 0, n)
+            }
+            return out.toByteArray()
+        }
+    }
+
     override fun zipAllAssetsRequest(activity: Context, r0: ResItem) {
         val name = "assets.zip" //+app_name
         val outputZipPath =

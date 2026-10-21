@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image as BitmapImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -61,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -96,6 +99,7 @@ fun AssetsScreen(
     val error by viewModel.error.collectAsState()
     val toastMessage by viewModel.toastMessage.collectAsState()
     val selectedAssetWithContent by viewModel.selectedAsset.collectAsState()
+    val imagePreview by viewModel.imagePreview.collectAsState()
     var pendingAsset by remember { mutableStateOf<ResItem?>(null) }
     var pendingAction by remember { mutableStateOf<AssetAction?>(null) }
 
@@ -123,7 +127,7 @@ fun AssetsScreen(
 
     fun runAction(asset: ResItem, action: AssetAction) {
         when (action) {
-            AssetAction.Read -> viewModel.readAsset(context, asset)
+            AssetAction.Read -> viewModel.openAsset(context, asset)
             AssetAction.ViewXml -> onViewXml(asset.fullPath)
             AssetAction.Copy -> clipboardManager.setText(AnnotatedString(asset.fullPath))
             AssetAction.Zip -> viewModel.zipAllAssets(context, asset)
@@ -181,6 +185,44 @@ fun AssetsScreen(
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                     modifier = Modifier.fillMaxWidth()
                 )
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearSelectedAsset() }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
+        )
+    }
+
+    imagePreview?.let { (res, bytes) ->
+        val bitmap = remember(bytes) {
+            android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+        }
+        AlertDialog(
+            onDismissRequest = { viewModel.clearSelectedAsset() },
+            title = {
+                Text(
+                    text = res.fullPath.substringAfterLast('/'),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            text = {
+                if (bitmap == null) {
+                    Text(
+                        stringResource(com.walhalla.compose.R.string.asset_preview_failed),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    BitmapImage(
+                        bitmap = bitmap,
+                        contentDescription = res.fullPath.substringAfterLast('/'),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 360.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearSelectedAsset() }) {

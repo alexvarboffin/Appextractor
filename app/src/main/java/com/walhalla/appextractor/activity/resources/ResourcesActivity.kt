@@ -45,16 +45,16 @@ class ResourcesActivity : AppCompatActivity(), QCallback {
     override fun hideProgress() {
     }
 
-    override fun handleException(exception: Exception) {
+    override fun handleException(exception: kotlin.Exception?) {
     }
 
-    override fun success(text: Int) {
+    override fun success(text: kotlin.Int) {
     }
 
-    override fun copyToBuffer(value: String) {
+    override fun copyToBuffer(value: kotlin.String) {
     }
 
-    override fun shareText(value: String) {
+    override fun shareText(value: kotlin.String) {
     }
 
     companion object {

@@ -149,10 +149,10 @@ class ManifestActivity : AppCompatActivity(), QCallback {
         super.onResume()
     }
 
-    override fun copyToBuffer(value: String) {
+    override fun copyToBuffer(value: kotlin.String) {
     }
 
-    override fun shareText(value: String) {
+    override fun shareText(value: kotlin.String) {
     }
 
     override fun showProgress() {
@@ -161,10 +161,10 @@ class ManifestActivity : AppCompatActivity(), QCallback {
     override fun hideProgress() {
     }
 
-    override fun handleException(exception: Exception) {
+    override fun handleException(exception: kotlin.Exception?) {
     }
 
-    override fun success(text: Int) {
+    override fun success(text: kotlin.Int) {
     }
 
 

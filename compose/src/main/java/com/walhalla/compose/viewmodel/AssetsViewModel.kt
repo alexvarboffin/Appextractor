@@ -10,9 +10,12 @@ import com.walhalla.appextractor.activity.assets.ResItem
 import com.walhalla.compose.model.AssetTreeNode
 import com.walhalla.compose.model.allBranchPaths
 import com.walhalla.compose.model.buildAssetTree
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AssetsViewModel(application: Application) : AndroidViewModel(application) {
     private val _assetTree = MutableStateFlow<List<AssetTreeNode>>(emptyList())
@@ -29,6 +32,9 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _selectedAsset = MutableStateFlow<Pair<ResItem, String>?>(null)
     val selectedAsset: StateFlow<Pair<ResItem, String>?> = _selectedAsset.asStateFlow()
+
+    private val _imagePreview = MutableStateFlow<Pair<ResItem, ByteArray>?>(null)
+    val imagePreview: StateFlow<Pair<ResItem, ByteArray>?> = _imagePreview.asStateFlow()
 
     private var presenter: AssetsPresenter? = null
 
@@ -96,6 +102,27 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
         presenter?.readAssetRequest(context, asset)
     }
 
+    /** Text stays a text preview. png/jpg/webp/gif decode as a picture, not as a string. */
+    fun openAsset(context: Context, asset: ResItem) {
+        if (!isImageAsset(asset.fullPath)) {
+            _imagePreview.value = null
+            readAsset(context, asset)
+            return
+        }
+        viewModelScope.launch {
+            val bytes = withContext(Dispatchers.IO) {
+                runCatching { presenter?.readAssetBytes(asset) }
+            }
+            bytes.onSuccess { data ->
+                _selectedAsset.value = null
+                _imagePreview.value = data?.let { asset to it }
+            }.onFailure { error ->
+                _imagePreview.value = null
+                _error.value = error.message
+            }
+        }
+    }
+
     fun saveIcon(context: Context, asset: ResItem) {
         presenter?.saveAsset(context, asset)
     }
@@ -110,10 +137,16 @@ class AssetsViewModel(application: Application) : AndroidViewModel(application) 
 
     fun clearSelectedAsset() {
         _selectedAsset.value = null
+        _imagePreview.value = null
     }
 
     override fun onCleared() {
         super.onCleared()
         presenter = null
     }
-} 
+}
+
+private val IMAGE_EXT = setOf("png", "jpg", "jpeg", "webp", "gif")
+
+fun isImageAsset(path: String): Boolean =
+    path.substringAfterLast('.', "").lowercase() in IMAGE_EXT 
