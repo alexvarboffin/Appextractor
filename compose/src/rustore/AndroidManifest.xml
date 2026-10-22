@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- RuStore flavor: permissions below are declared in src/main/AndroidManifest.xml
+         and are removed only from the rustore build (запрещены RuStore). -->
+
+    <!-- запрещены RuStore:
+    <uses-permission
+        android:name="android.permission.ACCESS_SUPERUSER" />
+    -->
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" tools:node="remove" />
+
+    <!-- запрещены RuStore:
+    <uses-permission
+        android:name="android.permission.DELETE_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
+    -->
+    <uses-permission android:name="android.permission.DELETE_PACKAGES" tools:node="remove" />
+
+    <!-- запрещены RuStore:
+    <uses-permission android:name="com.android.certinstaller.INSTALL_AS_USER" />
+    -->
+    <uses-permission android:name="com.android.certinstaller.INSTALL_AS_USER" tools:node="remove" />
+
+    <!-- запрещены RuStore:
+    <uses-permission
+        android:name="android.permission.BIND_CONTROLS"
+        tools:ignore="ProtectedPermissions" />
+    -->
+    <uses-permission android:name="android.permission.BIND_CONTROLS" tools:node="remove" />
+
+</manifest>

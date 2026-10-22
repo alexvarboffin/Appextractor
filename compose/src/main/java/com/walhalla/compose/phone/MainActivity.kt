@@ -52,7 +52,7 @@ import com.walhalla.compose.ui.mobile.LogScreen
 import com.walhalla.compose.ui.mobile.ManifestScreen
 import com.walhalla.compose.ui.mobile.SettingsScreen
 import com.walhalla.compose.ui.theme.AppextractorTheme
-import com.walhalla.ui.observer.RateAppModule
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
