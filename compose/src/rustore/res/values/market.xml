@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- RuStore links (rustore flavor), see rustore.ru/help/sdk/rustore-deeplinks. %s = packageName -->
+    <string name="market_name" translatable="false">RuStore</string>
+    <string name="market_app_url" translatable="false">rustore://apps.rustore.ru/app/%s</string>
+    <string name="market_app_web_url" translatable="false">https://www.rustore.ru/catalog/app/%s</string>
+    <!--<string name="market_dev_url" translatable="false">https://www.rustore.ru/catalog/search?query=Walhalla%20Dynamics</string>-->
+    <string name="market_dev_url" translatable="false">rustore://apps.rustore.ru/developer/6f1hn3</string>
+    <!--<string name="market_dev_web_url" translatable="false">https://www.rustore.ru/catalog/search?query=Walhalla%20Dynamics</string>-->
+    <string name="market_dev_web_url" translatable="false">https://www.rustore.ru/catalog/developer/6f1hn3</string>
+</resources>

@@ -73,11 +73,13 @@ fun AppDetailScreen(
         viewModel.loadAppDetails(app)
     }
 
+    val usageMsg = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.detail_usage_access_needed)
+    val usageAction = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.detail_usage_access_settings)
     LaunchedEffect(needsUsageAccess) {
         if (needsUsageAccess) {
             val result = snackbarHostState.showSnackbar(
-                message = "Need special permission package usage stats",
-                actionLabel = "SETTINGS",
+                message = usageMsg,
+                actionLabel = usageAction,
                 duration = SnackbarDuration.Indefinite
             )
             if (result == SnackbarResult.ActionPerformed) {
@@ -117,7 +119,7 @@ fun AppDetailScreen(
                         Icon(Icons.Default.QrCode2, contentDescription = stringResource(R.string.action_send_qr))
                     }
                     IconButton(onClick = { onViewManifest(app, null) }) {
-                        Icon(Icons.Default.Description, contentDescription = "Manifest")
+                        Icon(Icons.Default.Description, contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_title))
                     }
                     IconButton(onClick = { viewModel.openInSettings(app) }) {
                         Icon(Icons.Default.Settings, contentDescription = null)

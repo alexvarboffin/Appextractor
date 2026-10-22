@@ -115,7 +115,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
             }
 
             override fun makeSnackBar(file: File) {
-                val msg = "APK extracted to:\n${file.path}"
+                val msg = getApplication<Application>().getString(com.walhalla.compose.R.string.extract_done_one, file.path)
                 _successMessage.value = msg
                 AppLogBus.success(msg)
             }
@@ -128,9 +128,9 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                 val count = mFile.values.sumOf { it.size }
                 val paths = mFile.values.flatten().joinToString("\n") { it.path }
                 val msg = if (count == 1) {
-                    "APK extracted to:\n$paths"
+                    getApplication<Application>().getString(com.walhalla.compose.R.string.extract_done_one, paths)
                 } else {
-                    "Extracted $count files:\n$paths"
+                    getApplication<Application>().getString(com.walhalla.compose.R.string.extract_done_many, count, paths)
                 }
                 _successMessage.value = msg
                 AppLogBus.success(msg)
@@ -148,7 +148,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
             override fun extractOnePleaseDialog(noneExtracted: List<PackageMeta>) {
                 val names = noneExtracted.joinToString { it.label }
-                val msg = "Need root to extract: $names"
+                val msg = getApplication<Application>().getString(com.walhalla.compose.R.string.extract_need_root, names)
                 _successMessage.value = msg
                 AppLogBus.error(msg)
             }
@@ -413,7 +413,7 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(Intent.createChooser(intent, "Share Icon").apply {
+                context.startActivity(Intent.createChooser(intent, getApplication<Application>().getString(com.walhalla.compose.R.string.share_icon)).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
             } catch (e: Exception) {
@@ -466,7 +466,8 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, context.getString(com.walhalla.extractor.R.string.app_name))
-            putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${context.packageName}")
+            //putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${context.packageName}")
+            putExtra(Intent.EXTRA_TEXT, com.walhalla.compose.util.MarketLinks.appWebUrl(context))
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(Intent.createChooser(intent, context.getString(com.walhalla.extractor.R.string.action_share_app)))
@@ -474,36 +475,44 @@ class ExtractorViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun discoverMoreApps() {
         val context = getApplication<Application>()
-        try {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("market://search?q=pub:${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("https://play.google.com/store/apps/developer?id=${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        }
+        com.walhalla.compose.util.MarketLinks.openDeveloper(context)
+/* old:
+//        val context = getApplication<Application>()
+//        try {
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                data = Uri.parse("market://search?q=pub:${context.packageName}")
+//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//            }
+//            context.startActivity(intent)
+//        } catch (e: ActivityNotFoundException) {
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                data = Uri.parse("https://play.google.com/store/apps/developer?id=${context.packageName}")
+//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//            }
+//            context.startActivity(intent)
+//        }
+*/
     }
 
     fun rateApp() {
         val context = getApplication<Application>()
-        try {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("market://details?id=${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        }
+        com.walhalla.compose.util.MarketLinks.openApp(context)
+/* old:
+//        val context = getApplication<Application>()
+//        try {
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                data = Uri.parse("market://details?id=${context.packageName}")
+//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//            }
+//            context.startActivity(intent)
+//        } catch (e: ActivityNotFoundException) {
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                data = Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")
+//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//            }
+//            context.startActivity(intent)
+//        }
+*/
     }
 
     fun showAbout() {

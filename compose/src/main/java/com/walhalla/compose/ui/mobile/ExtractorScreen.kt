@@ -103,7 +103,7 @@ fun MainMenu(viewModel: ExtractorViewModel) {
         IconButton(onClick = { showMenu = true }) {
             Icon(
                 Icons.Default.MoreVert,
-                contentDescription = "More options"
+                contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_more_options)
             )
         }
 
@@ -201,7 +201,7 @@ fun MainMenu(viewModel: ExtractorViewModel) {
                 },
                 confirmButton = {
                     TextButton(onClick = { showPlayCategories = false }) {
-                        Text("Cancel")
+                        Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_cancel))
                     }
                 }
             )
@@ -248,12 +248,30 @@ fun AboutDialog(
                         text = appVersion,
                         style = MaterialTheme.typography.bodyMedium
                     )
+
+                    // как в легаси DialogAbout: "(c) <год> <play_google_pub>"
+                    Text(
+                        text = "\u00a9 " + java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) +
+                            " " + stringResource(com.walhalla.shared.R.string.play_google_pub),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.ok))
+            }
+        },
+        // как в легаси DialogAbout: negative = action_discover_more_app -> Module_U.moreApp
+        dismissButton = {
+            val ctx = LocalContext.current
+            TextButton(onClick = {
+                onDismiss()
+                //com.walhalla.ui.plugins.Module_U.moreApp(ctx)
+                com.walhalla.compose.util.MarketLinks.openDeveloper(ctx)
+            }) {
+                Text(stringResource(com.walhalla.shared.R.string.action_discover_more_app))
             }
         }
     )
@@ -309,7 +327,7 @@ fun ExtractorScreen(
         println("DEBUG: Showing extraction dialog")
         AlertDialog(
             onDismissRequest = { /* Can't dismiss during extraction */ },
-            title = { Text("Extracting APK") },
+            title = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.extractor_extracting_title)) },
             text = {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -317,7 +335,7 @@ fun ExtractorScreen(
                 ) {
                     extractionFileCount?.let {
                         Text(
-                            text = "Extracting ${it.second} file(s)...",
+                            text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.extractor_extracting_files, it.second),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -400,7 +418,7 @@ fun ExtractorScreen(
                             IconButton(onClick = { viewModel.setSearchQuery("") }) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Clear"
+                                    contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_clear)
                                 )
                             }
                         }

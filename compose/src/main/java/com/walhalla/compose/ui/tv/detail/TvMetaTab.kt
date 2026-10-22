@@ -51,7 +51,7 @@ fun TvMetaTab(app: PackageMeta, modifier: Modifier = Modifier) {
         }
         sections.isEmpty() -> Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                "No metadata found",
+                androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.meta_empty),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

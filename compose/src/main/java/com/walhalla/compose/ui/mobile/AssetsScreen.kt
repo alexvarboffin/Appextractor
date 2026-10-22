@@ -250,7 +250,7 @@ fun AssetsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No assets",
+                    text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.assets_empty),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -292,16 +292,16 @@ private fun AssetsToolbar(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "$branchCount folders · $fileCount files shown",
+                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.assets_shown, branchCount, fileCount),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Row {
                 IconButton(onClick = onExpandAll) {
-                    Icon(Icons.Default.UnfoldMore, contentDescription = "Expand all")
+                    Icon(Icons.Default.UnfoldMore, contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.assets_expand_all))
                 }
                 IconButton(onClick = onCollapseAll) {
-                    Icon(Icons.Default.UnfoldLess, contentDescription = "Collapse all")
+                    Icon(Icons.Default.UnfoldLess, contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.assets_collapse_all))
                 }
             }
         }
@@ -375,7 +375,7 @@ private fun AssetTreeRow(
             IconButton(onClick = { showMenu = true }) {
                 Icon(
                     Icons.Default.MoreVert,
-                    contentDescription = "Actions",
+                    contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_actions),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

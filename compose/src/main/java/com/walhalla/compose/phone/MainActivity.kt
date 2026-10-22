@@ -156,7 +156,7 @@ private fun PhoneRoot() {
                         }
                     },
                     icon = { Icon(screen.icon, contentDescription = null) },
-                    label = { Text(screen.label) }
+                    label = { Text(androidx.compose.ui.res.stringResource(screen.label)) }
                 )
             }
         }
@@ -244,12 +244,12 @@ private fun PhoneRoot() {
 
 private sealed class Screen(
     val route: String,
-    val label: String,
+    @androidx.annotation.StringRes val label: Int,
     val icon: ImageVector
 ) {
-    object Extractor : Screen("extractor", "Extractor", Icons.Default.Storage)
-    object Logs : Screen("logs", "Logs", Icons.AutoMirrored.Filled.List)
-    object Settings : Screen("settings", "Settings", Icons.Default.Settings)
-    object Manifest : Screen("manifest", "Manifest", Icons.Default.Description)
-    object AppDetail : Screen("app_detail/{packageName}", "App Detail", Icons.Default.Info)
+    object Extractor : Screen("extractor", com.walhalla.compose.R.string.nav_extractor, Icons.Default.Storage)
+    object Logs : Screen("logs", com.walhalla.compose.R.string.nav_logs, Icons.AutoMirrored.Filled.List)
+    object Settings : Screen("settings", com.walhalla.compose.R.string.nav_settings, Icons.Default.Settings)
+    object Manifest : Screen("manifest", com.walhalla.compose.R.string.nav_manifest, Icons.Default.Description)
+    object AppDetail : Screen("app_detail/{packageName}", com.walhalla.compose.R.string.nav_app_detail, Icons.Default.Info)
 }

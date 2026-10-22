@@ -80,7 +80,7 @@ fun MetaScreen(app: PackageMeta) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "No metadata found",
+                    text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.meta_empty),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

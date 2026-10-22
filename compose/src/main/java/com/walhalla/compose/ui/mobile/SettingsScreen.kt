@@ -33,7 +33,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") }
+                title = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_title)) }
             )
         }
     ) { paddingValues ->
@@ -45,14 +45,14 @@ fun SettingsScreen(
         ) {
             // Storage Settings
             Text(
-                text = "Storage Settings",
+                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_storage),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(16.dp)
             )
 
             // Google Drive
             ListItem(
-                headlineContent = { Text("Google Drive Backup") },
+                headlineContent = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_google_drive_backup)) },
                 trailingContent = {
                     Switch(
                         checked = settings.googleDriveEnabled,
@@ -63,7 +63,7 @@ fun SettingsScreen(
 
             // Dropbox
             ListItem(
-                headlineContent = { Text("Dropbox Backup") },
+                headlineContent = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_dropbox_backup)) },
                 trailingContent = {
                     Switch(
                         checked = settings.dropboxEnabled,
@@ -74,13 +74,13 @@ fun SettingsScreen(
 
             // Telegram Settings
             Text(
-                text = "Telegram Settings",
+                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_telegram),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(16.dp)
             )
 
             ListItem(
-                headlineContent = { Text("Enable Telegram") },
+                headlineContent = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_enable_telegram)) },
                 trailingContent = {
                     Switch(
                         checked = settings.telegramEnabled,
@@ -120,20 +120,20 @@ fun SettingsScreen(
 
             // About Section
             Text(
-                text = "About",
+                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_about),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(16.dp)
             )
 
             ListItem(
                 headlineContent = { Text(settings.appName) },
-                supportingContent = { Text("Version ${settings.appVersion}") },
+                supportingContent = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_version, settings.appVersion)) },
                 modifier = Modifier.clickable { showAbout = true }
             )
 
             // Additional Info
             Text(
-                text = "App Extractor is a tool for extracting APK files from installed applications.",
+                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_about_text),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )

@@ -113,7 +113,7 @@ class LogViewModel(application: Application) : AndroidViewModel(application) {
                     file.exists() && file.delete()
                 }
                 if (deleted) {
-                    _toastMessage.value = "Success!!!"
+                    _toastMessage.value = getApplication<Application>().getString(com.walhalla.compose.R.string.logs_file_deleted)
                     AppLogBus.success("File deleted: ${file.name}")
                     loadLogs()
                 } else {

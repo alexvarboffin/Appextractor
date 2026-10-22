@@ -131,19 +131,19 @@ fun InformationScreen(
         if (appDetails == null) {
             item {
                 ExpandableCard(
-                    title = "Basic Information",
+                    title = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_basic),
                     icon = Icons.Default.Info,
                     initiallyExpanded = true
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        DetailRow("Package Name", app.packageName)
-                        DetailRow("Version", "${app.versionName} (${app.versionCode})")
-                        DetailRow("Size", prettyFileSize(app.fileSize))
-                        DetailRow("Has splits", if (app.hasSplits) "Yes" else "No")
-                        DetailRow("Pinning", if (app.hasPinning) "Yes" else "No")
-                        DetailRow("System App", if (app.isSystemApp) "Yes" else "No")
+                        DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_package_name), app.packageName)
+                        DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.stat_version), "${app.versionName} (${app.versionCode})")
+                        DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.stat_size), prettyFileSize(app.fileSize))
+                        DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_has_splits), if (app.hasSplits) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.value_yes) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.value_no))
+                        DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_pinning), if (app.hasPinning) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.value_yes) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.value_no))
+                        DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_system_app), if (app.isSystemApp) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.value_yes) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.value_no))
                         if (app.sourceDir.isNotEmpty()) {
-                            DetailRow("Source dir", app.sourceDir)
+                            DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_source_dir), app.sourceDir)
                         }
                     }
                 }
@@ -151,7 +151,7 @@ fun InformationScreen(
         } else {
             items(sections, key = { it.title + it.items.size }) { section ->
                 ExpandableCard(
-                    title = section.title.ifBlank { "Details" },
+                    title = section.title.ifBlank { androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_details) },
                     iconRes = section.iconRes.takeIf { it != 0 },
                     icon = if (section.iconRes == 0) Icons.Default.Info else null,
                     initiallyExpanded = section.title.contains("Basic", ignoreCase = true)
@@ -213,7 +213,7 @@ private fun FlagsRow(flags: Int) {
     val names = remember(flags) { ApplicationFlags.activeNames(flags) }
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(
-            text = "Flags (0x${Integer.toHexString(flags)})",
+            text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_flags, Integer.toHexString(flags)),
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -235,7 +235,7 @@ private fun FlagsRow(flags: Int) {
         }
         if (names.isEmpty()) {
             Text(
-                text = "No flags set",
+                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_no_flags),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -347,7 +347,7 @@ private fun PermissionRow(line: PermissionLine, onOpenAppSettings: () -> Unit = 
             )
         }
         Text(
-            text = if (line.isGranted) "granted" else "denied",
+            text = if (line.isGranted) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.status_granted) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.status_denied),
             style = MaterialTheme.typography.labelSmall,
             color = statusColor,
             modifier = Modifier.padding(top = 2.dp)
@@ -376,7 +376,7 @@ private fun ActivityRow(line: ActivityLine, packageName: String) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = if (line.exported) "Exported" else "Not exported",
+                text = if (line.exported) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_exported) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_not_exported),
                 style = MaterialTheme.typography.labelSmall,
                 color = if (line.exported) {
                     MaterialTheme.colorScheme.error
@@ -397,7 +397,7 @@ private fun ActivityRow(line: ActivityLine, packageName: String) {
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Launch",
+                    contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_launch),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -425,7 +425,7 @@ private fun ServiceRow(line: ServiceLine, onLaunchService: (String) -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = if (line.exported) "Exported" else "Not exported",
+                text = if (line.exported) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_exported) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_not_exported),
                 style = MaterialTheme.typography.labelSmall,
                 color = if (line.exported) {
                     MaterialTheme.colorScheme.error
@@ -438,7 +438,7 @@ private fun ServiceRow(line: ServiceLine, onLaunchService: (String) -> Unit) {
             IconButton(onClick = { onLaunchService(line.className) }) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Launch service",
+                    contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_launch_service),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -463,7 +463,7 @@ private fun ComponentRow(label: String, className: String, exported: Boolean) {
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = if (exported) "Exported" else "Not exported",
+            text = if (exported) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_exported) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_not_exported),
             style = MaterialTheme.typography.labelSmall,
             color = if (exported) {
                 MaterialTheme.colorScheme.error
@@ -488,7 +488,7 @@ private fun InfoApkRow(line: InfoApkLine, onViewXml: (String) -> Unit) {
         }
         Box {
             IconButton(onClick = { showMenu = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More")
+                Icon(Icons.Default.MoreVert, contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_more))
             }
             DropdownMenu(
                 expanded = showMenu,
@@ -527,7 +527,7 @@ private fun ProviderRow(line: ProviderLine, packageName: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (line.authority.isNotBlank()) {
-                DetailRow("Authority", line.authority, copyable = true)
+                DetailRow(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_authority), line.authority, copyable = true)
             }
             Text(
                 text = buildString {
@@ -555,7 +555,7 @@ private fun ProviderRow(line: ProviderLine, packageName: String) {
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Query provider",
+                    contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.info_query_provider),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -613,7 +613,7 @@ private fun ExpandableCard(
                 }
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (expanded) "Collapse" else "Expand"
+                    contentDescription = if (expanded) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_collapse) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_expand)
                 )
             }
 

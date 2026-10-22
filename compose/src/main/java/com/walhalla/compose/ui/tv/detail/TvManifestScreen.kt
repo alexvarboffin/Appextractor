@@ -68,7 +68,7 @@ fun TvManifestScreen(
                 .focusRequester(backFocus)
                 .padding(bottom = 12.dp)
         ) {
-            Text(stringResource(ExtR.string.action_app_manifest) + " · Back")
+            Text(stringResource(ExtR.string.action_app_manifest) + " · " + androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_back))
         }
 
         when {

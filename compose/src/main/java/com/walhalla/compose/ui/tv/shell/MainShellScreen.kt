@@ -87,16 +87,16 @@ fun MainShellScreen() {
     }
 
     val drawerItems = listOf(
-        DrawerItem(ShellPanel.Extractor, "Extractor", Icons.Default.Storage) {
+        DrawerItem(ShellPanel.Extractor, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.nav_extractor), Icons.Default.Storage) {
             selectPanel(ShellPanel.Extractor)
         },
-        DrawerItem(ShellPanel.Logs, "Logs", Icons.AutoMirrored.Filled.List) {
+        DrawerItem(ShellPanel.Logs, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.nav_logs), Icons.AutoMirrored.Filled.List) {
             selectPanel(ShellPanel.Logs)
         },
-        DrawerItem(ShellPanel.Settings, "Settings", Icons.Default.Settings) {
+        DrawerItem(ShellPanel.Settings, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.nav_settings), Icons.Default.Settings) {
             selectPanel(ShellPanel.Settings)
         },
-        DrawerItem(null, "About", Icons.Default.Info) {
+        DrawerItem(null, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_about), Icons.Default.Info) {
             showAbout = true
         }
     )
@@ -111,7 +111,7 @@ fun MainShellScreen() {
             ) {
                 Text("ApkChief", style = MaterialTheme.typography.headlineSmall)
                 Text(
-                    "TV: OK → detail · long-press → actions menu",
+                    androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.tv_about_hint),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Button(onClick = { showAbout = false }) {

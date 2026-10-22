@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.view.ViewGroup
+import android.view.MotionEvent
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -55,6 +56,7 @@ fun ManifestScreen(
     val error by viewModel.error.collectAsState()
 
     var showFormatted by remember { mutableStateOf(true) }
+    val manifestCopiedMsg = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_copied)
 
     // Получаем текущий активный манифест
     val currentManifest = manifestStates.getOrNull(pagerState.currentPage)
@@ -69,7 +71,7 @@ fun ManifestScreen(
             }
             clipboardManager.setText(AnnotatedString(textToCopy))
             scope.launch {
-                snackbarHostState.showSnackbar("Manifest content copied")
+                snackbarHostState.showSnackbar(manifestCopiedMsg)
             }
         }
     }
@@ -84,7 +86,7 @@ fun ManifestScreen(
             val sendIntent = Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_TEXT, textToShare)
-                putExtra(Intent.EXTRA_TITLE, "Manifest for ${app.label} (${state.name})")
+                putExtra(Intent.EXTRA_TITLE, context.getString(com.walhalla.compose.R.string.manifest_share_title, app.label, state.name))
                 type = "text/plain"
             }
             val shareIntent = Intent.createChooser(sendIntent, null)
@@ -122,10 +124,10 @@ fun ManifestScreen(
         topBar = {
             Column {
             TopAppBar(
-                    title = { Text("Manifest") },
+                    title = { Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_back))
                         }
                     },
                     actions = {
@@ -133,7 +135,7 @@ fun ManifestScreen(
                         IconButton(onClick = { showFormatted = !showFormatted }) {
                             Icon(
                                 if (showFormatted) Icons.Default.Code else Icons.Default.Article,
-                                contentDescription = if (showFormatted) "Show plain text" else "Show formatted"
+                                contentDescription = if (showFormatted) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_show_plain) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_show_formatted)
                             )
                         }
 
@@ -142,7 +144,7 @@ fun ManifestScreen(
                             onClick = { copyCurrentManifest() },
                             enabled = currentManifest != null
                         ) {
-                            Icon(Icons.Default.ContentCopy, "Copy manifest")
+                            Icon(Icons.Default.ContentCopy, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_copy))
                         }
 
                         // Поделиться текущим манифестом
@@ -150,7 +152,7 @@ fun ManifestScreen(
                             onClick = { shareCurrentManifest() },
                             enabled = currentManifest != null
                         ) {
-                            Icon(Icons.Default.Share, "Share manifest")
+                            Icon(Icons.Default.Share, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_share))
                         }
 
                         // Открыть настройки приложения
@@ -161,7 +163,7 @@ fun ManifestScreen(
                             }
                             context.startActivity(intent)
                         }) {
-                            Icon(Icons.Default.Settings, "App settings")
+                            Icon(Icons.Default.Settings, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_app_settings))
                         }
                     }
                 )
@@ -202,7 +204,7 @@ fun ManifestScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = app.label ?: "Unknown",
+                                text = app.label ?: androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_unknown),
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Text(
@@ -240,7 +242,7 @@ fun ManifestScreen(
                             ) {
                                 CircularProgressIndicator()
                                 Spacer(modifier = Modifier.height(16.dp))
-                                Text("Loading manifest...")
+                                Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_loading))
                             }
                         }
                     }
@@ -270,7 +272,7 @@ fun ManifestScreen(
                             // Добавляем заголовок с информацией о текущем файле
                             val currentState = manifestStates[pagerState.currentPage]
                             Text(
-                                text = "Manifest from: ${currentState.name}",
+                                text = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_from, currentState.name),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(16.dp)
                             )
@@ -342,6 +344,42 @@ fun ManifestScreen(
                                                     ViewGroup.LayoutParams.MATCH_PARENT
                                                 )
                                                 webView = this
+                                                // Pinch-zoom / horizontal pan inside WebView: forbid the parent
+                                                // HorizontalPager from intercepting while WebView can still scroll
+                                                // in the drag direction or while multi-touch is active.
+                                                // At the horizontal edge the pager swipes tabs as before.
+                                                var lastX = 0f
+                                                @Suppress("ClickableViewAccessibility")
+                                                setOnTouchListener { v, event ->
+                                                    when (event.actionMasked) {
+                                                        MotionEvent.ACTION_DOWN -> {
+                                                            lastX = event.x
+                                                            v.parent?.requestDisallowInterceptTouchEvent(
+                                                                v.canScrollHorizontally(1) || v.canScrollHorizontally(-1)
+                                                            )
+                                                        }
+                                                        MotionEvent.ACTION_POINTER_DOWN ->
+                                                            v.parent?.requestDisallowInterceptTouchEvent(true)
+                                                        MotionEvent.ACTION_MOVE -> {
+                                                            if (event.pointerCount > 1) {
+                                                                v.parent?.requestDisallowInterceptTouchEvent(true)
+                                                            } else {
+                                                                val dx = event.x - lastX
+                                                                lastX = event.x
+                                                                if (dx != 0f) {
+                                                                    // finger right (dx>0) => content scrolls left (-1)
+                                                                    val dir = if (dx > 0) -1 else 1
+                                                                    v.parent?.requestDisallowInterceptTouchEvent(
+                                                                        v.canScrollHorizontally(dir)
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                                                            v.parent?.requestDisallowInterceptTouchEvent(false)
+                                                    }
+                                                    false // let WebView handle zoom/scroll itself
+                                                }
                                             }
                                         },
                                         update = { webView ->
@@ -403,7 +441,7 @@ private fun ManifestContent(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Icon(Icons.Default.ContentCopy, "Copy manifest")
+            Icon(Icons.Default.ContentCopy, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.manifest_copy))
         }
     }
 } 

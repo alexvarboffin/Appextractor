@@ -46,30 +46,30 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            "Settings",
+            androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_title),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            "Version ${settings.appVersion}",
+            androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_version, settings.appVersion),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         ToggleRow(
-            title = "Google Drive Backup",
+            title = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_google_drive_backup),
             enabled = settings.googleDriveEnabled,
             onClick = { viewModel.updateGoogleDriveEnabled(!settings.googleDriveEnabled) },
             modifier = leftToDrawer
         )
         ToggleRow(
-            title = "Dropbox Backup",
+            title = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_dropbox_backup),
             enabled = settings.dropboxEnabled,
             onClick = { viewModel.updateDropboxEnabled(!settings.dropboxEnabled) },
             modifier = leftToDrawer
         )
         ToggleRow(
-            title = "Telegram Backup",
+            title = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_telegram_backup),
             enabled = settings.telegramEnabled,
             onClick = { viewModel.updateTelegramEnabled(!settings.telegramEnabled) },
             modifier = leftToDrawer
@@ -126,7 +126,7 @@ private fun ToggleRow(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
             Text(
-                text = if (enabled) "On" else "Off",
+                text = if (enabled) androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_on) else androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.settings_off),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google Play links (google flavor). %s = packageName -->
+    <string name="market_name" translatable="false">Google Play</string>
+    <string name="market_app_url" translatable="false">market://details?id=%s</string>
+    <string name="market_app_web_url" translatable="false">https://play.google.com/store/apps/details?id=%s</string>
+    <!-- as legacy Module_U.moreApp -->
+    <string name="market_dev_url" translatable="false">market://search?q=pub:Walhalla Dynamics</string>
+    <string name="market_dev_web_url" translatable="false">https://play.google.com/store/search?q=pub:Walhalla%20Dynamics</string>
+</resources>

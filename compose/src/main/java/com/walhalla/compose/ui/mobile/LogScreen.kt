@@ -1,6 +1,14 @@
 package com.walhalla.compose.ui.mobile
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.outlined.Inbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
+import com.walhalla.compose.model.LogType
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -104,6 +112,28 @@ fun LogScreen(
         ) {
             if (isLoading && logs.isEmpty()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (logs.size == 1 && (logs[0] as? LogModel.MessageLog)?.type == LogType.Empty) {
+                // Phone: centered empty state instead of the top "empty" LogItem card
+                // (old: LogItem(placeholder) rendered as the first row of LazyColumn)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Outlined.Inbox,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = (logs[0] as LogModel.MessageLog).message,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(

@@ -93,12 +93,12 @@ fun StringScreen(
                             IconButton(onClick = {
                                 clipboardManager.setText(AnnotatedString(resource.name))
                             }) {
-                                Icon(Icons.Default.ContentCopy, "Copy name")
+                                Icon(Icons.Default.ContentCopy, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.strings_copy_name))
                             }
                             IconButton(onClick = {
                                 clipboardManager.setText(AnnotatedString(resource.text))
                             }) {
-                                Icon(Icons.Default.ContentCopy, "Copy value")
+                                Icon(Icons.Default.ContentCopy, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.strings_copy_value))
                             }
                             IconButton(onClick = {
                                 val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
@@ -112,7 +112,7 @@ fun StringScreen(
                                     }
                                 )
                             }) {
-                                Icon(Icons.Default.Share, "Share")
+                                Icon(Icons.Default.Share, androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.common_share))
                             }
                             if (resourceType == ResourcesToolForPlugin.XML) {
                                 IconButton(onClick = { onViewXml(resource.name) }) {
@@ -120,7 +120,7 @@ fun StringScreen(
                                         painter = painterResource(
                                             id = com.walhalla.extractor.R.drawable.ic_baseline_text_snippet_24
                                         ),
-                                        contentDescription = "View XML"
+                                        contentDescription = androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.strings_view_xml)
                                     )
                                 }
                             }

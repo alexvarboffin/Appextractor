@@ -106,7 +106,7 @@ fun AppDetailScreen(
                 .padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("App not found: $packageName", color = MaterialTheme.colorScheme.onSurface)
+            Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.detail_app_not_found, packageName), color = MaterialTheme.colorScheme.onSurface)
             Button(onClick = goBack, modifier = Modifier.focusRequester(firstAction)) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
@@ -194,7 +194,7 @@ fun AppDetailScreen(
                 onClick = { detailViewModel.openUsageAccessSettings() },
                 modifier = Modifier.padding(bottom = 8.dp)
             ) {
-                Text("Usage access · SETTINGS")
+                Text(androidx.compose.ui.res.stringResource(com.walhalla.compose.R.string.tv_usage_access))
             }
         }
 
