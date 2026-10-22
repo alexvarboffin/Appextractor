@@ -111,7 +111,8 @@ private fun PhoneRoot() {
         currentRoute == Screen.Settings.route
     BackHandler(enabled = atRoot) {
         if (exitArmed) {
-            (context as? AppCompatActivity)?.finish()
+            // MainActivity is a ComponentActivity, not AppCompatActivity: the old cast was always null
+            (context as? ComponentActivity)?.finish()
         } else {
             exitArmed = true
             Toast.makeText(
@@ -121,7 +122,7 @@ private fun PhoneRoot() {
                 Toast.LENGTH_LONG
             ).show()
             scope.launch {
-                delay(1100)
+                delay(2000)
                 exitArmed = false
             }
         }

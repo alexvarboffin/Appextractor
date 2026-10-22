@@ -31,6 +31,7 @@ import com.walhalla.extractor.R
 import com.walhalla.ui.DLog.d
 import com.walhalla.ui.DLog.handleException
 //import org.qiyi.pluginlibrary.utils.ManifestParser
+import com.walhalla.appextractor.sdk.manifest.ManifestParser
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
 import java.security.cert.CertificateFactory
@@ -939,6 +940,7 @@ class F0Presenter @SuppressLint("PackageManagerGetSignatures") constructor(
 
         val sourceDir = applicationInfo.sourceDir
         //val parser = ManifestParser(myActivityContext, sourceDir)
+        val parser = ManifestParser(myActivityContext, sourceDir)
         val activities = parser.activities
 
         for (activity in activities) {
