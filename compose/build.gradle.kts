@@ -55,6 +55,18 @@ android {
             versionNameSuffix = ".release"
         }
     }
+
+    // Store flavors: google = unchanged Play build; rustore = same app/signing,
+    // minus permissions RuStore rejects (see src/rustore/AndroidManifest.xml).
+    flavorDimensions += "store"
+    productFlavors {
+        create("google") {
+            dimension = "store"
+        }
+        create("rustore") {
+            dimension = "store"
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

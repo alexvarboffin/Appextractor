@@ -79,7 +79,6 @@ fun LogScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.logs_title)) },
-                windowInsets = WindowInsets(0, 0, 0, 0),
                 actions = {
                     IconButton(onClick = { viewModel.refresh() }) {
                         Icon(

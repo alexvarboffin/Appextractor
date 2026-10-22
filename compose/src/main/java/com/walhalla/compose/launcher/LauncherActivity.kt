@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import com.walhalla.shared.BuildConfig
 
 import com.walhalla.compose.phone.MainActivity as PhoneMainActivity
 import com.walhalla.compose.tv.MainActivity as TvMainActivity
@@ -16,13 +17,19 @@ class LauncherActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        println(BuildConfig.BUILD_TYPE + " @@ "+ android.os.Build.MODEL)
+
+
         val isTv =
             (resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK) ==
-                Configuration.UI_MODE_TYPE_TELEVISION
-                    //|| (BuildConfig.DEBUG && FORCE_TV_IN_DEBUG)
+                    Configuration.UI_MODE_TYPE_TELEVISION
+                    || (/*BuildConfig.DEBUG && FORCE_TV_IN_DEBUG*/
+                    android.os.Build.MODEL.equals("SM-X810N"))
         val target = if (isTv) TvMainActivity::class.java else PhoneMainActivity::class.java
         startActivity(Intent(this, target))
         finish()
+
     }
 
     private companion object {

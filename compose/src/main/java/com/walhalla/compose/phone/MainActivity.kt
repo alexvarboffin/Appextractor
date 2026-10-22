@@ -2,11 +2,13 @@ package com.walhalla.compose.phone
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -50,19 +52,20 @@ import com.walhalla.compose.ui.mobile.LogScreen
 import com.walhalla.compose.ui.mobile.ManifestScreen
 import com.walhalla.compose.ui.mobile.SettingsScreen
 import com.walhalla.compose.ui.theme.AppextractorTheme
-import com.walhalla.ui.observer.RateAppModule
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 /** Phone / tablet entry. Screens live in [com.walhalla.compose.ui.mobile]. */
-class MainActivity : AppCompatActivity() {
-    private var rateAppModule: RateAppModule? = null
+class MainActivity : ComponentActivity() {
+
+    //private var rateAppModule: RateAppModule? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rateAppModule = RateAppModule(this)
-        lifecycle.addObserver(rateAppModule!!)
+        //rateAppModule = RateAppModule(context)
+        //lifecycle.addObserver(rateAppModule!!)
         val testDevices = listOf(
             AdRequest.DEVICE_ID_EMULATOR,
             "B9F431FA79D446517D20E015CC3D013E"
@@ -83,10 +86,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        rateAppModule?.appReloadedHandler()
-        super.onSaveInstanceState(outState)
-    }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        rateAppModule?.appReloadedHandler()
+//        super.onSaveInstanceState(outState)
+//    }
 }
 
 @Composable
@@ -108,7 +111,8 @@ private fun PhoneRoot() {
         currentRoute == Screen.Settings.route
     BackHandler(enabled = atRoot) {
         if (exitArmed) {
-            (context as? AppCompatActivity)?.finish()
+            // MainActivity is a ComponentActivity, not AppCompatActivity: the old cast was always null
+            (context as? ComponentActivity)?.finish()
         } else {
             exitArmed = true
             Toast.makeText(
@@ -118,7 +122,7 @@ private fun PhoneRoot() {
                 Toast.LENGTH_LONG
             ).show()
             scope.launch {
-                delay(1100)
+                delay(2000)
                 exitArmed = false
             }
         }
@@ -133,7 +137,7 @@ private fun PhoneRoot() {
         NavigationSuiteType.None
     }
 
-    Column(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize().navigationBarsPadding()) {
     NavigationSuiteScaffold(
         modifier = Modifier.weight(1f),
         layoutType = layoutType,
